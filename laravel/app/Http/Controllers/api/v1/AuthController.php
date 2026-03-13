@@ -16,7 +16,7 @@ class AuthController extends Controller
     public function register(RegisterRequest $request){
         $validatedData = $request->validated();
 
-        $validatedData['password'] = Hash::make($validatedData['password']);
+        // $validatedData['password'] = Hash::make($validatedData['password']);
 
         $user = $this->userService->register($validatedData);
 

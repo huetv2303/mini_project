@@ -26,3 +26,4 @@ class CategoryFactory extends Factory
             'is_featured' => fake()->boolean(20) ? 1 : 0, // 20% chance of being featured
         ];
 }
+}

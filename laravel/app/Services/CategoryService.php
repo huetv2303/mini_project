@@ -1,11 +1,11 @@
 <?php
 namespace App\Services;
 
-use App\Repositories\CategoryRepository;
+use App\Interfaces\CategoryRepositoryInterface;
 
 class CategoryService {
     protected $cateRepo;
-    public function __construct(CategoryRepository $cateRepo){
+    public function __construct(CategoryRepositoryInterface $cateRepo){
         $this->cateRepo = $cateRepo;
     }
     public function findBySlug($slug){

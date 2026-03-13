@@ -4,10 +4,12 @@ namespace App\Http\Controllers\api\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Category\StoreCategoryRequest;
+use App\Http\Requests\Category\UpdateCategoryRequest;
 use App\Services\CategoryService;
 use App\Services\UploadService;
 use Illuminate\Http\Request;
-
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 class CategoryController extends Controller
 {
     protected $cateService;
@@ -18,7 +20,7 @@ class CategoryController extends Controller
     }
     public function index(Request $request){
         $data = $this->cateService->getAll($request);
-        if ($data instanceof \Illuminate\Database\Eloquent\Builder || $data instanceof \Illuminate\Database\Eloquent\Relations\Relation || $data instanceof \Illuminate\Database\Query\Builder) {
+        if ($data instanceof Builder || $data instanceof Relation || $data instanceof Builder) {
             $data = $data->paginate(10);
         }
         return response()->json([
@@ -50,20 +52,21 @@ class CategoryController extends Controller
             'status' => 'success',
             'message' => 'Category created successfully',
             'data' => $data
-        ], 200);
+        ], 201);
     }
 
-    public function update(Request $request, string $slug){
+    public function update(UpdateCategoryRequest $request, string $slug){
         $category = $this->cateService->findBySlug($slug);
         if (!$category) {
             return response()->json(['status' => 'error', 'message' => 'Category not found'], 404);
         }
 
-        $data = $request->all();
+        $data = $request->validated();
         if ($request->hasFile('image')) {
             if ($category->image) {
                 $this->uploadService->deleteFile($category->image);
             }
+
             $image = $this->uploadService->uploadFile($request->file('image'), 'categories');
             $data['image'] = $image['path'];
         }
