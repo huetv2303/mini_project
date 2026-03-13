@@ -7,7 +7,8 @@ use App\Http\Requests\StoreCategoryRequest;
 use App\Services\CategoryService;
 use App\Services\UploadService;
 use Illuminate\Http\Request;
-
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 class CategoryController extends Controller
 {
     protected $cateService;
@@ -18,7 +19,7 @@ class CategoryController extends Controller
     }
     public function index(Request $request){
         $data = $this->cateService->getAll($request);
-        if ($data instanceof \Illuminate\Database\Eloquent\Builder || $data instanceof \Illuminate\Database\Eloquent\Relations\Relation || $data instanceof \Illuminate\Database\Query\Builder) {
+        if ($data instanceof Builder || $data instanceof Relation || $data instanceof Builder) {
             $data = $data->paginate(10);
         }
         return response()->json([
