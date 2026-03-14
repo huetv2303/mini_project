@@ -1,8 +1,8 @@
 function App() {
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-200">
-      <h1 className="text-4xl font-bold text-blue-600">
-        React + Tailwind v3 🚀
+    <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <h1 className="text-5xl font-extrabold text-blue-600 tracking-tight drop-shadow-md">
+        MINI PROJECT FOR INTERN 
       </h1>
     </div>
   );

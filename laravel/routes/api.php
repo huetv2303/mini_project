@@ -7,6 +7,7 @@ use App\Http\Controllers\api\v1\AuthController;
 use App\Http\Controllers\api\v1\CategoryController;
 
 use App\Http\Controllers\api\v1\ProductController;
+use App\Http\Controllers\api\v1\OrderController;
 
 Route::prefix('v1/')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
@@ -33,6 +34,15 @@ Route::prefix('v1/')->group(function () {
         Route::post('/', [ProductController::class, 'store']);
         Route::put('/{slug}', [ProductController::class, 'update']);
         Route::delete('/{slug}', [ProductController::class, 'destroy']);
+    });
+
+    // Order routes - yêu cầu đăng nhập
+    Route::middleware('auth:api')->prefix('orders')->group(function () {
+        Route::get('/', [OrderController::class, 'index']);
+        Route::post('/', [OrderController::class, 'store']);
+        Route::get('/{id}', [OrderController::class, 'show']);
+        Route::put('/{id}', [OrderController::class, 'update']);
+        Route::patch('/{id}/cancel', [OrderController::class, 'cancel']);
     });
 });
 

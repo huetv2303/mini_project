@@ -3,11 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Str;
+use Illuminate\Support\Str;
 
 class Supplier extends Model
 {
-   protected static function booted()
+    protected static function booted()
     {
         static::creating(function ($supplier) {
             $supplier->slug = Str::slug($supplier->name);
@@ -31,9 +31,8 @@ class Supplier extends Model
         'tax_code'
     ];
 
-    public function products(){
+    public function products()
+    {
         return $this->hasMany(Product::class, 'supplier_id');
     }
-
-    
 }

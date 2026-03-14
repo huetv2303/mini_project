@@ -10,6 +10,7 @@ use App\Interfaces\Product\ProductImageRepositoryInterface;
 use App\Interfaces\InventoryRepositoryInterface;
 use App\Interfaces\SupplierRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
+use App\Interfaces\Order\OrderRepositoryInterface;
 use App\Repositories\CategoryRepository;
 use App\Repositories\Product\ProductRepository;
 use App\Repositories\Product\ProductVariantRepository;
@@ -18,6 +19,7 @@ use App\Repositories\Product\ProductImageRepository;
 use App\Repositories\InventoryRepository;
 use App\Repositories\SupplierRepository;
 use App\Repositories\UserRepository;
+use App\Repositories\Order\OrderRepository;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -35,6 +37,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ProductAttributeRepositoryInterface::class, ProductAttributeRepository::class);
         $this->app->bind(ProductImageRepositoryInterface::class, ProductImageRepository::class);
         $this->app->bind(InventoryRepositoryInterface::class, InventoryRepository::class);
+        $this->app->bind(OrderRepositoryInterface::class, OrderRepository::class);
     }
 
     /**
