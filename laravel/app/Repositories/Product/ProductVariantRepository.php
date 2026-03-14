@@ -26,9 +26,9 @@ class ProductVariantRepository implements ProductVariantRepositoryInterface
         return ProductVariant::create($data);
     }
 
-    public function updateProVariant(array $data)
+    public function updateProVariant(array $data, $id)
     {
-        $variant = ProductVariant::where('sku', $data['sku'])->first();
+        $variant = ProductVariant::find($id);
         if ($variant) {
             $variant->update($data);
             return $variant;

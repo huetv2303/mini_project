@@ -11,7 +11,7 @@ use App\Http\Controllers\api\v1\ProductController;
 Route::prefix('v1/')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
-    
+
     Route::prefix('categories')->group(function () {
         Route::get('/', [CategoryController::class, 'index']);
         Route::get('/{slug}', [CategoryController::class, 'show']);
@@ -31,6 +31,8 @@ Route::prefix('v1/')->group(function () {
     Route::prefix('products')->group(function () {
         Route::get('/', [ProductController::class, 'index']);
         Route::post('/', [ProductController::class, 'store']);
+        Route::put('/{slug}', [ProductController::class, 'update']);
+        Route::delete('/{slug}', [ProductController::class, 'destroy']);
     });
 });
 

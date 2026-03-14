@@ -26,9 +26,9 @@ class ProductImageRepository implements ProductImageRepositoryInterface
         return ProductImage::create($data);
     }
 
-    public function updateProImage(array $data)
+    public function updateProImage(array $data, $id)
     {
-        $image = ProductImage::find($data['id']);
+        $image = ProductImage::find($id);
         if ($image) {
             $image->update($data);
             return $image;

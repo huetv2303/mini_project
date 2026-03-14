@@ -26,9 +26,9 @@ class ProductAttributeRepository implements ProductAttributeRepositoryInterface
         return ProductAttribute::create($data);
     }
 
-    public function updateProAttribute(array $data)
+    public function updateProAttribute(array $data, $id)
     {
-        $attr = ProductAttribute::find($data['id']);
+        $attr = ProductAttribute::find($id);
         if ($attr) {
             $attr->update($data);
             return $attr;

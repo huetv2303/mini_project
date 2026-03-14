@@ -24,12 +24,12 @@ class InventoryRepository implements InventoryRepositoryInterface
     {
         return Inventory::create($data);
     }
-    public function updateInventory(array $data)
+    public function updateInventory(array $data, $id)
     {
-        $product = Inventory::where('slug', $data['slug'])->first();
-        if ($product) {
-            $product->update($data);
-            return $product;
+        $inventory = Inventory::find($id);
+        if ($inventory) {
+            $inventory->update($data);
+            return $inventory;
         }
         return null;
     }

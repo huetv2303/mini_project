@@ -9,12 +9,12 @@ class ProductRepository implements ProductRepositoryInterface
 {
     public function getAll($request = null)
     {
-        $query = Product::query();
+        $query = Product::with(['category', 'supplier', 'images', 'attributes', 'variants.attributes', 'variants.inventories'])->paginate(10);
         if ($request == null) {
-            return  $query->paginate(10);
+            return  $query;
         }
 
-        return $query->when($request->search, fn($q, $v) => $q->where('name', 'like', '%' . $v . '%'))->paginate(10);
+        return $query->when($request->search, fn($q, $v) => $q->where('name', 'like', '%' . $v . '%'));
     }
     public function findBySlug($slug)
     {
@@ -24,9 +24,9 @@ class ProductRepository implements ProductRepositoryInterface
     {
         return Product::create($data);
     }
-    public function updateProduct(array $data)
+    public function updateProduct(array $data, $slug)
     {
-        $product = Product::where('slug', $data['slug'])->first();
+        $product = Product::where('slug', $slug)->first();
         if ($product) {
             $product->update($data);
             return $product;
