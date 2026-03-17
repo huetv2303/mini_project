@@ -19,19 +19,17 @@ class SupplierController extends Controller
         $this->supplierService = $supplierService;
         $this->uploadService = $uploadService;
     }
-    public function index(Request $request){
+    public function index(Request $request)
+    {
         $suppliers = $this->supplierService->getAll($request);
-         return response()->json([
-            'data' => SupplierResource::collection($suppliers),
-            'meta'  => [
-                'current_page' => $suppliers->currentPage(),
-                'last_page'    => $suppliers->lastPage(),
-                'per_page'     => $suppliers->perPage(),
-                'total'        => $suppliers->total(),
-            ]
+        return response()->json([
+            'status' => 'success',
+            'data'   => SupplierResource::collection($suppliers)->response()->getData(true)
         ]);
     }
-    public function store(StoreSupplierRequest $request){
+
+    public function store(StoreSupplierRequest $request)
+    {
         $validatedData = $request->validated();
         if ($request->hasFile('image')) {
             $image = $this->uploadService->uploadFile($request->file('image'), 'suppliers');
@@ -39,24 +37,26 @@ class SupplierController extends Controller
         }
         $supplier = $this->supplierService->createSupplier($validatedData);
         return response()->json([
-            'status' => true,
+            'status'  => 'success',
             'message' => 'Supplier created successfully',
-            'data' => $supplier
-        ]);
+            'data'    => new SupplierResource($supplier)
+        ], 201);
     }
 
-    public function show($slug){
+    public function show($slug)
+    {
         $supplier = $this->supplierService->getBySlug($slug);
         if (!$supplier) {
             return response()->json(['status' => 'error', 'message' => 'Supplier not found'], 404);
         }
         return response()->json([
             'status' => 'success',
-            'data' => new SupplierResource($supplier)
+            'data'   => new SupplierResource($supplier)
         ]);
     }
 
-    public function update(Request $request, $slug){
+    public function update(Request $request, $slug)
+    {
         $supplier = $this->supplierService->getBySlug($slug);
         if (!$supplier) {
             return response()->json(['status' => 'error', 'message' => 'Supplier not found'], 404);
@@ -71,13 +71,14 @@ class SupplierController extends Controller
         }
         $updatedSupplier = $this->supplierService->updateSupplier($slug, $validatedData);
         return response()->json([
-            'status' => true,
+            'status'  => 'success',
             'message' => 'Supplier updated successfully',
-            'data' => $updatedSupplier
+            'data'    => new SupplierResource($updatedSupplier)
         ]);
     }
 
-    public function destroy($slug){
+    public function destroy($slug)
+    {
         $supplier = $this->supplierService->getBySlug($slug);
         if (!$supplier) {
             return response()->json(['status' => 'error', 'message' => 'Supplier not found'], 404);
@@ -86,9 +87,6 @@ class SupplierController extends Controller
             $this->uploadService->deleteFile($supplier->image);
         }
         $this->supplierService->deleteSupplier($slug);
-        return response()->json([
-            'status' => true,
-            'message' => 'Supplier deleted successfully'
-        ]);
+        return response()->json(null, 204);
     }
 }

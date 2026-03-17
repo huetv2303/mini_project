@@ -92,9 +92,9 @@ Route::prefix('v1')->group(function () {
             Route::get('/', [InventoryController::class, 'index'])->middleware('permission:products.view');
             Route::get('/{variantId}/history', [InventoryController::class, 'history'])->middleware('permission:products.view');
         });
+
+        Route::get('/user', function (Request $request) {
+            return new \App\Http\Resources\UserResource($request->user());
+        });
     });
 });
-
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:api');

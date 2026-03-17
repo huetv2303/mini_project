@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Interfaces\UserRepositoryInterface;
 use Illuminate\Http\Request;
 
+use App\Http\Resources\UserResource;
+
 class UserController extends Controller
 {
     protected $userRepo;
@@ -23,7 +25,7 @@ class UserController extends Controller
         $users = $this->userRepo->getAllUsers();
         return response()->json([
             'status' => 'success',
-            'data'   => $users
+            'data'   => UserResource::collection($users)
         ]);
     }
 
@@ -41,7 +43,7 @@ class UserController extends Controller
             return response()->json([
                 'status'  => 'success',
                 'message' => 'Cập nhật vai trò thành công cho người dùng ' . $user->name,
-                'data'    => $user
+                'data'    => new UserResource($user)
             ]);
         } catch (\Exception $e) {
             return response()->json([

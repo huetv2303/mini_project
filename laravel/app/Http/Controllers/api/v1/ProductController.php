@@ -75,10 +75,7 @@ class ProductController extends Controller
         try {
             $this->productService->destroy($slug);
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Product deleted successfully',
-            ], 200);
+            return response()->json(null, 204);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',

@@ -7,6 +7,8 @@ use App\Models\Role;
 use App\Models\Permission;
 use Illuminate\Http\Request;
 
+use App\Http\Resources\RoleResource;
+
 class RoleController extends Controller
 {
     /**
@@ -17,7 +19,7 @@ class RoleController extends Controller
         $roles = Role::with('permissions')->get();
         return response()->json([
             'status' => 'success',
-            'data'   => $roles
+            'data'   => RoleResource::collection($roles)
         ]);
     }
 
@@ -29,7 +31,7 @@ class RoleController extends Controller
         $role = Role::with('permissions')->findOrFail($id);
         return response()->json([
             'status' => 'success',
-            'data'   => $role
+            'data'   => new RoleResource($role)
         ]);
     }
 
@@ -51,7 +53,7 @@ class RoleController extends Controller
         return response()->json([
             'status'  => 'success',
             'message' => 'Cập nhật quyền cho vai trò ' . $role->name . ' thành công.',
-            'data'    => $role->load('permissions')
+            'data'    => new RoleResource($role->load('permissions'))
         ]);
     }
 
@@ -71,7 +73,7 @@ class RoleController extends Controller
         return response()->json([
             'status'  => 'success',
             'message' => 'Tạo vai trò thành công.',
-            'data'    => $role
+            'data'    => new RoleResource($role)
         ], 201);
     }
 }

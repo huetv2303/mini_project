@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Permission;
 use Illuminate\Http\Request;
 
+use App\Http\Resources\PermissionResource;
+
 class PermissionController extends Controller
 {
     /**
@@ -13,11 +15,12 @@ class PermissionController extends Controller
      */
     public function index()
     {
-        $permissions = Permission::all()->groupBy('group');
-        
+        $permissions = Permission::all();
+        $grouped = PermissionResource::collection($permissions)->groupBy('group');
+
         return response()->json([
             'status' => 'success',
-            'data'   => $permissions
+            'data'   => $grouped
         ]);
     }
 }

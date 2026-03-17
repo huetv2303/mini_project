@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Services\StockReceiptService;
 use Illuminate\Http\Request;
 
+use App\Http\Resources\StockReceiptResource;
+use App\Http\Requests\StoreStockReceiptRequest;
+
 class StockReceiptController extends Controller
 {
     protected $receiptService;
@@ -23,7 +26,7 @@ class StockReceiptController extends Controller
         $receipts = $this->receiptService->getAll($request);
         return response()->json([
             'status' => 'success',
-            'data'   => $receipts,
+            'data'   => StockReceiptResource::collection($receipts),
         ]);
     }
 
@@ -36,7 +39,7 @@ class StockReceiptController extends Controller
             $receipt = $this->receiptService->findById($id);
             return response()->json([
                 'status' => 'success',
-                'data'   => $receipt,
+                'data'   => new StockReceiptResource($receipt),
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -49,25 +52,14 @@ class StockReceiptController extends Controller
     /**
      * Tạo phiếu nhập kho mới (status: pending)
      */
-    public function store(Request $request)
+    public function store(StoreStockReceiptRequest $request)
     {
-        // TODO: Tách thành StoreStockReceiptRequest
-        $data = $request->validate([
-            'supplier_id'           => 'required|exists:suppliers,id',
-            'note'                  => 'nullable|string',
-            'received_at'           => 'nullable|date',
-            'items'                 => 'required|array|min:1',
-            'items.*.variant_id'    => 'required|exists:product_variants,id',
-            'items.*.quantity'      => 'required|integer|min:1',
-            'items.*.unit_price'    => 'required|numeric|min:0',
-        ]);
-
         try {
-            $receipt = $this->receiptService->createReceipt($data, auth()->id());
+            $receipt = $this->receiptService->createReceipt($request->validated(), auth()->id());
             return response()->json([
                 'status'  => 'success',
                 'message' => 'Tạo phiếu nhập kho thành công.',
-                'data'    => $receipt,
+                'data'    => new StockReceiptResource($receipt),
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
@@ -87,7 +79,7 @@ class StockReceiptController extends Controller
             return response()->json([
                 'status'  => 'success',
                 'message' => 'Xác nhận nhập kho thành công. Tồn kho đã được cập nhật.',
-                'data'    => $receipt,
+                'data'    => new StockReceiptResource($receipt),
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -104,11 +96,7 @@ class StockReceiptController extends Controller
     {
         try {
             $receipt = $this->receiptService->cancelReceipt($id);
-            return response()->json([
-                'status'  => 'success',
-                'message' => 'Phiếu nhập kho đã được huỷ.',
-                'data'    => $receipt,
-            ]);
+            return response()->json(null, 204);
         } catch (\Exception $e) {
             return response()->json([
                 'status'  => 'error',
