@@ -23,7 +23,29 @@ class User extends Authenticatable implements JWTSubject
         'name',
         'email',
         'password',
+        'role_id',
     ];
+
+    /**
+     * Relationship với Role
+     */
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    /**
+     * Kiểm tra User có Permission cụ thể không
+     */
+    public function hasPermission(string $permissionCode): bool
+    {
+        if (!$this->role) {
+            return false;
+        }
+
+        // Kiểm tra permissionCode có tồn tại trong danh sách permissions của Role không
+        return $this->role->permissions()->where('code', $permissionCode)->exists();
+    }
 
     /**
      * The attributes that should be hidden for serialization.

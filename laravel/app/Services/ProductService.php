@@ -45,7 +45,7 @@ class ProductService
 
             //  Upload Feature Image
             if ($request->hasFile('feature_image')) {
-                $img =  $this->uploadImageService->uploadFile($request->file('feature_image'), 'products');
+                $img =  $this->uploadImageService->uploadFile($request->file('feature_image'), 'products', 800, 800);
                 $product->update(['feature_image' => $img['path']]);
             }
 
@@ -53,7 +53,7 @@ class ProductService
             if (isset($data['images']) && is_array($data['images'])) {
                 foreach ($data['images'] as $index => $imgData) {
                     if ($request->hasFile("images.$index.file")) {
-                        $uploadedImg = $this->uploadImageService->uploadFile($request->file("images.$index.file"), 'products/gallery');
+                        $uploadedImg = $this->uploadImageService->uploadFile($request->file("images.$index.file"), 'products/gallery', 800, 800);
                         $this->productImageRepo->createProImage([
                             'product_id' => $product->id,
                             'variant_id' => null,
@@ -93,7 +93,7 @@ class ProductService
 
                     // 5a. Upload Variant Image (sau khi đã tạo variant)
                     if ($request->hasFile("variants.$vIndex.image")) {
-                        $variantImg = $this->uploadImageService->uploadFile($request->file("variants.$vIndex.image"), 'products/variants');
+                        $variantImg = $this->uploadImageService->uploadFile($request->file("variants.$vIndex.image"), 'products/variants', 400, 400);
                         $variant->update(['image' => $variantImg['path']]);
                     }
 
@@ -143,7 +143,7 @@ class ProductService
                 if ($product->feature_image) {
                     $this->uploadImageService->deleteFile($product->feature_image);
                 }
-                $img = $this->uploadImageService->uploadFile($request->file('feature_image'), 'products');
+                $img = $this->uploadImageService->uploadFile($request->file('feature_image'), 'products', 800, 800);
                 $product->update(['feature_image' => $img['path']]);
             }
 
@@ -191,7 +191,7 @@ class ProductService
                             if ($imageRecord && $imageRecord->image_path) {
                                 $this->uploadImageService->deleteFile($imageRecord->image_path);
                             }
-                            $uploadedImg = $this->uploadImageService->uploadFile($request->file("images.$index.file"), 'products/gallery');
+                            $uploadedImg = $this->uploadImageService->uploadFile($request->file("images.$index.file"), 'products/gallery', 800, 800);
                             $imgUpdateData['image_path'] = $uploadedImg['path'];
                         }
 
@@ -200,7 +200,7 @@ class ProductService
                     } else {
                         // Tạo mới ảnh
                         if ($request->hasFile("images.$index.file")) {
-                            $uploadedImg = $this->uploadImageService->uploadFile($request->file("images.$index.file"), 'products/gallery');
+                            $uploadedImg = $this->uploadImageService->uploadFile($request->file("images.$index.file"), 'products/gallery', 800, 800);
                             $newImg = $this->productImageRepo->createProImage([
                                 'product_id' => $product->id,
                                 'variant_id' => null,
@@ -262,7 +262,7 @@ class ProductService
                         if ($variant->image) {
                             $this->uploadImageService->deleteFile($variant->image);
                         }
-                        $variantImg = $this->uploadImageService->uploadFile($request->file("variants.$vIndex.image"), 'products/variants');
+                        $variantImg = $this->uploadImageService->uploadFile($request->file("variants.$vIndex.image"), 'products/variants', 400, 400);
                         $variant->update(['image' => $variantImg['path']]);
                     }
 

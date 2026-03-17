@@ -22,6 +22,7 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $products = $this->productService->getAll($request);
+
         return response()->json([
             'status' => 'success',
             'data' => ProductResource::collection($products)

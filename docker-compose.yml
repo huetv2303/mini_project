@@ -18,7 +18,7 @@ services:
     networks:
       - laravel-network
     env_file:
-      - .laravel/env
+      - ./laravel/.env
 
   # React App (Frontend)
   frontend:
@@ -71,7 +71,7 @@ services:
     networks:
       - laravel-network
     env_file:
-      - .laravel/env
+      - ./laravel/.env
 
 networks:
   laravel-network:

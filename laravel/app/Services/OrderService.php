@@ -13,10 +13,14 @@ use \Illuminate\Support\Str;
 class OrderService
 {
     protected $orderRepo;
+    protected $inventoryService;
 
-    public function __construct(OrderRepositoryInterface $orderRepo)
-    {
+    public function __construct(
+        OrderRepositoryInterface $orderRepo,
+        InventoryService $inventoryService
+    ) {
         $this->orderRepo = $orderRepo;
+        $this->inventoryService = $inventoryService;
     }
 
     public function getAll($request = null)
@@ -89,10 +93,16 @@ class OrderService
                 $order->items()->create($itemData);
             }
 
-            // Trừ tồn kho
+            // Trừ tồn kho qua InventoryService
             foreach ($items as $item) {
-                Inventory::where('variant_id', $item['product_variant_id'])
-                    ->decrement('quantity', $item['quantity']);
+                $this->inventoryService->decreaseStock(
+                    $item['product_variant_id'],
+                    $item['quantity'],
+                    'order',
+                    $order->id,
+                    $staffId,
+                    "Xuất kho cho đơn hàng: " . $order->code
+                );
             }
 
             return $order->load(['paymentMethod', 'staff', 'items']);
@@ -128,11 +138,17 @@ class OrderService
 
             // Xử lý khi status chuyển sang 'cancelled'
             if ($oldStatus !== 'cancelled' && $newStatus === 'cancelled') {
-                // Hoàn lại tồn kho
+                // Hoàn lại tồn kho qua InventoryService
                 foreach ($order->items as $item) {
                     if ($item->product_variant_id) {
-                        Inventory::where('variant_id', $item->product_variant_id)
-                            ->increment('quantity', $item->quantity);
+                        $this->inventoryService->increaseStock(
+                            $item->product_variant_id,
+                            $item->quantity,
+                            'order_cancel',
+                            $order->id,
+                            auth()->id(),
+                            "Hoàn kho do huỷ đơn hàng: " . $order->code
+                        );
                     }
                 }
                 // Nếu đơn đã delivered thì giảm sold_count lại
@@ -165,11 +181,17 @@ class OrderService
                 throw new \Exception('Không thể hủy đơn hàng đang trong quá trình vận chuyển.');
             }
 
-            // Hoàn lại tồn kho
+            // Hoàn lại tồn kho qua InventoryService
             foreach ($order->items as $item) {
                 if ($item->product_variant_id) {
-                    Inventory::where('variant_id', $item->product_variant_id)
-                        ->increment('quantity', $item->quantity);
+                    $this->inventoryService->increaseStock(
+                        $item->product_variant_id,
+                        $item->quantity,
+                        'order_cancel',
+                        $order->id,
+                        auth()->id(),
+                        "Hoàn kho do huỷ đơn hàng: " . $order->code
+                    );
                 }
             }
 

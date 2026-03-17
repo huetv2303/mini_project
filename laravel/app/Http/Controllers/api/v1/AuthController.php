@@ -7,16 +7,17 @@ use App\Http\Requests\RegisterRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Services\AuthService;
+
 class AuthController extends Controller
 {
     protected $userService;
-    public function __construct(AuthService $userService){
+    public function __construct(AuthService $userService)
+    {
         $this->userService = $userService;
     }
-    public function register(RegisterRequest $request){
+    public function register(RegisterRequest $request)
+    {
         $validatedData = $request->validated();
-
-        // $validatedData['password'] = Hash::make($validatedData['password']);
 
         $user = $this->userService->register($validatedData);
 
@@ -27,7 +28,8 @@ class AuthController extends Controller
         ], 200);
     }
 
-    public function login(Request $request){
+    public function login(Request $request)
+    {
         $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required|string',
@@ -43,7 +45,8 @@ class AuthController extends Controller
         return $this->createNewToken($token);
     }
 
-    protected function createNewToken($token){
+    protected function createNewToken($token)
+    {
         return response()->json([
             'access_token' => $token,
             'expires_in' => auth('api')->factory()->getTTL() * 60,

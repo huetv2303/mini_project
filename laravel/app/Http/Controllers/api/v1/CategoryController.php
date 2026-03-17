@@ -44,7 +44,7 @@ class CategoryController extends Controller
     public function store(StoreCategoryRequest $request){
         $validatedData = $request->validated();
         if ($request->hasFile('image')) {
-            $image = $this->uploadService->uploadFile($request->file('image'), 'categories');
+            $image = $this->uploadService->uploadFile($request->file('image'), 'categories', 500, 500);
             $validatedData['image'] = $image['path'];
         }
         $data = $this->cateService->createCate($validatedData);
@@ -67,7 +67,7 @@ class CategoryController extends Controller
                 $this->uploadService->deleteFile($category->image);
             }
 
-            $image = $this->uploadService->uploadFile($request->file('image'), 'categories');
+            $image = $this->uploadService->uploadFile($request->file('image'), 'categories', 500, 500);
             $data['image'] = $image['path'];
         }
         
