@@ -1,0 +1,53 @@
+<?php
+
+namespace App\Http\Controllers\api\v1;
+
+use App\Http\Controllers\Controller;
+use App\Interfaces\UserRepositoryInterface;
+use Illuminate\Http\Request;
+
+class UserController extends Controller
+{
+    protected $userRepo;
+
+    public function __construct(UserRepositoryInterface $userRepo)
+    {
+        $this->userRepo = $userRepo;
+    }
+
+    /**
+     * Danh sách người dùng
+     */
+    public function index()
+    {
+        $users = $this->userRepo->getAllUsers();
+        return response()->json([
+            'status' => 'success',
+            'data'   => $users
+        ]);
+    }
+
+    /**
+     * Cập nhật vai trò cho người dùng
+     */
+    public function updateRole(Request $request, $id)
+    {
+        $request->validate([
+            'role_id' => 'required|exists:roles,id'
+        ]);
+
+        try {
+            $user = $this->userRepo->updateRole($id, $request->role_id);
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Cập nhật vai trò thành công cho người dùng ' . $user->name,
+                'data'    => $user
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Cập nhật thất bại: ' . $e->getMessage()
+            ], 422);
+        }
+    }
+}

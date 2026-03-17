@@ -27,6 +27,8 @@ class RolePermissionSeeder extends Seeder
             ['name' => 'Sửa đơn hàng', 'code' => 'orders.edit', 'group' => 'Đơn hàng'],
             // Danh mục
             ['name' => 'Quản lý danh mục', 'code' => 'categories.manage', 'group' => 'Danh mục'],
+            // Quản trị
+            ['name' => 'Quản trị hệ thống', 'code' => 'admin.manage', 'group' => 'Hệ thống'],
         ];
 
         foreach ($permissions as $p) {

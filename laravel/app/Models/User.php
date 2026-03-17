@@ -43,7 +43,6 @@ class User extends Authenticatable implements JWTSubject
             return false;
         }
 
-        // Kiểm tra permissionCode có tồn tại trong danh sách permissions của Role không
         return $this->role->permissions()->where('code', $permissionCode)->exists();
     }
 

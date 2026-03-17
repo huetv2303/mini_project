@@ -12,6 +12,7 @@ use App\Interfaces\SupplierRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Interfaces\Order\OrderRepositoryInterface;
 use App\Interfaces\StockReceiptRepositoryInterface;
+use App\Interfaces\CustomerRepositoryInterface;
 use App\Repositories\CategoryRepository;
 use App\Repositories\Product\ProductRepository;
 use App\Repositories\Product\ProductVariantRepository;
@@ -22,6 +23,7 @@ use App\Repositories\SupplierRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\Order\OrderRepository;
 use App\Repositories\StockReceiptRepository;
+use App\Repositories\CustomerRepository;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use App\Models\Permission;
@@ -43,6 +45,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(InventoryRepositoryInterface::class, InventoryRepository::class);
         $this->app->bind(OrderRepositoryInterface::class, OrderRepository::class);
         $this->app->bind(StockReceiptRepositoryInterface::class, StockReceiptRepository::class);
+        $this->app->bind(CustomerRepositoryInterface::class, CustomerRepository::class);
     }
 
     /**
@@ -57,7 +60,7 @@ class AppServiceProvider extends ServiceProvider
                     Gate::define($permission->code, function ($user) use ($permission) {
                         return $user->hasPermission($permission->code);
                     });
-                } );
+                });
             }
         } catch (\Exception $e) {
             // Tránh lỗi khi migrate chưa có table permissions
