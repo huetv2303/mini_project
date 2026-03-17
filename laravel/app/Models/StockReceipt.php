@@ -3,27 +3,37 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class StockReceipt extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'code',
         'supplier_id',
-        'user_id',
+        'created_by',
         'status',
         'total_amount',
         'note',
-        'received_at'
+        'received_at',
     ];
+
+    protected $casts = [
+        'received_at'  => 'datetime',
+        'total_amount' => 'decimal:2',
+    ];
+
+    // ─── Relationships ───────────────────────────────────────────────────────
 
     public function supplier()
     {
         return $this->belongsTo(Supplier::class);
     }
 
-    public function user()
+    public function staff()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     public function items()

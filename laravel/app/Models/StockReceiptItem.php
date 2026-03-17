@@ -11,21 +11,23 @@ class StockReceiptItem extends Model
         'variant_id',
         'quantity',
         'unit_price',
-        'total_price'
+        'total_price',
     ];
 
-    public function stockReceipt()
+    protected $casts = [
+        'unit_price'  => 'decimal:2',
+        'total_price' => 'decimal:2',
+    ];
+
+    // ─── Relationships ───────────────────────────────────────────────────────
+
+    public function receipt()
     {
-        return $this->belongsTo(StockReceipt::class);
+        return $this->belongsTo(StockReceipt::class, 'stock_receipt_id');
     }
 
     public function variant()
     {
-        return $this->belongsTo(ProductVariant::class);
-    }
-
-    public function transactions()
-    {
-        return $this->hasMany(InventoryTransaction::class, 'reference_id')->where('reference_type', 'stock_receipt');
+        return $this->belongsTo(ProductVariant::class, 'variant_id');
     }
 }

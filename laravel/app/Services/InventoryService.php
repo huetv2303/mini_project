@@ -8,55 +8,85 @@ use Illuminate\Support\Facades\DB;
 
 class InventoryService
 {
-
-    public function increaseStock($variantId, $quantity, $refType, $refId, $userId, $note = null)
+    /**
+     * Xem tổng quan tồn kho (tất cả variants)
+     */
+    public function getAll($request = null)
     {
-        return DB::transaction(function () use ($variantId, $quantity, $refType, $refId, $userId, $note) {
-            $inventory = Inventory::firstOrCreate(
-                ['variant_id' => $variantId],
-                ['quantity' => 0, 'reserved' => 0]
-            );
+        $query = Inventory::with(['variant.product'])
+            ->orderBy('quantity', 'asc');
 
-            $qtyBefore = $inventory->quantity;
+        if ($request && $request->low_stock) {
+            // Lọc hàng sắp hết (quantity <= min_quantity)
+            $query->whereColumn('quantity', '<=', 'min_quantity');
+        }
 
-            $inventory->increment('quantity', $quantity);
+        return $query->paginate(15);
+    }
 
-            return InventoryTransaction::create([
-                'variant_id' => $variantId,
-                'type' => 'in',
-                'reference_type' => $refType,
-                'reference_id' => $refId,
-                'quantity_before' => $qtyBefore,
-                'quantity_change' => $quantity,
-                'quantity_after' => $qtyBefore + $quantity,
-                'user_id' => $userId,
-                'note' => $note,
+    /**
+     * Xem tồn kho theo variant_id
+     */
+    public function getByVariant($variantId)
+    {
+        return Inventory::with(['variant.product'])
+            ->where('variant_id', $variantId)
+            ->firstOrFail();
+    }
+
+    /**
+     * Xem lịch sử biến động của 1 variant
+     */
+    public function getHistory($variantId, $request = null)
+    {
+        $query = InventoryTransaction::with(['variant', 'createdBy'])
+            ->where('variant_id', $variantId)
+            ->latest('created_at');
+
+        if ($request && $request->type) {
+            $query->where('type', $request->type);
+        }
+
+        return $query->paginate(20);
+    }
+
+    /**
+     * Điều chỉnh tồn kho thủ công (kiểm kê)
+     */
+    public function adjust($variantId, $newQuantity, $note, $userId)
+    {
+        return DB::transaction(function () use ($variantId, $newQuantity, $note, $userId) {
+            $inventory = Inventory::where('variant_id', $variantId)->firstOrFail();
+
+            $before = $inventory->quantity;
+            $change = $newQuantity - $before;
+
+            $inventory->update(['quantity' => $newQuantity]);
+
+            InventoryTransaction::create([
+                'variant_id'      => $variantId,
+                'type'            => 'adjustment',
+                'reference_type'  => 'manual',
+                'reference_id'    => null,
+                'quantity_before' => $before,
+                'quantity_change' => $change,
+                'quantity_after'  => $newQuantity,
+                'note'            => $note ?? 'Điều chỉnh tồn kho thủ công',
+                'created_by'      => $userId,
             ]);
+
+            return $inventory->fresh(['variant.product']);
         });
     }
 
-    public function decreaseStock($variantId, $quantity, $refType, $refId, $userId, $note = null)
+    /**
+     * Danh sách hàng sắp hết theo ngưỡng min_quantity
+     */
+    public function getLowStock()
     {
-        return DB::transaction(function () use ($variantId, $quantity, $refType, $refId, $userId, $note) {
-            $inventory = Inventory::where('variant_id', $variantId)->first();
-
-            if (!$inventory || $inventory->quantity < $quantity) {
-                throw new \Exception("Không đủ tồn kho để thực hiện giao dịch này.");
-            }
-
-            $inventory->decrement("quantity", $quantity);
-
-            return InventoryTransaction::create([
-                'variant_id' => $variantId,
-                'type' => 'out',
-                'reference_type' => $refType,
-                'reference_id' => $refId,
-                'quantity_before' => $inventory->quantity + $quantity,
-                'quantity_change' => $quantity,
-                'quantity_after' => $inventory->quantity,
-                'user_id' => $userId,
-                'note' => $note,
-            ]);
-        });
+        return Inventory::with(['variant.product'])
+            ->whereColumn('quantity', '<=', 'min_quantity')
+            ->orderBy('quantity', 'asc')
+            ->get();
     }
 }
