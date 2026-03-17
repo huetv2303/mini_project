@@ -23,10 +23,10 @@ class UpdateCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "name" => "required|string|max:255",
-            'image'=> 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'parent_id' => 'nullable',
-            'status' => 'nullable|integer',
+            "name"      => "required|string|max:255",
+            'image'     => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'parent_id' => 'nullable|integer|exists:categories,id',
+            'status'    => 'nullable|integer',
         ];
     }
 }

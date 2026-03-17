@@ -27,7 +27,7 @@ return new class extends Migration
             $table->integer('quantity_after');              // Tồn kho SAU giao dịch
 
             $table->text('note')->nullable();
-            $table->foreignId('created_by')
+            $table->foreignId('user_id')
                 ->constrained('users')
                 ->onDelete('restrict');
 

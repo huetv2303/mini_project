@@ -46,7 +46,7 @@ class CategoryController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data' => new CategoryResource($category)
+            'data' => new CategoryResource($category->load('parent'))
         ]);
     }
 
@@ -63,7 +63,7 @@ class CategoryController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Category created successfully',
-            'data' => new CategoryResource($category)
+            'data' => new CategoryResource($category->load('parent'))
         ], 201);
     }
 
@@ -89,7 +89,7 @@ class CategoryController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data' => new CategoryResource($updated),
+            'data' => new CategoryResource($updated->load('parent')),
             'message' => 'Category updated successfully'
         ]);
     }

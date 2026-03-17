@@ -20,7 +20,7 @@ class StockReceiptResource extends JsonResource
                 'name' => $this->supplier?->name,
             ],
             'created_by'   => [
-                'id'   => $this->created_by,
+                'id'   => $this->user_id,
                 'name' => $this->staff?->name,
             ],
             'items'        => StockReceiptItemResource::collection($this->whenLoaded('items')),

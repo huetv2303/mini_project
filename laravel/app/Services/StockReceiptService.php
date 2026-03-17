@@ -3,18 +3,20 @@
 namespace App\Services;
 
 use App\Interfaces\StockReceipt\StockReceiptRepositoryInterface;
-use App\Models\Inventory;
-use App\Models\InventoryTransaction;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class StockReceiptService
 {
     protected $receiptRepo;
+    protected $inventoryService;
 
-    public function __construct(StockReceiptRepositoryInterface $receiptRepo)
-    {
+    public function __construct(
+        StockReceiptRepositoryInterface $receiptRepo,
+        InventoryService $inventoryService
+    ) {
         $this->receiptRepo = $receiptRepo;
+        $this->inventoryService = $inventoryService;
     }
 
     public function getAll($request = null)
@@ -47,7 +49,7 @@ class StockReceiptService
             $receipt = $this->receiptRepo->create([
                 'code'         => $code,
                 'supplier_id'  => $data['supplier_id'],
-                'created_by'   => $userId,
+                'user_id'      => $userId,
                 'status'       => 'pending',
                 'total_amount' => $totalAmount,
                 'note'         => $data['note'] ?? null,
@@ -81,29 +83,14 @@ class StockReceiptService
             }
 
             foreach ($receipt->items as $item) {
-                $inventory = Inventory::where('variant_id', $item->variant_id)->first();
-
-                if (!$inventory) {
-                    throw new \Exception("Không tìm thấy tồn kho cho variant ID: {$item->variant_id}");
-                }
-
-                $before = $inventory->quantity;
-
-                // Cộng tồn kho
-                $inventory->increment('quantity', $item->quantity);
-
-                // Ghi lịch sử biến động
-                InventoryTransaction::create([
-                    'variant_id'      => $item->variant_id,
-                    'type'            => 'in',
-                    'reference_type'  => 'stock_receipt',
-                    'reference_id'    => $receipt->id,
-                    'quantity_before' => $before,
-                    'quantity_change' => +$item->quantity,
-                    'quantity_after'  => $before + $item->quantity,
-                    'note'            => "Nhập kho theo phiếu {$receipt->code}",
-                    'created_by'      => $userId,
-                ]);
+                $this->inventoryService->increaseStock(
+                    $item->variant_id,
+                    $item->quantity,
+                    'stock_receipt',
+                    $receipt->id,
+                    $userId,
+                    "Nhập kho theo phiếu {$receipt->code}"
+                );
             }
 
             $this->receiptRepo->update([

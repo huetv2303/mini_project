@@ -12,7 +12,7 @@ class StockReceipt extends Model
     protected $fillable = [
         'code',
         'supplier_id',
-        'created_by',
+        'user_id',
         'status',
         'total_amount',
         'note',
@@ -33,7 +33,7 @@ class StockReceipt extends Model
 
     public function staff()
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function items()

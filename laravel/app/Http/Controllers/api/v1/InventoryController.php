@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\api\v1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\InventoryTransactionResource;
 use App\Services\InventoryService;
 use Illuminate\Http\Request;
 
@@ -54,7 +55,7 @@ class InventoryController extends Controller
         $history = $this->inventoryService->getHistory($variantId, $request);
         return response()->json([
             'status' => 'success',
-            'data'   => $history,
+            'data'   => InventoryTransactionResource::collection($history),
         ]);
     }
 

@@ -26,6 +26,6 @@ class CategoryRepository implements CategoryRepositoryInterface{
         return false;
     }
     public function getAll($request = null){
-        return Category::query();
+        return Category::with('parent');
     }
 }

@@ -75,7 +75,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/', [OrderController::class, 'index'])->middleware('permission:orders.view');
             Route::post('/', [OrderController::class, 'store']); // Ai đã đăng nhập cũng có thể tạo order (khách hàng/nv)
             Route::get('/{id}', [OrderController::class, 'show'])->middleware('permission:orders.view');
-            Route::put('/{id}', [OrderController::class, 'update'])->middleware('permission:orders.edit');
+            Route::put('/{id}', [OrderController::class, 'update']);
             Route::patch('/{id}/cancel', [OrderController::class, 'cancel']);
         });
 
@@ -90,7 +90,7 @@ Route::prefix('v1')->group(function () {
         // Inventory routes - yêu cầu đăng nhập
         Route::prefix('inventory')->group(function () {
             Route::get('/', [InventoryController::class, 'index'])->middleware('permission:products.view');
-            Route::get('/{variantId}/history', [InventoryController::class, 'history'])->middleware('permission:products.view');
+            Route::get('/{variantId}/history', [InventoryController::class, 'history']);
         });
 
         Route::get('/user', function (Request $request) {

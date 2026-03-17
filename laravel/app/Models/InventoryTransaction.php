@@ -17,7 +17,7 @@ class InventoryTransaction extends Model
         'quantity_change',
         'quantity_after',
         'note',
-        'created_by',
+        'user_id',
     ];
 
     protected $casts = [
@@ -33,6 +33,6 @@ class InventoryTransaction extends Model
 
     public function createdBy()
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

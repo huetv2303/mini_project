@@ -14,7 +14,7 @@ return new class extends Migration
             $table->foreignId('supplier_id')
                 ->constrained('suppliers')
                 ->onDelete('restrict');
-            $table->foreignId('created_by')
+            $table->foreignId('user_id')
                 ->constrained('users')
                 ->onDelete('restrict');
             $table->enum('status', ['pending', 'completed', 'cancelled'])->default('pending');
