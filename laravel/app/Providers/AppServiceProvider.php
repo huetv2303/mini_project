@@ -53,7 +53,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Tự động định nghĩa các Gate dựa trên database permissions
+        // Tối ưu hóa: Không load toàn bộ Permission từ DB trên mỗi request
+        /*
         try {
             if (app()->runningInConsole() === false) {
                 Permission::all()->each(function ($permission) {
@@ -65,5 +66,6 @@ class AppServiceProvider extends ServiceProvider
         } catch (\Exception $e) {
             // Tránh lỗi khi migrate chưa có table permissions
         }
+        */
     }
 }

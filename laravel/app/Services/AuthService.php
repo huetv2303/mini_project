@@ -13,13 +13,21 @@ class AuthService {
     }
     public function register(array $data)
     {
-       return $this->userRepo->createUser($data);
+       $user = $this->userRepo->createUser($data);
+       $user->sendEmailVerificationNotification();
+       return $user;
     }
 
     public function login(array $credentials)
     {
         if (!$token = auth('api')->attempt($credentials)) {
             return false;
+        }
+
+        $user = auth('api')->user();
+        if (!$user->hasVerifiedEmail()) {
+            auth('api')->logout();
+            throw new \Exception('EmailNotVerified');
         }
 
         return $token;

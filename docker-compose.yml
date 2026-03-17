@@ -14,11 +14,30 @@ services:
     working_dir: /var/www
     volumes:
       - ./laravel:/var/www
+      - vendor-data:/var/www/vendor
       - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
     networks:
       - laravel-network
     env_file:
       - ./laravel/.env
+
+  # Queue Worker (Xử lý gửi email ngầm)
+  worker:
+    image: laravel-app
+    container_name: laravel-worker
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./laravel:/var/www
+      - vendor-data:/var/www/vendor
+    depends_on:
+      - db
+      - app
+    networks:
+      - laravel-network
+    env_file:
+      - ./laravel/.env
+    command: php artisan queue:work --tries=3
 
   # React App (Frontend)
   frontend:
@@ -45,6 +64,7 @@ services:
       - "8000:80"
     volumes:
       - ./laravel:/var/www
+      - vendor-data:/var/www/vendor
       - ./docker/nginx/laravel.conf:/etc/nginx/conf.d/default.conf
     networks:
       - laravel-network
@@ -79,4 +99,6 @@ networks:
 
 volumes:
   dbdata:
+    driver: local
+  vendor-data:
     driver: local

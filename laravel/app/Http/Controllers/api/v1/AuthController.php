@@ -35,14 +35,70 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        if (!$token = $this->userService->login($credentials)) {
-            return response()->json([
-                'message' => 'Unauthorized',
-                'status' => 401
-            ], 401);
+        try {
+            if (!$token = $this->userService->login($credentials)) {
+                return response()->json([
+                    'message' => 'Unauthorized',
+                    'status' => 401
+                ], 401);
+            }
+        } catch (\Exception $e) {
+            if ($e->getMessage() === 'EmailNotVerified') {
+                return response()->json([
+                    'message' => 'Vui lòng xác nhận email trước khi đăng nhập.',
+                    'status' => 403
+                ], 403);
+            }
+            throw $e;
         }
 
         return $this->createNewToken($token);
+    }
+
+    public function verify(Request $request, $id, $hash)
+    {
+        // Kiểm tra chữ ký hợp lệ của Laravel
+        if (!$request->hasValidSignature()) {
+            return response()->json(['message' => 'Đường dẫn xác nhận đã hết hạn hoặc không hợp lệ.'], 400);
+        }
+
+        $user = \App\Models\User::find($id);
+
+        if (!$user) {
+            return response()->json(['message' => 'Người dùng không tồn tại.'], 404);
+        }
+
+        if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+            return response()->json(['message' => 'Mã xác nhận không khớp.'], 400);
+        }
+
+        if ($user->hasVerifiedEmail()) {
+            return response()->json(['message' => 'Email đã được xác nhận.'], 200);
+        }
+
+        if ($user->markEmailAsVerified()) {
+            event(new \Illuminate\Auth\Events\Verified($user));
+        }
+
+        return response()->json(['message' => 'Email xác nhận thành công.']);
+    }
+
+    public function resendVerificationEmail(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+        $user = \App\Models\User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'Người dùng không tồn tại.'], 404);
+        }
+
+        if ($user->hasVerifiedEmail()) {
+            return response()->json(['message' => 'Email đã được xác nhận.'], 200);
+        }
+
+        $user->sendEmailVerificationNotification();
+
+        return response()->json(['message' => 'Đã gửi lại email xác nhận.']);
     }
 
     protected function createNewToken($token)

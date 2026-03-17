@@ -18,6 +18,11 @@ use App\Http\Controllers\api\v1\CustomerController;
 Route::prefix('v1')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
+
+    // Xác nhận email
+    Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verify'])->name('verification.verify');
+    Route::post('/email/resend', [AuthController::class, 'resendVerificationEmail'])->name('verification.send');
+
     Route::middleware('auth:api')->group(function () {
 
         // Quản trị hệ thống (Chỉ dành cho Admin có quyền admin.manage)
