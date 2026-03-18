@@ -24,7 +24,6 @@ class InventoryTransaction extends Model
         'created_at' => 'datetime',
     ];
 
-    // ─── Relationships ───────────────────────────────────────────────────────
 
     public function variant()
     {

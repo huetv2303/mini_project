@@ -88,7 +88,7 @@ class OrderService
                 'customer_address'   => $data['customer_address'],
             ]);
 
-            // Tạo OrderItems
+            // Tạo OrderItemsx
             foreach ($preparedItems as $itemData) {
                 $order->items()->create($itemData);
             }

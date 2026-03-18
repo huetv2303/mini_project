@@ -19,7 +19,6 @@ class StockReceiptItem extends Model
         'total_price' => 'decimal:2',
     ];
 
-    // ─── Relationships ───────────────────────────────────────────────────────
 
     public function receipt()
     {

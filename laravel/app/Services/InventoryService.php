@@ -8,9 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class InventoryService
 {
-    /**
-     * Xem tổng quan tồn kho (tất cả variants)
-     */
+
     public function getAll($request = null)
     {
         $query = Inventory::with(['variant.product'])
@@ -24,9 +22,7 @@ class InventoryService
         return $query->paginate(15);
     }
 
-    /**
-     * Xem tồn kho theo variant_id
-     */
+
     public function getByVariant($variantId)
     {
         return Inventory::with(['variant.product'])
@@ -34,9 +30,7 @@ class InventoryService
             ->firstOrFail();
     }
 
-    /**
-     * Xem lịch sử biến động của 1 variant
-     */
+
     public function getHistory($variantId, $request = null)
     {
         $query = InventoryTransaction::with(['variant.product', 'createdBy'])
@@ -50,9 +44,6 @@ class InventoryService
         return $query->paginate(20);
     }
 
-    /**
-     * Điều chỉnh tồn kho thủ công (kiểm kê)
-     */
     public function adjust($variantId, $newQuantity, $note, $userId)
     {
         return DB::transaction(function () use ($variantId, $newQuantity, $note, $userId) {
@@ -79,9 +70,7 @@ class InventoryService
         });
     }
 
-    /**
-     * Danh sách hàng sắp hết theo ngưỡng min_quantity
-     */
+
     public function getLowStock()
     {
         return Inventory::with(['variant.product'])
@@ -90,9 +79,6 @@ class InventoryService
             ->get();
     }
 
-    /**
-     * Tăng tồn kho (Khi nhập hàng hoặc huỷ đơn)
-     */
     public function increaseStock($variantId, $quantity, $referenceType, $referenceId, $userId, $note = null)
     {
         return DB::transaction(function () use ($variantId, $quantity, $referenceType, $referenceId, $userId, $note) {
@@ -122,9 +108,6 @@ class InventoryService
         });
     }
 
-    /**
-     * Giảm tồn kho (Khi bán hàng hoặc trả hàng cho NCC)
-     */
     public function decreaseStock($variantId, $quantity, $referenceType, $referenceId, $userId, $note = null)
     {
         return DB::transaction(function () use ($variantId, $quantity, $referenceType, $referenceId, $userId, $note) {

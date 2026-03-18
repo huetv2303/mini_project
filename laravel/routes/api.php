@@ -14,18 +14,23 @@ use App\Http\Controllers\api\v1\RoleController;
 use App\Http\Controllers\api\v1\PermissionController;
 use App\Http\Controllers\api\v1\UserController;
 use App\Http\Controllers\api\v1\CustomerController;
+use App\Http\Controllers\api\v1\SocialAuthController;
 
 Route::prefix('v1')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
+
+    // Google OAuth
+    Route::get('/auth/google/redirect', [SocialAuthController::class, 'redirectToGoogle']);
+    Route::get('/auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback']);
 
     // Xác nhận email
     Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verify'])->name('verification.verify');
     Route::post('/email/resend', [AuthController::class, 'resendVerificationEmail'])->name('verification.send');
 
     Route::middleware('auth:api')->group(function () {
+        Route::post('/logout', [AuthController::class, 'logout']);
 
-        // Quản trị hệ thống (Chỉ dành cho Admin có quyền admin.manage)
         Route::middleware('permission:admin.manage')->group(function () {
             Route::prefix('roles')->group(function () {
                 Route::get('/', [RoleController::class, 'index']);
@@ -36,7 +41,6 @@ Route::prefix('v1')->group(function () {
 
             Route::get('/permissions', [PermissionController::class, 'index']);
 
-            // Quản trị người dùng
             Route::prefix('users')->group(function () {
                 Route::get('/', [UserController::class, 'index']);
                 Route::put('/{id}/role', [UserController::class, 'updateRole']);
@@ -75,7 +79,6 @@ Route::prefix('v1')->group(function () {
             Route::delete('/{slug}', [ProductController::class, 'destroy'])->middleware('permission:products.delete');
         });
 
-        // Order routes - yêu cầu đăng nhập
         Route::prefix('orders')->group(function () {
             Route::get('/', [OrderController::class, 'index'])->middleware('permission:orders.view');
             Route::post('/', [OrderController::class, 'store']); // Ai đã đăng nhập cũng có thể tạo order (khách hàng/nv)
@@ -84,7 +87,6 @@ Route::prefix('v1')->group(function () {
             Route::patch('/{id}/cancel', [OrderController::class, 'cancel']);
         });
 
-        // Stock Receipt routes - yêu cầu đăng nhập
         Route::prefix('stock-receipts')->group(function () {
             Route::get('/', [StockReceiptController::class, 'index'])->middleware('permission:products.view');
             Route::post('/', [StockReceiptController::class, 'store'])->middleware('permission:products.create');
@@ -92,14 +94,14 @@ Route::prefix('v1')->group(function () {
             Route::post('/{id}/confirm', [StockReceiptController::class, 'confirm'])->middleware('permission:products.create');
         });
 
-        // Inventory routes - yêu cầu đăng nhập
         Route::prefix('inventory')->group(function () {
             Route::get('/', [InventoryController::class, 'index'])->middleware('permission:products.view');
             Route::get('/{variantId}/history', [InventoryController::class, 'history']);
         });
 
         Route::get('/user', function (Request $request) {
-            return new \App\Http\Resources\UserResource($request->user());
+            $user = $request->user()->load('role.permissions');
+            return new \App\Http\Resources\UserResource($user);
         });
     });
 });

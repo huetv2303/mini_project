@@ -4,6 +4,8 @@ namespace App\Http\Controllers\api\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Resources\UserResource;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Services\AuthService;
@@ -36,20 +38,23 @@ class AuthController extends Controller
         ]);
 
         try {
-            if (!$token = $this->userService->login($credentials)) {
-                return response()->json([
-                    'message' => 'Unauthorized',
-                    'status' => 401
-                ], 401);
-            }
+            $token = $this->userService->login($credentials);
         } catch (\Exception $e) {
+            $status = 401;
+            $message = 'Tài khoản hoặc mật khẩu không chính xác.';
+
             if ($e->getMessage() === 'EmailNotVerified') {
-                return response()->json([
-                    'message' => 'Vui lòng xác nhận email trước khi đăng nhập.',
-                    'status' => 403
-                ], 403);
+                $status = 403;
+                $message = 'Vui lòng xác nhận email trước khi đăng nhập.';
+            } elseif ($e->getMessage() === 'GoogleAccountOnly') {
+                $status = 422;
+                $message = 'Tài khoản này đã đăng ký qua Google. Vui lòng sử dụng tính năng "Đăng nhập với Google".';
             }
-            throw $e;
+
+            return response()->json([
+                'message' => $message,
+                'status' => $status
+            ], $status);
         }
 
         return $this->createNewToken($token);
@@ -62,7 +67,7 @@ class AuthController extends Controller
             return response()->json(['message' => 'Đường dẫn xác nhận đã hết hạn hoặc không hợp lệ.'], 400);
         }
 
-        $user = \App\Models\User::find($id);
+        $user = User::find($id);
 
         if (!$user) {
             return response()->json(['message' => 'Người dùng không tồn tại.'], 404);
@@ -101,12 +106,19 @@ class AuthController extends Controller
         return response()->json(['message' => 'Đã gửi lại email xác nhận.']);
     }
 
+    public function logout()
+    {
+        auth('api')->logout();
+        return response()->json(['message' => 'Successfully logged out']);
+    }
+
     protected function createNewToken($token)
     {
+        $user = auth('api')->user()->load('role.permissions');
         return response()->json([
             'access_token' => $token,
             'expires_in' => auth('api')->factory()->getTTL() * 60,
-            'user' => auth('api')->user()
+            'user' => new UserResource($user)
         ]);
     }
 }

@@ -16,9 +16,6 @@ class InventoryController extends Controller
         $this->inventoryService = $inventoryService;
     }
 
-    /**
-     * Tổng quan tồn kho tất cả variants
-     */
     public function index(Request $request)
     {
         $inventory = $this->inventoryService->getAll($request);
@@ -28,9 +25,7 @@ class InventoryController extends Controller
         ]);
     }
 
-    /**
-     * Tồn kho theo variant_id
-     */
+
     public function show($variantId)
     {
         try {
@@ -47,9 +42,7 @@ class InventoryController extends Controller
         }
     }
 
-    /**
-     * Lịch sử biến động tồn kho của 1 variant
-     */
+
     public function history($variantId, Request $request)
     {
         $history = $this->inventoryService->getHistory($variantId, $request);
@@ -59,9 +52,6 @@ class InventoryController extends Controller
         ]);
     }
 
-    /**
-     * Điều chỉnh tồn kho thủ công (kiểm kê)
-     */
     public function adjust(Request $request)
     {
         $data = $request->validate([
@@ -90,9 +80,7 @@ class InventoryController extends Controller
         }
     }
 
-    /**
-     * Danh sách hàng sắp hết (quantity <= min_quantity)
-     */
+
     public function lowStock()
     {
         $items = $this->inventoryService->getLowStock();

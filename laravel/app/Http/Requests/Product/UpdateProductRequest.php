@@ -26,7 +26,6 @@ class UpdateProductRequest extends FormRequest
         $productId = $this->route('slug') ? \App\Models\Product::where('slug', $this->route('slug'))->value('id') : null;
 
         $rules = [
-            // Thông tin product chính
             'name'              => 'required|string|unique:products,name' . ($productId ? ',' . $productId : ''),
             'category_id'       => 'required|exists:categories,id',
             'supplier_id'       => 'required|exists:suppliers,id',
@@ -34,18 +33,18 @@ class UpdateProductRequest extends FormRequest
             'description'       => 'nullable|string',
             'status'            => 'in:active,inactive,draft',
             'feature_image'     => 'nullable|image|max:2048',
-            // Gallery
+
             'images'               => 'nullable|array',
             'images.*.id'          => 'nullable|exists:product_images,id',
             'images.*.file'        => 'nullable|image|max:2048',
             'images.*.is_main'     => 'boolean',
             'images.*.sort_order'  => 'integer',
-            // Thuộc tính chung (không gắn variant)
+
             'attributes'                   => 'nullable|array',
             'attributes.*.id'              => 'nullable|exists:product_attributes,id',
             'attributes.*.attribute_name'  => 'required|string',
             'attributes.*.attribute_value' => 'required|string',
-            // Variants
+
             'variants'               => 'required|array|min:1',
             'variants.*.id'          => [
                 'nullable',

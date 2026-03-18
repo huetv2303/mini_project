@@ -34,17 +34,16 @@ class CustomerController extends Controller
     public function store(StoreCustomerRequest $request)
     {
         $data = $request->validated();
-        
+
         if ($request->hasFile('avatar')) {
             $upload = $this->uploadService->uploadFile($request->file('avatar'), 'customers/avatars');
             $data['avatar'] = $upload['path'];
         }
 
-        // Tạm thời gán user_id bằng auth user nếu có, hoặc để trống từ migration
-        $data['user_id'] = auth()->id() ?? 1; // Giả sử 1 là admin default nếu chưa login
+        $data['user_id'] = auth()->id() ?? 1;
 
         $customer = $this->customerService->createCustomer($data);
-        
+
         return response()->json([
             'status' => 'success',
             'message' => 'Customer created successfully',
@@ -83,7 +82,7 @@ class CustomerController extends Controller
         }
 
         $updatedCustomer = $this->customerService->updateCustomer($id, $data);
-        
+
         // Refresh model to get latest data
         $customer = $this->customerService->getCustomerById($id);
 
@@ -106,7 +105,7 @@ class CustomerController extends Controller
         }
 
         $this->customerService->destroyCustomer($id);
-        
+
         return response()->json([
             'status' => 'success',
             'message' => 'Customer deleted successfully'

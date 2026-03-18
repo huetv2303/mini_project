@@ -23,7 +23,6 @@ class StoreProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // Thông tin product chính
             'name'              => 'required|string|unique:products,name',
             'category_id'       => 'required|exists:categories,id',
             'supplier_id'       => 'required|exists:suppliers,id',
@@ -32,18 +31,15 @@ class StoreProductRequest extends FormRequest
             'status'            => 'in:active,inactive,draft',
             'feature_image'     => 'nullable|image|max:2048',
 
-            // Gallery images
             'images'              => 'nullable|array',
             'images.*.file'       => 'required|image|max:2048',
             'images.*.is_main'    => 'boolean',
             'images.*.sort_order' => 'integer',
 
-            // Thuộc tính chung (không gắn variant)
             'attributes'                   => 'nullable|array',
             'attributes.*.attribute_name'  => 'required|string',
             'attributes.*.attribute_value' => 'required|string',
 
-            // Variants
             'variants'                    => 'required|array|min:1',
             'variants.*.name'             => 'required|string',
             'variants.*.sku'              => 'required|string|unique:product_variants,sku',
@@ -51,12 +47,10 @@ class StoreProductRequest extends FormRequest
             'variants.*.compare_price'    => 'nullable|numeric',
             'variants.*.image'            => 'nullable|image|max:2048',
 
-            // Thuộc tính của từng variant
             'variants.*.attributes'                   => 'nullable|array',
             'variants.*.attributes.*.attribute_name'  => 'required|string',
             'variants.*.attributes.*.attribute_value' => 'required|string',
 
-            // Tồn kho khởi tạo cho variant
             'variants.*.inventory.quantity'     => 'required|integer|min:0',
             'variants.*.inventory.min_quantity' => 'nullable|integer|min:0',
         ];

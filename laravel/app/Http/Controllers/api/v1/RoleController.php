@@ -11,9 +11,7 @@ use App\Http\Resources\RoleResource;
 
 class RoleController extends Controller
 {
-    /**
-     * Danh sách vai trò và quyền kèm theo
-     */
+
     public function index()
     {
         $roles = Role::with('permissions')->get();
@@ -35,19 +33,16 @@ class RoleController extends Controller
         ]);
     }
 
-    /**
-     * Cập nhật danh sách quyền cho một vai trò
-     */
+
     public function updatePermissions(Request $request, $id)
     {
         $role = Role::findOrFail($id);
-        
+
         $request->validate([
             'permission_ids'   => 'required|array',
             'permission_ids.*' => 'exists:permissions,id'
         ]);
 
-        // Đồng bộ quyền: xoá những cái cũ không có trong mảng, thêm những cái mới
         $role->permissions()->sync($request->permission_ids);
 
         return response()->json([
@@ -57,9 +52,7 @@ class RoleController extends Controller
         ]);
     }
 
-    /**
-     * Tạo vai trò mới (tùy chọn)
-     */
+
     public function store(Request $request)
     {
         $data = $request->validate([

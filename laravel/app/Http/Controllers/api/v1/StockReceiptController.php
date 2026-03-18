@@ -18,9 +18,7 @@ class StockReceiptController extends Controller
         $this->receiptService = $receiptService;
     }
 
-    /**
-     * Danh sách phiếu nhập kho
-     */
+
     public function index(Request $request)
     {
         $receipts = $this->receiptService->getAll($request);
@@ -30,9 +28,7 @@ class StockReceiptController extends Controller
         ]);
     }
 
-    /**
-     * Chi tiết phiếu nhập kho
-     */
+
     public function show($id)
     {
         try {
@@ -49,9 +45,6 @@ class StockReceiptController extends Controller
         }
     }
 
-    /**
-     * Tạo phiếu nhập kho mới (status: pending)
-     */
     public function store(StoreStockReceiptRequest $request)
     {
         try {
@@ -69,9 +62,7 @@ class StockReceiptController extends Controller
         }
     }
 
-    /**
-     * Xác nhận phiếu nhập → cộng tồn kho
-     */
+    // Xác nhận phiếu nhập
     public function confirm($id)
     {
         try {
@@ -89,9 +80,7 @@ class StockReceiptController extends Controller
         }
     }
 
-    /**
-     * Huỷ phiếu nhập kho
-     */
+    // Hủy phiếu nhập kho
     public function cancel($id)
     {
         try {

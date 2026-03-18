@@ -20,7 +20,6 @@ class StoreOrderRequest extends FormRequest
             'payment_method_id'         => 'required|exists:payment_methods,id',
             'discount_amount'           => 'nullable|numeric|min:0',
             'note'                      => 'nullable|string',
-            // Danh sách sản phẩm
             'items'                     => 'required|array|min:1',
             'items.*.product_variant_id' => 'required|exists:product_variants,id',
             'items.*.quantity'          => 'required|integer|min:1',

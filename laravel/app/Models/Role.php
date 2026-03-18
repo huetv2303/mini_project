@@ -18,17 +18,13 @@ class Role extends Model
         'is_active',
     ];
 
-    /**
-     * Một Role có nhiều Permission
-     */
+
     public function permissions(): BelongsToMany
     {
         return $this->belongsToMany(Permission::class, 'role_permission');
     }
 
-    /**
-     * Một Role có nhiều User
-     */
+
     public function users(): HasMany
     {
         return $this->hasMany(User::class);

@@ -1,137 +1,248 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { Mail, Lock, User, Loader2, Eye, EyeOff } from 'lucide-react';
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import {
+  Mail,
+  Lock,
+  User,
+  Loader2,
+  Eye,
+  EyeOff,
+  AlertCircle,
+} from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import IconGoogle from "../../assets/IconGoogle.png";
+import toast from "react-hot-toast";
+
+const registerSchema = z
+  .object({
+    // ... (omitted for brevity in thinking, but will match precisely in tool call)
+    name: z.string().min(2, "Họ và tên phải có ít nhất 2 ký tự"),
+    email: z.string().email("Email không hợp lệ"),
+    password: z.string().min(6, "Mật khẩu phải có ít nhất 6 ký tự"),
+    password_confirmation: z.string().min(6, "Vui lòng xác nhận lại mật khẩu"),
+  })
+  .refine((data) => data.password === data.password_confirmation, {
+    message: "Mật khẩu xác nhận không khớp",
+    path: ["password_confirmation"],
+  });
 
 const Register = () => {
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [showPassword, setShowPassword] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
-    const { register } = useAuth();
-    const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
+  const [apiError, setApiError] = useState("");
+  const { register: registerUser } = useAuth();
+  const navigate = useNavigate();
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        setError('');
-        try {
-            await register(name, email, password);
-            navigate('/login', { state: { message: 'Đăng ký thành công! Vui lòng đăng nhập.' } });
-        } catch (err) {
-            setError(err.response?.data?.message || 'Đăng ký thất bại. Vui lòng thử lại.');
-        } finally {
-            setLoading(false);
-        }
-    };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: zodResolver(registerSchema),
+  });
 
-    return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-4">
-            <div className="w-full max-w-md">
-                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl overflow-hidden">
-                    <div className="p-8">
-                        <div className="text-center mb-10">
-                            <h1 className="text-4xl font-bold text-white mb-2">Tạo tài khoản</h1>
-                            <p className="text-slate-400">Tham gia cùng chúng tôi ngay hôm nay</p>
-                        </div>
+  const onSubmit = async (data) => {
+    setApiError("");
+    try {
+      await registerUser(
+        data.name,
+        data.email,
+        data.password,
+        data.password_confirmation,
+      );
+      toast.success(
+        "Đăng ký thành công! Vui lòng kiểm tra email để xác nhận tài khoản.",
+      );
+      navigate("/login");
+    } catch (err) {
+      const errorMsg =
+        err.response?.data?.message ||
+        "Đăng ký thất bại. Vui lòng thử lại sau.";
+      setApiError(errorMsg);
+      toast.error(errorMsg);
+    }
+  };
 
-                        {error && (
-                            <div className="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-xl text-red-200 text-sm">
-                                {error}
-                            </div>
-                        )}
-
-                        <form onSubmit={handleSubmit} className="space-y-5">
-                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-300 ml-1">Họ và tên</label>
-                                <div className="relative group">
-                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500 group-focus-within:text-blue-400 transition-colors">
-                                        <User size={20} />
-                                    </div>
-                                    <input
-                                        type="text"
-                                        required
-                                        className="block w-full pl-11 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all"
-                                        placeholder="Nguyễn Văn A"
-                                        value={name}
-                                        onChange={(e) => setName(e.target.value)}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-300 ml-1">Email</label>
-                                <div className="relative group">
-                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500 group-focus-within:text-blue-400 transition-colors">
-                                        <Mail size={20} />
-                                    </div>
-                                    <input
-                                        type="email"
-                                        required
-                                        className="block w-full pl-11 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all"
-                                        placeholder="name@example.com"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-300 ml-1">Mật khẩu</label>
-                                <div className="relative group">
-                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500 group-focus-within:text-blue-400 transition-colors">
-                                        <Lock size={20} />
-                                    </div>
-                                    <input
-                                        type={showPassword ? "text" : "password"}
-                                        required
-                                        className="block w-full pl-11 pr-12 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all"
-                                        placeholder="••••••••"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-500 hover:text-slate-300 transition-colors"
-                                    >
-                                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                                    </button>
-                                </div>
-                                <p className="text-[10px] text-slate-500 ml-1 mt-1">Mật khẩu tối thiểu 6 ký tự</p>
-                            </div>
-
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/25 transform transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
-                            >
-                                {loading ? (
-                                    <>
-                                        <Loader2 className="animate-spin" size={20} />
-                                        <span>Đang đăng ký...</span>
-                                    </>
-                                ) : (
-                                    <span>Đăng ký</span>
-                                )}
-                            </button>
-                        </form>
-                    </div>
-                    
-                    <div className="p-8 bg-white/5 border-t border-white/10 text-center">
-                        <p className="text-slate-400">
-                            Đã có tài khoản?{' '}
-                            <Link to="/login" className="text-blue-400 font-semibold hover:text-blue-300 transition-colors">
-                                Đăng nhập
-                            </Link>
-                        </p>
-                    </div>
-                </div>
-            </div>
+  return (
+    <div className="min-h-screen flex items-center justify-center pt-8 ">
+      <div className="w-full max-w-md ">
+        <div className="w-full max-w-md flex flex-col items-center gap-2 mb-8">
+          <span className="text-3xl font-medium">T R E N D O R A</span>
+          <p className="text-gray-500 text-xs">F A S H I O N</p>
         </div>
-    );
+        <div className="bg-white/10 backdrop-blur-2xl border border border-gray-300">
+          <div className="px-8 py-4">
+            <div className="text-center mb-10 space-y-2">
+              <h1 className="text-2xl ">Đ Ă N G K Ý</h1>
+            </div>
+
+            {apiError && (
+              <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400 text-sm flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
+                <AlertCircle size={18} />
+                <span>{apiError}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <div className="space-y-1.5 group">
+                <label className="text-sm text-gray-600 ">
+                  HỌ VÀ TÊN <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500    ">
+                    <User size={18} />
+                  </div>
+                  <input
+                    {...register("name")}
+                    className={`block w-full pl-11 pr-4 py-3  border border-gray-300 outline-none ${errors.name ? "border-red-500" : ""}`}
+                    placeholder="Nguyễn Văn A"
+                  />
+                </div>
+                {errors.name && (
+                  <p className="text-red-400 text-[0.8rem]  ml-1 flex items-center gap-1 animate-in fade-in">
+                    <AlertCircle size={12} /> {errors.name.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-1.5 group">
+                <label className="text-sm text-gray-600 ">
+                  EMAIL <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500    ">
+                    <Mail size={18} />
+                  </div>
+                  <input
+                    {...register("email")}
+                    className={`block w-full pl-11 pr-4 py-3  border border-gray-300 outline-none ${errors.email ? "border-red-500" : ""}`}
+                    placeholder="Email"
+                  />
+                </div>
+                {errors.email && (
+                  <p className="text-red-400 text-[0.8rem]  ml-1 flex items-center gap-1 animate-in fade-in">
+                    <AlertCircle size={12} /> {errors.email.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-1.5 group">
+                <label className="text-sm text-gray-600 ">
+                  MẬT KHẨU <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500    ">
+                    <Lock size={18} />
+                  </div>
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    {...register("password")}
+                    className={`block w-full pl-11 pr-12 py-3  border border-gray-300 outline-none ${errors.password ? "border-red-500" : ""}`}
+                    placeholder="Nhập mật khẩu"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-500 hover:text-white transition-colors"
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+                {errors.password && (
+                  <p className="text-red-400 text-[0.8rem]  ml-1 flex items-center gap-1 animate-in fade-in">
+                    <AlertCircle size={12} /> {errors.password.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-1.5 group">
+                <label className="text-sm text-gray-600 ">
+                  XÁC NHẬN MẬT KHẨU <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500    ">
+                    <Lock size={18} />
+                  </div>
+                  <input
+                    type={showPasswordConfirm ? "text" : "password"}
+                    {...register("password_confirmation")}
+                    className={`block w-full pl-11 pr-12 py-3  border border-gray-300 outline-none ${errors.password_confirmation ? "border-red-500" : ""}`}
+                    placeholder="Nhập lại mật khẩu"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-500 hover:text-white transition-colors"
+                  >
+                    {showPasswordConfirm ? (
+                      <EyeOff size={18} />
+                    ) : (
+                      <Eye size={18} />
+                    )}
+                  </button>
+                </div>
+                {errors.password_confirmation && (
+                  <p className="text-red-400 text-[0.8rem]  ml-1 flex items-center gap-1 animate-in fade-in">
+                    <AlertCircle size={12} />{" "}
+                    {errors.password_confirmation.message}
+                  </p>
+                )}
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full py-4 bg-black hover:bg-black/80"
+              >
+                {isSubmitting ? (
+                  <>
+                    <div className="flex items-center justify-center gap-2">
+                      <Loader2 className="animate-spin text-white" size={20} />
+                      <span className="text-white">Đang xử lý...</span>
+                    </div>
+                  </>
+                ) : (
+                  <span className="text-white">Đăng ký ngay</span>
+                )}
+              </button>
+            </form>
+          </div>
+
+          <div className="flex items-center justify-center px-8">
+            <div className="w-full h-[0.5px] bg-gray-300 mr-2"></div>
+            <div className="text-gray-300 text-[15px]">HOẶC</div>
+            <div className="w-full h-[0.5px] bg-gray-300 ml-2"></div>
+          </div>
+
+          <div className="px-8 py-4 bg-white/5 border-t border-white/10 text-center flex items-center justify-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                window.location.href = `${import.meta.env.VITE_API_BASE_URL}/auth/google/redirect`;
+              }}
+              className="w-full py-3 px-4 bg-white border border-gray-300 bg-white hover:border-black"
+            >
+              <span className="flex items-center justify-center">
+                <img src={IconGoogle} alt="Google" width={20} height={20} />
+              </span>
+            </button>
+          </div>
+
+          <div className="px-8 py-4 bg-white/5 border-t border-white/10 text-center">
+            <p className="text-gray-500">
+              Đã có tài khoản?{" "}
+              <Link to="/login" className="hover:underline text-black">
+                Đăng nhập
+              </Link>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Register;
