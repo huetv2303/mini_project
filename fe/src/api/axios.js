@@ -10,6 +10,7 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
+    "Content-Type": "multipart/form-data",
     Accept: "application/json",
   },
 });
@@ -45,8 +46,9 @@ api.interceptors.response.use(
   async (error) => {
     const original = error.config;
     // Không thực hiện retry/refresh token cho các route auth
-    const isAuthRoute = original.url.includes("/login") || original.url.includes("/register");
-    
+    const isAuthRoute =
+      original.url.includes("/login") || original.url.includes("/register");
+
     if (error.response?.status === 401 && !original._retry && !isAuthRoute) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {

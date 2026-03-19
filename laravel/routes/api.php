@@ -57,9 +57,11 @@ Route::prefix('v1')->group(function () {
 
 
         Route::prefix('categories')->group(function () {
+            Route::post('/bulk-delete', [CategoryController::class, 'bulkDelete'])->middleware('permission:categories.manage');
             Route::get('/', [CategoryController::class, 'index']);
             Route::get('/{slug}', [CategoryController::class, 'show']);
-            Route::post('/', [CategoryController::class, 'store'])->middleware('permission:categories.manage');
+            Route::post('/', [CategoryController::class, 'store']);
+            // ->middleware('permission:categories.manage');
             Route::put('/{slug}', [CategoryController::class, 'update'])->middleware('permission:categories.manage');
             Route::delete('/{slug}', [CategoryController::class, 'destroy'])->middleware('permission:categories.manage');
         });

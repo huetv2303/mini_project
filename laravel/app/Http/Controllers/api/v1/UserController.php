@@ -17,9 +17,6 @@ class UserController extends Controller
         $this->userRepo = $userRepo;
     }
 
-    /**
-     * Danh sách người dùng
-     */
     public function index()
     {
         $users = $this->userRepo->getAllUsers();
@@ -29,9 +26,6 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Cập nhật vai trò cho người dùng
-     */
     public function updateRole(Request $request, $id)
     {
         $request->validate([

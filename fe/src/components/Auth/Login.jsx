@@ -183,7 +183,7 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 px-4 bg-white border border-gray-500 outline-none  bg-black hover:bg-black/80"
+                className="w-full py-3 px-4 bg-black border border-gray-500 outline-none  hover:bg-black/80"
               >
                 {loading ? (
                   <>

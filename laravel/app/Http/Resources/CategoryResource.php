@@ -20,6 +20,8 @@ class CategoryResource extends JsonResource
             'sort_order'  => $this->sort_order,
             'is_featured' => $this->is_featured,
             'parent'      => new CategoryResource($this->whenLoaded('parent')),
+            'children'    => CategoryResource::collection($this->whenLoaded('childrenRecursive')),
+            'children_count' => $this->children_count ?? $this->children->count(),
             'created_at'  => $this->created_at?->format('Y-m-d H:i:s'),
             'updated_at'  => $this->updated_at?->format('Y-m-d H:i:s'),
         ];

@@ -70,9 +70,6 @@ class StockReceiptService
         });
     }
 
-    /**
-     * Xác nhận phiếu nhập → Cộng tồn kho + Ghi InventoryTransaction
-     */
     public function confirmReceipt($id, $userId)
     {
         return DB::transaction(function () use ($id, $userId) {
@@ -102,9 +99,6 @@ class StockReceiptService
         });
     }
 
-    /**
-     * Huỷ phiếu nhập (chỉ khi đang pending)
-     */
     public function cancelReceipt($id)
     {
         return DB::transaction(function () use ($id) {

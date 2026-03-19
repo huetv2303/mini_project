@@ -16,11 +16,41 @@ import AuthGuard from "./middleware/AuthGuard";
 import GuestGuard from "./middleware/GuestGuard";
 import RoleGuard from "./middleware/RoleGuard";
 import { Toaster } from "react-hot-toast";
+import CategoryListPage from "./pages/Admin/category/CategoryListPage";
+import CategoryForm from "./pages/Admin/category/CategoryForm";
 
 const App = () => {
   return (
     <AuthProvider>
-      <Toaster position="top-right" reverseOrder={false} />
+      <Toaster
+        position="top-right"
+        reverseOrder={false}
+        toastOptions={{
+          style: {
+            borderRadius: "24px",
+            background: "#111",
+            color: "#fff",
+            padding: "12px 24px",
+            fontSize: "14px",
+            fontWeight: "600",
+            letterSpacing: "-0.2px",
+            boxShadow: "0 10px 30px -10px rgba(0,0,0,0.3)",
+            border: "1px solid rgba(255,255,255,0.05)",
+          },
+          success: {
+            iconTheme: {
+              primary: "#22c55e",
+              secondary: "#fff",
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: "#ef4444",
+              secondary: "#fff",
+            },
+          },
+        }}
+      />
       <Router>
         <Routes>
           <Route
@@ -47,7 +77,7 @@ const App = () => {
               </GuestGuard>
             }
           />
-
+          {/* 
           <Route
             path="/"
             element={
@@ -55,7 +85,7 @@ const App = () => {
                 <Home />
               </AuthGuard>
             }
-          />
+          /> */}
 
           <Route
             path="/admin"
@@ -63,6 +93,39 @@ const App = () => {
               <AuthGuard>
                 <RoleGuard permission="admin.manage">
                   <AdminDashboard />
+                </RoleGuard>
+              </AuthGuard>
+            }
+          />
+
+          <Route
+            path="/admin/categories"
+            element={
+              <AuthGuard>
+                <RoleGuard>
+                  <CategoryListPage />
+                </RoleGuard>
+              </AuthGuard>
+            }
+          />
+
+          <Route
+            path="/admin/categories/create"
+            element={
+              <AuthGuard>
+                <RoleGuard permission="admin.manage">
+                  <CategoryForm />
+                </RoleGuard>
+              </AuthGuard>
+            }
+          />
+
+          <Route
+            path="/admin/categories/edit/:slug"
+            element={
+              <AuthGuard>
+                <RoleGuard permission="admin.manage">
+                  <CategoryForm />
                 </RoleGuard>
               </AuthGuard>
             }
