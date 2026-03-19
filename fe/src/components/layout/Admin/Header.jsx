@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useAuth } from "../../../context/AuthContext";
-import { User, Key, LogOut, ChevronDown } from "lucide-react";
+import { User, Key, LogOut, ChevronDown, Menu } from "lucide-react";
 import { Link } from "react-router-dom";
 
-const Header = () => {
+const Header = ({ toggleSidebar }) => {
   const { logout, user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -19,12 +19,20 @@ const Header = () => {
   }, []);
 
   return (
-    <header className="bg-[#1a1a1a] shadow-sm border-b border-gray-800">
-      <div className="mx-auto px-8 sm:px-8 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          <div className="flex items-center">
+    <header className="bg-[#1a1a1a] shadow-sm border-b border-white/5 z-50">
+      <div className="mx-auto px-4 sm:px-8 lg:px-12">
+        <div className="flex justify-between items-center h-16 md:h-20">
+          <div className="flex items-center gap-4">
+            {/* Hamburger Menu - Chỉ hiện trên di động/tablet */}
+            <button
+              onClick={toggleSidebar}
+              className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-xl lg:hidden transition-all duration-300"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+
             <div className="flex-shrink-0">
-              <span className="text-xl text-white font-bold uppercase tracking-wider">
+              <span className=" md:text-xl sm:text-sm text-white font-black uppercase tracking-[3px] border-l-4 border-indigo-500 pl-4">
                 Bảng điều khiển
               </span>
             </div>
@@ -38,7 +46,10 @@ const Header = () => {
                 <div className="relative">
                   <img
                     className="h-9 w-9 rounded-full object-cover ring-2 ring-gray-700 group-hover:ring-gray-500 transition-all"
-                    src={user?.avatar || "https://ui-avatars.com/api/?name=" + user?.name}
+                    src={
+                      user?.avatar ||
+                      "https://ui-avatars.com/api/?name=" + user?.name
+                    }
                     alt={user?.name}
                   />
                 </div>

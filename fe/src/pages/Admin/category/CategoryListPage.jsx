@@ -270,15 +270,19 @@ const CategoryListPage = () => {
             </div>
           </td>
           <td className="px-3 py-4 text-center">
-            <img
-              src={
-                category.image
-                  ? `${import.meta.env.VITE_URL_IMAGE}/${category.image}`
-                  : "/no-image.png"
-              }
-              alt={category.name}
-              className="w-10 h-10 rounded-xl object-cover shadow-sm mx-auto border border-gray-100 group-hover:scale-105 transition-transform"
-            />
+            {category.image ? (
+              <img
+                src={
+                  category.image
+                    ? `${import.meta.env.VITE_URL_IMAGE}/${category.image}`
+                    : "/no-image.png"
+                }
+                alt={category.name}
+                className="w-10 h-10 rounded-xl object-cover shadow-sm mx-auto border border-gray-100 group-hover:scale-105 transition-transform"
+              />
+            ) : (
+              <div></div>
+            )}
           </td>
           <td className="px-6 py-4">
             <div className="flex justify-end items-center gap-2">

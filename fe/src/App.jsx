@@ -18,6 +18,8 @@ import RoleGuard from "./middleware/RoleGuard";
 import { Toaster } from "react-hot-toast";
 import CategoryListPage from "./pages/Admin/category/CategoryListPage";
 import CategoryForm from "./pages/Admin/category/CategoryForm";
+import SupplierListPage from "./pages/Admin/supplier/SupplierListPage";
+import SupplierForm from "./pages/Admin/supplier/SupplierForm";
 
 const App = () => {
   return (
@@ -126,6 +128,40 @@ const App = () => {
               <AuthGuard>
                 <RoleGuard permission="admin.manage">
                   <CategoryForm />
+                </RoleGuard>
+              </AuthGuard>
+            }
+          />
+
+          {/* Suppliers */}
+          <Route
+            path="/admin/suppliers"
+            element={
+              <AuthGuard>
+                <RoleGuard permission="admin.manage">
+                  <SupplierListPage />
+                </RoleGuard>
+              </AuthGuard>
+            }
+          />
+
+          <Route
+            path="/admin/suppliers/create"
+            element={
+              <AuthGuard>
+                <RoleGuard permission="admin.manage">
+                  <SupplierForm />
+                </RoleGuard>
+              </AuthGuard>
+            }
+          />
+
+          <Route
+            path="/admin/suppliers/edit/:slug"
+            element={
+              <AuthGuard>
+                <RoleGuard permission="admin.manage">
+                  <SupplierForm />
                 </RoleGuard>
               </AuthGuard>
             }

@@ -139,7 +139,7 @@ const CategoryForm = () => {
         {/* Header Section */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+            <h1 className="md:text-3xl sm:text-2xl font-bold text-gray-900 tracking-tight">
               {isEdit ? "Chỉnh sửa danh mục" : "Tạo danh mục mới"}
             </h1>
             <p className="mt-1 text-sm text-gray-500 font-medium">
@@ -153,8 +153,10 @@ const CategoryForm = () => {
             to="/admin/categories"
             className="inline-flex items-center px-4 py-2 bg-white border border-gray-200 text-gray-700 text-sm font-semibold rounded-xl hover:bg-gray-50 transition-all shadow-sm active:scale-95"
           >
-            <ArrowLeft className="w-5 h-5 mr-2" />
-            Quay lại
+            <ArrowLeft className="md:w-5 md:h-5 sm:w-4 sm:h-4 mr-2" />
+            <span className="md:block sm:hidden md:text-sm sm:text-xs">
+              Quay lại
+            </span>
           </Link>
         </div>
 
