@@ -48,8 +48,8 @@ class StoreProductRequest extends FormRequest
             'variants.*.image'            => 'nullable|image|max:2048',
 
             'variants.*.attributes'                   => 'nullable|array',
-            'variants.*.attributes.*.attribute_name'  => 'required|string',
-            'variants.*.attributes.*.attribute_value' => 'required|string',
+            'variants.*.attributes.*.attribute_name'  => 'nullable|string',
+            'variants.*.attributes.*.attribute_value' => 'nullable|string',
 
             'variants.*.inventory.quantity'     => 'required|integer|min:0',
             'variants.*.inventory.min_quantity' => 'nullable|integer|min:0',

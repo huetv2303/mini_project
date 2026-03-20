@@ -20,6 +20,10 @@ class ProductRepository implements ProductRepositoryInterface
     {
         return Product::where('slug', $slug)->first();
     }
+    public function findByIds(array $ids)
+    {
+        return Product::whereIn('id', $ids)->get();
+    }
     public function createProduct(array $data)
     {
         return Product::create($data);

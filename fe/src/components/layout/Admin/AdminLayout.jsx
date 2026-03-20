@@ -32,7 +32,7 @@ const AdminLayout = ({ children }) => {
         >
           {/* Nút đóng nhanh trên di động */}
           <div className="flex items-center justify-between p-6 lg:hidden border-b border-gray-100">
-            <span className="font-black text-gray-900 uppercase tracking-widest text-sm">Menu</span>
+            <span className="font-bold text-gray-900 text-sm">Menu</span>
             <button
               onClick={() => setIsSidebarOpen(false)}
               className="p-2 text-gray-400 hover:text-red-500 transition-colors"
@@ -48,7 +48,7 @@ const AdminLayout = ({ children }) => {
 
         {/* Main Content Area */}
         <main className="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent bg-gray-50">
-          <div className="max-w-7xl mx-auto w-full animate-in fade-in slide-in-from-bottom-2 duration-500">
+          <div className="max-w-7xl w-full animate-in fade-in slide-in-from-bottom-2 duration-500">
             {children}
           </div>
         </main>

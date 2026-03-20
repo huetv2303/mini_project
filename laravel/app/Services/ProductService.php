@@ -33,10 +33,11 @@ class ProductService
     {
         return $this->productRepo->getAll($request);
     }
-    // public function getBySlug($slug)
-    // {
-    //     return $this->productRepo->getBySlug($slug);
-    // }
+
+    public function findBySlug($slug)
+    {
+        return $this->productRepo->findBySlug($slug);
+    }
     public function createProduct(array $data, $request)
     {
         return DB::transaction(function () use ($data, $request) {
@@ -301,35 +302,50 @@ class ProductService
     public function destroy($slug)
     {
         return DB::transaction(function () use ($slug) {
-            $product = $this->productRepo->deleteProduct($slug);
+            $product = $this->productRepo->findBySlug($slug);
             if (!$product) {
                 throw new \Exception("Product not found");
             }
+            return $this->deleteProductData($product);
+        });
+    }
 
-            if ($product->feature_image) {
-                $this->uploadImageService->deleteFile($product->feature_image);
+    public function bulkDestroy(array $ids)
+    {
+        return DB::transaction(function () use ($ids) {
+            $products = $this->productRepo->findByIds($ids);
+            foreach ($products as $product) {
+                $this->deleteProductData($product);
             }
-
-            foreach ($product->images as $image) {
-                if ($image->image_path) {
-                    $this->uploadImageService->deleteFile($image->image_path);
-                }
-                $image->delete();
-            }
-
-            foreach ($product->variants as $variant) {
-                if ($variant->image) {
-                    $this->uploadImageService->deleteFile($variant->image);
-                }
-                $variant->attributes()->delete();
-                $variant->inventories()->delete();
-                $variant->delete();
-            }
-
-            $product->attributes()->whereNull('variant_id')->delete();
-            $this->productRepo->deleteProduct($slug);
-
             return true;
         });
+    }
+
+    protected function deleteProductData($product)
+    {
+        if ($product->feature_image) {
+            $this->uploadImageService->deleteFile($product->feature_image);
+        }
+
+        foreach ($product->images as $image) {
+            if ($image->image_path) {
+                $this->uploadImageService->deleteFile($image->image_path);
+            }
+            $image->delete();
+        }
+
+        foreach ($product->variants as $variant) {
+            if ($variant->image) {
+                $this->uploadImageService->deleteFile($variant->image);
+            }
+            $variant->attributes()->delete();
+            $variant->inventories()->delete();
+            $variant->delete();
+        }
+
+        $product->attributes()->whereNull('variant_id')->delete();
+        $product->delete();
+
+        return true;
     }
 }

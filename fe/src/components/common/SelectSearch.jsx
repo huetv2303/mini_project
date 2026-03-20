@@ -64,7 +64,7 @@ const SelectSearch = ({
       <div
         onClick={() => setIsOpen(!isOpen)}
         className={`
-          flex items-center justify-between w-full px-4 py-3 border rounded-xl cursor-pointer transition-all outline-none
+          flex items-center justify-between w-full px-4 py-3 border rounded-lg cursor-pointer transition-all outline-none
           ${isOpen ? "border-black ring-2 ring-black/5" : "border-gray-200 hover:border-gray-300 bg-white"}
         `}
       >

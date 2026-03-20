@@ -1,7 +1,14 @@
 import React, { useRef } from "react";
 import { Plus, X, Image as ImageIcon } from "lucide-react";
 
-const ImageUpload = ({ label, images, setImages, multiple = false }) => {
+const ImageUpload = ({
+  label,
+  images,
+  setImages,
+  multiple = false,
+  width = "w-80",
+  height = "h-80",
+}) => {
   const fileInputRef = useRef(null);
 
   // Xử lý khi chọn file
@@ -49,7 +56,7 @@ const ImageUpload = ({ label, images, setImages, multiple = false }) => {
   };
 
   return (
-    <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+    <div className="bg-white rounded-lg p-4 border border-gray-100 shadow-sm">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-bold text-gray-900">{label}</h2>
       </div>
@@ -118,7 +125,7 @@ const ImageUpload = ({ label, images, setImages, multiple = false }) => {
             onClick={triggerInput}
             className={`
               flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-2xl cursor-pointer hover:border-blue-400 hover:bg-blue-50/10 transition-all group/btn
-              ${multiple ? "w-24 h-24 sm:w-28 sm:h-28" : "w-80 h-80"}
+              ${multiple ? "w-24 h-24 sm:w-28 sm:h-28" : `${width} ${height}`}
             `}
           >
             <Plus className="w-6 h-6 text-gray-400 group-hover/btn:text-blue-500 transition-colors" />

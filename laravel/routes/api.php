@@ -75,10 +75,15 @@ Route::prefix('v1')->group(function () {
         });
 
         Route::prefix('products')->group(function () {
+            Route::post('/bulk-delete', [ProductController::class, 'bulkDelete']);
             Route::get('/', [ProductController::class, 'index']);
-            Route::post('/', [ProductController::class, 'store'])->middleware('permission:products.create');
-            Route::put('/{slug}', [ProductController::class, 'update'])->middleware('permission:products.edit');
-            Route::delete('/{slug}', [ProductController::class, 'destroy'])->middleware('permission:products.delete');
+            Route::get('/{slug}', [ProductController::class, 'show']);
+            Route::post('/', [ProductController::class, 'store']);
+            // ->middleware('permission:products.create');
+            Route::put('/{slug}', [ProductController::class, 'update']);
+            // ->middleware('permission:products.edit');
+            Route::delete('/{slug}', [ProductController::class, 'destroy']);
+            // ->middleware('permission:products.delete');
         });
 
         Route::prefix('orders')->group(function () {

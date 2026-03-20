@@ -20,6 +20,8 @@ import CategoryListPage from "./pages/Admin/category/CategoryListPage";
 import CategoryForm from "./pages/Admin/category/CategoryForm";
 import SupplierListPage from "./pages/Admin/supplier/SupplierListPage";
 import SupplierForm from "./pages/Admin/supplier/SupplierForm";
+import ProductListPage from "./pages/Admin/product/ProductListPage";
+import ProductForm from "./pages/Admin/product/ProductForm";
 
 const App = () => {
   return (
@@ -162,6 +164,40 @@ const App = () => {
               <AuthGuard>
                 <RoleGuard permission="admin.manage">
                   <SupplierForm />
+                </RoleGuard>
+              </AuthGuard>
+            }
+          />
+
+          {/* Products */}
+          <Route
+            path="/admin/products"
+            element={
+              <AuthGuard>
+                <RoleGuard permission="admin.manage">
+                  <ProductListPage />
+                </RoleGuard>
+              </AuthGuard>
+            }
+          />
+
+          <Route
+            path="/admin/products/create"
+            element={
+              <AuthGuard>
+                <RoleGuard permission="admin.manage">
+                  <ProductForm />
+                </RoleGuard>
+              </AuthGuard>
+            }
+          />
+
+          <Route
+            path="/admin/products/edit/:slug"
+            element={
+              <AuthGuard>
+                <RoleGuard permission="admin.manage">
+                  <ProductForm />
                 </RoleGuard>
               </AuthGuard>
             }

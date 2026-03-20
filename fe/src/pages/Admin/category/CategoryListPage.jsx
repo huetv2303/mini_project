@@ -324,7 +324,7 @@ const CategoryListPage = () => {
       <div className="animate-in fade-in duration-500 pb-10">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+            <h1 className="text-2xl font-bold text-gray-900">
               Danh mục sản phẩm
             </h1>
             <p className="mt-1 text-sm text-gray-500 font-medium italic">
@@ -386,19 +386,19 @@ const CategoryListPage = () => {
                       )}
                     </button>
                   </th>
-                  <th className="px-6 py-5 text-xs font-bold text-gray-400 uppercase tracking-widest leading-loose">
+                  <th className="px-6 py-5 text-xs font-semibold text-gray-400 uppercase tracking-wider leading-loose">
                     Tên danh mục
                   </th>
-                  <th className="px-6 py-5 text-xs font-bold text-gray-400 uppercase tracking-widest leading-loose">
+                  <th className="px-6 py-5 text-xs font-semibold text-gray-400 uppercase tracking-wider leading-loose">
                     Đường dẫn
                   </th>
-                  <th className="px-6 py-5 text-xs font-bold text-gray-400 uppercase tracking-widest text-center leading-loose">
+                  <th className="px-6 py-5 text-xs font-semibold text-gray-400 uppercase tracking-wider text-center leading-loose">
                     Cấu trúc
                   </th>
-                  <th className="px-6 py-5 text-xs font-bold text-gray-400 uppercase tracking-widest text-center leading-loose">
+                  <th className="px-6 py-5 text-xs font-semibold text-gray-400 uppercase tracking-wider text-center leading-loose">
                     Ảnh
                   </th>
-                  <th className="px-6 py-5 text-xs font-bold text-gray-400 uppercase tracking-widest text-right leading-loose">
+                  <th className="px-6 py-5 text-xs font-semibold text-gray-400 uppercase tracking-wider text-right leading-loose">
                     Thao tác
                   </th>
                 </tr>

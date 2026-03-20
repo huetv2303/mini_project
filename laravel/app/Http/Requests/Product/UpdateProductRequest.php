@@ -58,9 +58,11 @@ class UpdateProductRequest extends FormRequest
             'variants.*.image'       => 'nullable|image|max:2048',
             'variants.*.attributes'  => 'nullable|array',
             'variants.*.attributes.*.id'              => 'nullable|exists:product_attributes,id',
-            'variants.*.attributes.*.attribute_name'  => 'required|string',
-            'variants.*.attributes.*.attribute_value' => 'required|string',
+            'variants.*.attributes.*.attribute_name'  => 'nullable|string',
+            'variants.*.attributes.*.attribute_value' => 'nullable|string',
             'variants.*.inventory.quantity' => 'required|integer|min:0',
+            'variants.*.inventory.min_quantity' => 'nullable|integer|min:0',
+            'variants.*.cost_price' => 'nullable|numeric|min:0',
         ];
 
         if ($this->has('variants') && is_array($this->input('variants'))) {

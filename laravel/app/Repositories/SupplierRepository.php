@@ -7,14 +7,15 @@ use App\Models\Supplier;
 
 class SupplierRepository implements SupplierRepositoryInterface
 {
-    public function getAll($request =null)
+    public function getAll($request = null)
     {
         $query = Supplier::query();
-        if ($request == null){
-            return  $query->paginate(10);
+        
+        if ($request && $request->has('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
         }
 
-        return $query->when($request->search, fn($q, $v) => $q->where('name', 'like', '%'.$v.'%'))->paginate(10);
+        return $query;
     }
 
     public function getBySlug($slug)

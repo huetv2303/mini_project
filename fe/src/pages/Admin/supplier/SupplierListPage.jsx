@@ -141,7 +141,7 @@ const SupplierListPage = () => {
       <div className="animate-in fade-in duration-500 pb-10">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+            <h1 className="text-2xl font-bold text-gray-900">
               Đối tác Cung ứng
             </h1>
           </div>
@@ -199,16 +199,16 @@ const SupplierListPage = () => {
                       )}
                     </button>
                   </th>
-                  <th className="px-6 py-6 text-xs font-bold text-gray-400 uppercase tracking-widest">
+                  <th className="px-6 py-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">
                     Nhà cung cấp
                   </th>
-                  <th className="px-6 py-6 text-xs font-bold text-gray-400 uppercase tracking-widest">
+                  <th className="px-6 py-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">
                     Liên hệ
                   </th>
-                  <th className="px-6 py-6 text-xs font-bold text-gray-400 uppercase tracking-widest">
+                  <th className="px-6 py-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">
                     Trạng thái
                   </th>
-                  <th className="px-6 py-6 text-xs font-bold text-gray-400 uppercase tracking-widest text-right">
+                  <th className="px-6 py-6 text-xs font-semibold text-gray-400 uppercase tracking-wider text-right">
                     Thao tác
                   </th>
                 </tr>

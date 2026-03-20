@@ -24,13 +24,13 @@ const SidebarItem = ({ to, icon: Icon, label }) => (
     <Icon
       className={`mr-4 h-5 w-5 flex-shrink-0 transition-colors duration-200`}
     />
-    <span className="uppercase tracking-widest text-[10px]">{label}</span>
+    <span className="font-semibold text-[11px]">{label}</span>
   </NavLink>
 );
 
 const SectionTitle = ({ title }) => (
   <div className="px-6 py-6 pb-2">
-    <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[2px]">
+    <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
       {title}
     </h3>
   </div>
@@ -41,7 +41,7 @@ const Sidebar = () => {
     <div className="flex flex-col h-full bg-white scrollbar-none">
       {/* Sidebar Branding (Optional Header inside sidebar) */}
       <div className="hidden lg:flex items-center justify-center p-8 border-b border-gray-50">
-        <span className="text-xl font-black text-gray-900 uppercase tracking-widest border-b-2 border-black">Admin</span>
+        <span className="text-xl font-bold text-gray-900 tracking-wider">ADMIN</span>
       </div>
 
       <nav className="flex-1 py-4">

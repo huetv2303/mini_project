@@ -3,11 +3,12 @@ import api from "../api/axios";
 /**
  * Lấy danh sách nhà cung cấp (có tìm kiếm & phân trang)
  */
-export const fetchSuppliersRequest = async ({ search = "", page = 1 } = {}) => {
+export const fetchSuppliersRequest = async ({ all = false, search = "", page = 1 } = {}) => {
   try {
     const params = new URLSearchParams();
+    if (all) params.append("all", "true");
     if (search) params.append("search", search);
-    if (page) params.append("page", page);
+    if (!all && page) params.append("page", page);
 
     const url = `/suppliers?${params.toString()}`;
     const response = await api.get(url);

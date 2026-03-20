@@ -21,7 +21,18 @@ class SupplierController extends Controller
     }
     public function index(Request $request)
     {
-        $suppliers = $this->supplierService->getAll($request);
+        $query = $this->supplierService->getAll($request);
+
+        if ($request->has('all') && $request->all == 'true') {
+            $suppliers = $query->get();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'All supplier list',
+                'data'   => SupplierResource::collection($suppliers)
+            ]);
+        }
+
+        $suppliers = $query->paginate(10);
         return response()->json([
             'status' => 'success',
             'data'   => SupplierResource::collection($suppliers)->response()->getData(true)

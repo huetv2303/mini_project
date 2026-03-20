@@ -25,8 +25,32 @@ class ProductController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data' => ProductResource::collection($products)
+            'data'   => ProductResource::collection($products)->response()->getData(true)
         ]);
+    }
+
+    public function show($slug)
+    {
+        try {
+            $product = $this->productService->findBySlug($slug);
+            if (!$product) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Product not found'
+                ], 404);
+            }
+            $product->load(['category', 'supplier', 'images', 'attributes', 'variants.attributes', 'variants.inventories']);
+
+            return response()->json([
+                'status' => 'success',
+                'data' => new ProductResource($product)
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to fetch product: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function store(StoreProductRequest $request)
@@ -80,6 +104,31 @@ class ProductController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to delete product: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        try {
+            $ids = $request->input('ids');
+            if (empty($ids)) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'No IDs provided'
+                ], 400);
+            }
+
+            $this->productService->bulkDestroy($ids);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Products deleted successfully'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to delete products: ' . $e->getMessage()
             ], 500);
         }
     }
