@@ -23,6 +23,7 @@ import {
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import ConfirmModal from "../../../components/common/ConfirmModal";
+import Pagination from "../../../components/common/Pagination";
 
 const debounce = (func, delay) => {
   let timer;
@@ -62,9 +63,10 @@ const SupplierListPage = () => {
 
       setSuppliers(items);
       setPagination({
-        total: meta.total || 0,
-        lastPage: meta.last_page || 1,
-        perPage: meta.per_page || 10,
+        currentPage: meta.current_page,
+        lastPage: meta.last_page,
+        total: meta.total,
+        perPage: meta.per_page,
       });
       setSelectedIds(new Set());
     } catch (error) {
@@ -72,6 +74,13 @@ const SupplierListPage = () => {
       toast.error("Không thể tải danh sách nhà cung cấp");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= pagination.lastPage) {
+      getSuppliers(newPage, searchTerm);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
@@ -141,7 +150,7 @@ const SupplierListPage = () => {
       <div className="animate-in fade-in duration-500 pb-10">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-2xl font-medium text-gray-900">
               Đối tác Cung ứng
             </h1>
           </div>
@@ -156,14 +165,14 @@ const SupplierListPage = () => {
             )}
             <Link
               to="/admin/suppliers/create"
-              className="inline-flex items-center px-6 py-3 bg-black text-white text-sm font-bold rounded-2xl hover:bg-black/90 transition-all shadow-lg active:scale-95"
+              className="inline-flex items-center px-4 py-3 bg-black text-white text-sm font-bold rounded-lg hover:bg-black/90 transition-all shadow-lg active:scale-95"
             >
               <Plus className="w-5 h-5 mr-2" /> Thêm NCC
             </Link>
           </div>
         </div>
 
-        <div className="bg-white rounded-[40px] border border-gray-100 shadow-2xl shadow-black/5 overflow-hidden">
+        <div className="bg-white rounded-lg border border-gray-100 shadow-2xl shadow-black/5 overflow-hidden">
           <div className="p-8 border-b border-gray-50 bg-gray-50/20 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -182,7 +191,7 @@ const SupplierListPage = () => {
             )}
           </div>
 
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto overflow-y-auto max-h-[480px]">
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-gray-50/50">
@@ -218,7 +227,7 @@ const SupplierListPage = () => {
                   <tr>
                     <td colSpan="5" className="px-6 py-24 text-center">
                       <Loader2 className="w-12 h-12 text-black animate-spin mx-auto mb-4" />
-                      <span className="text-gray-400 font-bold text-xs uppercase tracking-widest">
+                      <span className="text-gray-400 font-bold text-xs uppercase ">
                         Đang tải danh sách...
                       </span>
                     </td>
@@ -256,7 +265,7 @@ const SupplierListPage = () => {
                             <div className="font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">
                               {sup.name}
                             </div>
-                            <div className="text-xs text-gray-400 font-medium font-mono mt-1">
+                            <div className="text-xs text-gray-400 font-medium  mt-1">
                               MST: {sup.tax_code || "N/A"}
                             </div>
                           </div>
@@ -276,7 +285,7 @@ const SupplierListPage = () => {
                       </td>
                       <td className="px-6 py-5">
                         <span
-                          className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider ${sup.status === 1 ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600"}`}
+                          className={`px-3 py-1.5 rounded-xl text-[10px] font-medium uppercase  ${sup.status === 1 ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600"}`}
                         >
                           {sup.status === 1 ? "Hoạt động" : "Tạm ngưng"}
                         </span>
@@ -313,43 +322,11 @@ const SupplierListPage = () => {
             </table>
           </div>
 
-          {!loading && suppliers.length > 0 && pagination.lastPage > 1 && (
-            <div className="p-8 border-t border-gray-50 flex items-center justify-between bg-gray-50/20">
-              <span className="text-sm text-gray-500 font-medium italic font-mono">
-                Total Suppliers:{" "}
-                <span className="text-black font-bold font-sans">
-                  {pagination.total}
-                </span>
-              </span>
-              <div className="flex items-center gap-2">
-                <button
-                  disabled={currentPage === 1}
-                  onClick={() => setCurrentPage((p) => p - 1)}
-                  className="p-3 rounded-2xl border border-gray-100 bg-white hover:bg-gray-50 disabled:opacity-30"
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                <div className="flex gap-1.5">
-                  {[...Array(pagination.lastPage)].map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setCurrentPage(i + 1)}
-                      className={`w-12 h-12 rounded-2xl text-sm font-bold transition-all ${currentPage === i + 1 ? "bg-black text-white shadow-xl" : "bg-white border border-gray-100 text-gray-500 hover:bg-gray-50"}`}
-                    >
-                      {i + 1}
-                    </button>
-                  ))}
-                </div>
-                <button
-                  disabled={currentPage === pagination.lastPage}
-                  onClick={() => setCurrentPage((p) => p + 1)}
-                  className="p-3 rounded-2xl border border-gray-100 bg-white hover:bg-gray-50 disabled:opacity-30"
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-          )}
+          <Pagination
+            pagination={pagination}
+            onPageChange={handlePageChange}
+            label="Nhà cung cấp"
+          />
         </div>
       </div>
       <ConfirmModal

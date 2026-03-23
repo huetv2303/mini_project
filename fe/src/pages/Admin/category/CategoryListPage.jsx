@@ -324,7 +324,7 @@ const CategoryListPage = () => {
       <div className="animate-in fade-in duration-500 pb-10">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-2xl font-medium text-gray-900">
               Danh mục sản phẩm
             </h1>
             <p className="mt-1 text-sm text-gray-500 font-medium italic">
@@ -343,7 +343,7 @@ const CategoryListPage = () => {
             )}
             <Link
               to="/admin/categories/create"
-              className="inline-flex items-center justify-center px-6 py-3 bg-black text-white text-sm font-bold rounded-2xl hover:bg-black/90 transition-all shadow-lg active:scale-95"
+              className="inline-flex items-center justify-center px-4 py-3 bg-black text-white text-sm font-bold rounded-lg hover:bg-black/90 transition-all shadow-lg active:scale-95"
             >
               <Plus className="w-5 h-5 mr-2" /> Thêm danh mục
             </Link>
@@ -408,7 +408,7 @@ const CategoryListPage = () => {
                   <tr>
                     <td colSpan="6" className="px-6 py-20 text-center">
                       <Loader2 className="w-10 h-10 text-black animate-spin mx-auto mb-2" />
-                      <span className="text-gray-400 font-bold text-xs uppercase tracking-widest">
+                      <span className="text-gray-400 font-bold text-xs uppercase ">
                         Đang tải dữ liệu...
                       </span>
                     </td>

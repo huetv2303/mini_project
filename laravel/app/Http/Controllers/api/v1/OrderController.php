@@ -21,10 +21,7 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         $orders = $this->orderService->getAll($request);
-        return response()->json([
-            'status' => 'success',
-            'data'   => OrderResource::collection($orders),
-        ]);
+        return OrderResource::collection($orders)->additional(['status' => 'success']);
     }
 
     public function store(StoreOrderRequest $request)

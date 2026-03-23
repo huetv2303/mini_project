@@ -22,6 +22,12 @@ import SupplierListPage from "./pages/Admin/supplier/SupplierListPage";
 import SupplierForm from "./pages/Admin/supplier/SupplierForm";
 import ProductListPage from "./pages/Admin/product/ProductListPage";
 import ProductForm from "./pages/Admin/product/ProductForm";
+import OrderListPage from "./pages/Admin/order/OrderListPage";
+import OrderDetailsPage from "./pages/Admin/order/OrderDetailsPage";
+import OrderCreatePage from "./pages/Admin/order/OrderCreatePage";
+import InventoryListPage from "./pages/Admin/inventory/InventoryListPage";
+import OrderReturnListPage from "./pages/Admin/order/OrderReturnListPage";
+import OrderReturnDetailsPage from "./pages/Admin/order/OrderReturnDetailsPage";
 
 const App = () => {
   return (
@@ -92,10 +98,12 @@ const App = () => {
           /> */}
 
           <Route
-            path="/admin"
+            path="/admin/dashboard"
             element={
               <AuthGuard>
-                <RoleGuard permission="admin.manage">
+                <RoleGuard
+                  permission="admin.manage"
+                >
                   <AdminDashboard />
                 </RoleGuard>
               </AuthGuard>
@@ -106,7 +114,9 @@ const App = () => {
             path="/admin/categories"
             element={
               <AuthGuard>
-                <RoleGuard>
+                <RoleGuard
+                  permission="admin.manage"
+                >
                   <CategoryListPage />
                 </RoleGuard>
               </AuthGuard>
@@ -117,7 +127,9 @@ const App = () => {
             path="/admin/categories/create"
             element={
               <AuthGuard>
-                <RoleGuard permission="admin.manage">
+                <RoleGuard
+                  permission="admin.manage"
+                >
                   <CategoryForm />
                 </RoleGuard>
               </AuthGuard>
@@ -128,7 +140,9 @@ const App = () => {
             path="/admin/categories/edit/:slug"
             element={
               <AuthGuard>
-                <RoleGuard permission="admin.manage">
+                <RoleGuard
+                  permission="admin.manage"
+                >
                   <CategoryForm />
                 </RoleGuard>
               </AuthGuard>
@@ -140,7 +154,9 @@ const App = () => {
             path="/admin/suppliers"
             element={
               <AuthGuard>
-                <RoleGuard permission="admin.manage">
+                <RoleGuard
+                  permission="admin.manage"
+                >
                   <SupplierListPage />
                 </RoleGuard>
               </AuthGuard>
@@ -151,7 +167,9 @@ const App = () => {
             path="/admin/suppliers/create"
             element={
               <AuthGuard>
-                <RoleGuard permission="admin.manage">
+                <RoleGuard
+                  permission="admin.manage"
+                >
                   <SupplierForm />
                 </RoleGuard>
               </AuthGuard>
@@ -162,7 +180,9 @@ const App = () => {
             path="/admin/suppliers/edit/:slug"
             element={
               <AuthGuard>
-                <RoleGuard permission="admin.manage">
+                <RoleGuard
+                  permission="admin.manage"
+                >
                   <SupplierForm />
                 </RoleGuard>
               </AuthGuard>
@@ -174,7 +194,9 @@ const App = () => {
             path="/admin/products"
             element={
               <AuthGuard>
-                <RoleGuard permission="admin.manage">
+                <RoleGuard
+                  permission="admin.manage"
+                >
                   <ProductListPage />
                 </RoleGuard>
               </AuthGuard>
@@ -185,7 +207,9 @@ const App = () => {
             path="/admin/products/create"
             element={
               <AuthGuard>
-                <RoleGuard permission="admin.manage">
+                <RoleGuard
+                  permission="admin.manage"
+                >
                   <ProductForm />
                 </RoleGuard>
               </AuthGuard>
@@ -196,8 +220,86 @@ const App = () => {
             path="/admin/products/edit/:slug"
             element={
               <AuthGuard>
-                <RoleGuard permission="admin.manage">
+                <RoleGuard
+                  permission="admin.manage"
+                >
                   <ProductForm />
+                </RoleGuard>
+              </AuthGuard>
+            }
+          />
+
+          {/* Orders */}
+          <Route
+            path="/admin/orders"
+            element={
+              <AuthGuard>
+                <RoleGuard
+                  permission="admin.manage"
+                >
+                  <OrderListPage />
+                </RoleGuard>
+              </AuthGuard>
+            }
+          />
+
+          <Route
+            path="/admin/orders/create"
+            element={
+              <AuthGuard>
+                <RoleGuard
+                  permission="admin.manage"
+                >
+                  <OrderCreatePage />
+                </RoleGuard>
+              </AuthGuard>
+            }
+          />
+
+          <Route
+            path="/admin/orders/:id"
+            element={
+              <AuthGuard>
+                <RoleGuard
+                  permission="admin.manage"
+                >
+                  <OrderDetailsPage />
+                </RoleGuard>
+              </AuthGuard>
+            }
+          />
+
+          <Route
+            path="/admin/order-returns"
+            element={
+              <AuthGuard>
+                <RoleGuard permission="admin.manage">
+                  <OrderReturnListPage />
+                </RoleGuard>
+              </AuthGuard>
+            }
+          />
+
+          <Route
+            path="/admin/order-returns/:id"
+            element={
+              <AuthGuard>
+                <RoleGuard permission="admin.manage">
+                  <OrderReturnDetailsPage />
+                </RoleGuard>
+              </AuthGuard>
+            }
+          />
+          
+          {/* Inventory / Warehouse */}
+          <Route
+            path="/admin/warehouse"
+            element={
+              <AuthGuard>
+                <RoleGuard
+                  permission="admin.manage"
+                >
+                  <InventoryListPage />
                 </RoleGuard>
               </AuthGuard>
             }

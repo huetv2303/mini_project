@@ -24,6 +24,8 @@ use App\Repositories\SupplierRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\Order\OrderRepository;
 use App\Repositories\CustomerRepository;
+use App\Interfaces\Order\OrderReturnRepositoryInterface;
+use App\Repositories\Order\OrderReturnRepository;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use App\Models\Permission;
@@ -46,6 +48,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(OrderRepositoryInterface::class, OrderRepository::class);
         $this->app->bind(StockReceiptRepositoryInterface::class, StockReceiptRepository::class);
         $this->app->bind(CustomerRepositoryInterface::class, CustomerRepository::class);
+        $this->app->bind(OrderReturnRepositoryInterface::class, OrderReturnRepository::class);
     }
 
     /**

@@ -47,7 +47,7 @@ class CategoryController extends Controller
 
             $data = $query->with(['childrenRecursive'])
                 ->withCount('children')
-                ->paginate(3);
+                ->paginate(10);
         } else {
             // Nếu là collection, lọc bằng PHP
             $data = $query->whereIn('parent_id', [null, 0]);

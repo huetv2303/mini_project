@@ -31,7 +31,7 @@ const VariantsSection = ({
           <div className="w-10 h-10 bg-indigo-50 rounded-2xl flex items-center justify-center">
             <Settings className="w-5 h-5 text-indigo-500" />
           </div>
-          <h2 className="text-xl font-black text-gray-900 uppercase tracking-widest">
+          <h2 className="text-xl font-black text-gray-900 uppercase ">
             {hasVariants ? "Cấu hình Biến thể" : "Giá & Kho hàng"}
           </h2>
         </div>
@@ -63,7 +63,7 @@ const VariantsSection = ({
             )}
             <div className="flex flex-col md:flex-row gap-8">
               <div className="w-full md:w-32">
-                <label className="font-bold text-[10px] text-gray-400 uppercase tracking-widest mb-2 block">
+                <label className="font-bold text-[10px] text-gray-400 uppercase  mb-2 block">
                   Ảnh riêng
                 </label>
                 <ImageUpload

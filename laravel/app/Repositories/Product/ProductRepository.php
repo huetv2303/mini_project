@@ -11,10 +11,10 @@ class ProductRepository implements ProductRepositoryInterface
     {
         $query = Product::with(['category', 'supplier', 'images', 'attributes', 'variants.attributes', 'variants.inventories']);
         if ($request == null) {
-            return  $query->paginate(10);
+            return  $query->paginate(5);
         }
 
-        return $query->when($request->search, fn($q, $v) => $q->where('name', 'like', '%' . $v . '%'))->paginate(10);
+        return $query->when($request->search, fn($q, $v) => $q->where('name', 'like', '%' . $v . '%'))->paginate(5);
     }
     public function findBySlug($slug)
     {

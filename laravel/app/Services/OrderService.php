@@ -61,6 +61,7 @@ class OrderService
                     'product_variant_id' => $variant->id,
                     'product_name'       => $variant->product->name,
                     'variant_name'       => $variant->name,
+                    'image'              => $this->getItemImage($variant),
                     'sku'                => $variant->sku,
                     'price'              => $price,
                     'quantity'           => $item['quantity'],
@@ -101,7 +102,8 @@ class OrderService
                     'order',
                     $order->id,
                     $staffId,
-                    "Xuất kho cho đơn hàng: " . $order->code
+                    "Xuất kho cho đơn hàng: " . $order->code,
+                    'order'
                 );
             }
 
@@ -147,7 +149,8 @@ class OrderService
                             'order_cancel',
                             $order->id,
                             auth()->id(),
-                            "Hoàn kho do huỷ đơn hàng: " . $order->code
+                            "Hoàn kho do huỷ đơn hàng: " . $order->code,
+                            'order'
                         );
                     }
                 }
@@ -190,7 +193,8 @@ class OrderService
                         'order_cancel',
                         $order->id,
                         auth()->id(),
-                        "Hoàn kho do huỷ đơn hàng: " . $order->code
+                        "Hoàn kho do huỷ đơn hàng: " . $order->code,
+                        'order'
                     );
                 }
             }
@@ -209,5 +213,28 @@ class OrderService
 
             return $order;
         });
+    }
+
+    private function getItemImage($variant)
+    {
+        // 1. Ưu tiên ảnh của biến thể
+        if ($variant->image) {
+            return $variant->image;
+        }
+
+        // 2. Nếu không có, lấy ảnh đại diện (Feature Image) của sản phẩm
+        if ($variant->product && $variant->product->feature_image) {
+            return $variant->product->feature_image;
+        }
+
+        // 3. Nếu vẫn không có, lấy ảnh đầu tiên trong gallery sản phẩm
+        if ($variant->product) {
+            $firstImage = $variant->product->images()->first();
+            if ($firstImage) {
+                return $firstImage->image_path;
+            }
+        }
+
+        return null;
     }
 }

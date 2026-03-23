@@ -28,8 +28,12 @@ const Login = () => {
       setLoading(true);
       setToken({ access_token: token });
       fetchUser()
-        .then(() => {
-          navigate("/");
+        .then((userData) => {
+          if (userData?.role_id === 1) {
+            navigate("/admin/dashboard");
+          } else {
+            navigate("/");
+          }
         })
         .catch((err) => {
           const msg =
@@ -38,6 +42,13 @@ const Login = () => {
           toast.error(msg);
           setLoading(false);
         });
+    }
+
+    const expiredParam = params.get("expired");
+    if (expiredParam) {
+      toast.error("Hết phiên đăng nhập");
+      setError("Hết phiên đăng nhập");
+      navigate("/login", { replace: true });
     }
 
     if (errorParam) {
@@ -61,9 +72,14 @@ const Login = () => {
     setSuccessMessage("");
     setNeedsVerification(false);
     try {
-      await login(email, password);
+      const data = await login(email, password);
       toast.success("Đăng nhập thành công!");
-      navigate("/");
+      const user = data.user.data || data.user;
+      if (user.role_id === 1) {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/");
+      }
     } catch (err) {
       const msg =
         err.response?.data?.message || "Đăng nhập thất bại. Vui lòng thử lại.";

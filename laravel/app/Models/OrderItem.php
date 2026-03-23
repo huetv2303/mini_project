@@ -12,6 +12,7 @@ class OrderItem extends Model
         'product_variant_id',
         'product_name',
         'variant_name',
+        'image',
         'sku',
         'price',
         'quantity',
@@ -31,5 +32,10 @@ class OrderItem extends Model
     public function variant()
     {
         return $this->belongsTo(ProductVariant::class, 'product_variant_id');
+    }
+
+    public function returnItems()
+    {
+        return $this->hasMany(OrderReturnItem::class, 'order_item_id');
     }
 }

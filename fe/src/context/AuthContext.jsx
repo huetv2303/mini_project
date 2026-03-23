@@ -21,10 +21,11 @@ export const AuthProvider = ({ children }) => {
       const response = await fetchUserRequest();
       const userData = response.data.data || response.data;
       setUser(userData);
-      console.log("User fetched:", userData);
+      return userData; // <-- Return userData
     } catch (error) {
       clearAuth();
       setUser(null);
+      throw error; // <-- Rethrow to handle in then/catch
     } finally {
       setLoading(false);
     }

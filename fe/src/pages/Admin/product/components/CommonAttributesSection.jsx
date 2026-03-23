@@ -21,7 +21,7 @@ const CommonAttributesSection = ({
         <button
           type="button"
           onClick={() => handleAddAttribute()}
-          className="flex items-center gap-2 px-4 py-2 text-sm bg-black text-white rounded-xl hover:bg-gray-800 transition-all active:scale-95 shadow-lg"
+          className="flex items-center md:text-base text-xs gap-2 px-4 py-2 text-sm bg-black text-white rounded-xl hover:bg-gray-800 transition-all active:scale-95 shadow-lg"
         >
           <Plus className="w-4 h-4" /> Thêm thông số
         </button>

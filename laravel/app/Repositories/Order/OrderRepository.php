@@ -7,7 +7,7 @@ use App\Models\Order;
 
 class OrderRepository implements OrderRepositoryInterface
 {
-    public function getAll($request = null)
+    public function getAll($request = null, $perPage = 15)
     {
         $query = Order::with(['paymentMethod', 'staff', 'items']);
 
@@ -17,17 +17,17 @@ class OrderRepository implements OrderRepositoryInterface
             }
             if ($request->filled('search')) {
                 $query->where('code', 'like', '%' . $request->search . '%')
-                      ->orWhere('customer_name', 'like', '%' . $request->search . '%')
-                      ->orWhere('customer_phone', 'like', '%' . $request->search . '%');
+                    ->orWhere('customer_name', 'like', '%' . $request->search . '%')
+                    ->orWhere('customer_phone', 'like', '%' . $request->search . '%');
             }
         }
 
-        return $query->latest()->paginate(15);
+        return $query->latest()->paginate($perPage);
     }
 
     public function findById($id)
     {
-        return Order::with(['paymentMethod', 'staff', 'items'])->findOrFail($id);
+        return Order::with(['paymentMethod', 'staff', 'items.variant', 'items.product', 'items.returnItems'])->findOrFail($id);
     }
 
     public function createOrder(array $data): Order

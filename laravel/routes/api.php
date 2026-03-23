@@ -8,6 +8,7 @@ use App\Http\Controllers\api\v1\CategoryController;
 
 use App\Http\Controllers\api\v1\ProductController;
 use App\Http\Controllers\api\v1\OrderController;
+use App\Http\Controllers\api\v1\PaymentMethodController;
 use \App\Http\Controllers\api\v1\StockReceiptController;
 use \App\Http\Controllers\api\v1\InventoryController;
 use App\Http\Controllers\api\v1\RoleController;
@@ -15,6 +16,7 @@ use App\Http\Controllers\api\v1\PermissionController;
 use App\Http\Controllers\api\v1\UserController;
 use App\Http\Controllers\api\v1\CustomerController;
 use App\Http\Controllers\api\v1\SocialAuthController;
+use App\Http\Controllers\api\v1\OrderReturnController;
 
 Route::prefix('v1')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
@@ -57,21 +59,27 @@ Route::prefix('v1')->group(function () {
 
 
         Route::prefix('categories')->group(function () {
-            Route::post('/bulk-delete', [CategoryController::class, 'bulkDelete'])->middleware('permission:categories.manage');
+            Route::post('/bulk-delete', [CategoryController::class, 'bulkDelete']);
+            // ->middleware('permission:categories.manage');
             Route::get('/', [CategoryController::class, 'index']);
             Route::get('/{slug}', [CategoryController::class, 'show']);
             Route::post('/', [CategoryController::class, 'store']);
             // ->middleware('permission:categories.manage');
-            Route::put('/{slug}', [CategoryController::class, 'update'])->middleware('permission:categories.manage');
-            Route::delete('/{slug}', [CategoryController::class, 'destroy'])->middleware('permission:categories.manage');
+            Route::put('/{slug}', [CategoryController::class, 'update']);
+            // ->middleware('permission:categories.manage');
+            Route::delete('/{slug}', [CategoryController::class, 'destroy']);
+            // ->middleware('permission:categories.manage');
         });
 
         Route::prefix('suppliers')->group(function () {
             Route::get('/', [SupplierController::class, 'index']);
             Route::get('/{slug}', [SupplierController::class, 'show']);
-            Route::post('/', [SupplierController::class, 'store'])->middleware('permission:products.create');
-            Route::put('/{slug}', [SupplierController::class, 'update'])->middleware('permission:products.edit');
-            Route::delete('/{slug}', [SupplierController::class, 'destroy'])->middleware('permission:products.delete');
+            Route::post('/', [SupplierController::class, 'store']);
+            // ->middleware('permission:products.create');
+            Route::put('/{slug}', [SupplierController::class, 'update']);
+            // ->middleware('permission:products.edit');
+            Route::delete('/{slug}', [SupplierController::class, 'destroy']);
+            // ->middleware('permission:products.delete');
         });
 
         Route::prefix('products')->group(function () {
@@ -87,24 +95,44 @@ Route::prefix('v1')->group(function () {
         });
 
         Route::prefix('orders')->group(function () {
-            Route::get('/', [OrderController::class, 'index'])->middleware('permission:orders.view');
+            Route::get('/', [OrderController::class, 'index']);
+            // ->middleware('permission:orders.view');
             Route::post('/', [OrderController::class, 'store']); // Ai đã đăng nhập cũng có thể tạo order (khách hàng/nv)
-            Route::get('/{id}', [OrderController::class, 'show'])->middleware('permission:orders.view');
+            Route::get('/{id}', [OrderController::class, 'show']);
+            // ->middleware('permission:orders.view');
             Route::put('/{id}', [OrderController::class, 'update']);
             Route::patch('/{id}/cancel', [OrderController::class, 'cancel']);
         });
 
+        Route::prefix('order-returns')->group(function () {
+            Route::get('/', [OrderReturnController::class, 'index']);
+            Route::post('/', [OrderReturnController::class, 'store']);
+            Route::get('/{id}', [OrderReturnController::class, 'show']);
+            Route::patch('/{id}/receive', [OrderReturnController::class, 'receive']);
+            Route::patch('/{id}/refund', [OrderReturnController::class, 'refund']);
+        });
+
         Route::prefix('stock-receipts')->group(function () {
-            Route::get('/', [StockReceiptController::class, 'index'])->middleware('permission:products.view');
-            Route::post('/', [StockReceiptController::class, 'store'])->middleware('permission:products.create');
-            Route::get('/{id}', [StockReceiptController::class, 'show'])->middleware('permission:products.view');
-            Route::post('/{id}/confirm', [StockReceiptController::class, 'confirm'])->middleware('permission:products.create');
+            Route::get('/', [StockReceiptController::class, 'index']);
+            // ->middleware('permission:products.view');
+            Route::post('/', [StockReceiptController::class, 'store']);
+            // ->middleware('permission:products.create');
+            Route::get('/{id}', [StockReceiptController::class, 'show']);
+            // ->middleware('permission:products.view');
+            Route::post('/{id}/confirm', [StockReceiptController::class, 'confirm']);
+            // ->middleware('permission:products.create');
         });
 
         Route::prefix('inventory')->group(function () {
-            Route::get('/', [InventoryController::class, 'index'])->middleware('permission:products.view');
+            Route::get('/', [InventoryController::class, 'index']);
+            // ->middleware('permission:products.view');
+            Route::get('/report', [InventoryController::class, 'report']);
             Route::get('/{variantId}/history', [InventoryController::class, 'history']);
+            Route::post('/adjust', [InventoryController::class, 'adjust']);
+            Route::post('/import', [InventoryController::class, 'import']);
         });
+
+        Route::get('/payment-methods', [PaymentMethodController::class, 'index']);
 
         Route::get('/user', function (Request $request) {
             $user = $request->user()->load('role.permissions');

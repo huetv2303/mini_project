@@ -42,6 +42,24 @@ class InventoryController extends Controller
         }
     }
 
+    public function report(Request $request)
+    {
+        $month = $request->input('month', now()->month);
+        $year = $request->input('year', now()->year);
+
+        try {
+            $data = $this->inventoryService->getMonthlyReport($month, $year);
+            return response()->json([
+                'status' => 'success',
+                'data'   => $data,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Lỗi khi lấy báo cáo: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
 
     public function history($variantId, Request $request)
     {
@@ -80,6 +98,36 @@ class InventoryController extends Controller
         }
     }
 
+
+    public function import(Request $request)
+    {
+        $data = $request->validate([
+            'variant_id'   => 'required|exists:product_variants,id',
+            'quantity'     => 'required|integer|min:1',
+            'note'         => 'nullable|string',
+        ]);
+
+        try {
+            $inventory = $this->inventoryService->increaseStock(
+                $data['variant_id'],
+                $data['quantity'],
+                'manual',
+                null,
+                auth()->id(),
+                $data['note'] ?? 'Nhập kho thủ công'
+            );
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Nhập kho thành công.',
+                'data'    => $inventory,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => $e->getMessage(),
+            ], 422);
+        }
+    }
 
     public function lowStock()
     {

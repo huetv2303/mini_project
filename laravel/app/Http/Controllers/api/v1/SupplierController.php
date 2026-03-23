@@ -15,7 +15,8 @@ class SupplierController extends Controller
     protected $supplierService;
     protected $uploadService;
 
-    public function __construct(SupplierService $supplierService, UploadService $uploadService){
+    public function __construct(SupplierService $supplierService, UploadService $uploadService)
+    {
         $this->supplierService = $supplierService;
         $this->uploadService = $uploadService;
     }

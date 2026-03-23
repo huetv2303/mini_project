@@ -30,7 +30,9 @@ class ProductResource extends JsonResource
                 'name' => $this->supplier->name,
                 'slug' => $this->supplier->slug,
             ]),
-            'images' => $this->whenLoaded('images', fn() =>
+            'images' => $this->whenLoaded(
+                'images',
+                fn() =>
                 $this->images->map(fn($img) => [
                     'id'         => $img->id,
                     'url'        => asset('storage/' . $img->image_path),
@@ -39,7 +41,9 @@ class ProductResource extends JsonResource
                     'variant_id' => $img->variant_id,
                 ])
             ),
-            'attributes' => $this->whenLoaded('attributes', fn() =>
+            'attributes' => $this->whenLoaded(
+                'attributes',
+                fn() =>
                 $this->attributes
                     ->whereNull('variant_id')
                     ->map(fn($attr) => [
@@ -48,7 +52,9 @@ class ProductResource extends JsonResource
                         'attribute_value' => $attr->attribute_value,
                     ])->values()
             ),
-            'variants' => $this->whenLoaded('variants', fn() =>
+            'variants' => $this->whenLoaded(
+                'variants',
+                fn() =>
                 $this->variants->map(fn($variant) => [
                     'id'            => $variant->id,
                     'name'          => $variant->name,

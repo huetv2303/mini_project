@@ -10,7 +10,7 @@ class SupplierRepository implements SupplierRepositoryInterface
     public function getAll($request = null)
     {
         $query = Supplier::query();
-        
+
         if ($request && $request->has('search')) {
             $query->where('name', 'like', '%' . $request->search . '%');
         }

@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { Loader2 } from "lucide-react";
 
 const GuestGuard = ({ children }) => {
-  const { isAuthenticated, loading } = useAuth();
+  const { user, isAuthenticated, loading } = useAuth();
 
   if (loading) {
     return (
@@ -15,7 +15,7 @@ const GuestGuard = ({ children }) => {
   }
 
   if (isAuthenticated) {
-    return <Navigate to="/" replace />;
+    return <Navigate to={user?.role_id === 1 ? "/admin/dashboard" : "/"} replace />;
   }
 
   return children;

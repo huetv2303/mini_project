@@ -3,39 +3,39 @@
 namespace App\Services;
 
 use App\Models\Inventory;
-use App\Models\InventoryTransaction;
 use Illuminate\Support\Facades\DB;
+use App\Models\InventoryTransaction;
 
 class InventoryService
 {
-
     public function getAll($request = null)
     {
-        $query = Inventory::with(['variant.product'])
-            ->orderBy('quantity', 'asc');
+        $query = Inventory::with(['variant.product', 'variant.attributes']);
 
-        if ($request && $request->low_stock) {
-            // Lọc hàng sắp hết (quantity <= min_quantity)
+        if ($request && $request->status) {
+            if ($request->status === 'out_of_stock') {
+                $query->where('quantity', '<=', 0);
+            } elseif ($request->status === 'low_stock') {
+                $query->whereColumn('quantity', '<', 'min_quantity')->where('quantity', '>', 0);
+            }
+        }
+
+        if ($request && $request->has_min_stock) {
             $query->whereColumn('quantity', '<=', 'min_quantity');
         }
 
-        return $query->paginate(15);
+        return $query->paginate(5);
     }
 
 
     public function getByVariant($variantId)
     {
-        return Inventory::with(['variant.product'])
-            ->where('variant_id', $variantId)
-            ->firstOrFail();
+        return Inventory::where('variant_id', $variantId)->with(['variant.product'])->firstOrFail();
     }
-
 
     public function getHistory($variantId, $request = null)
     {
-        $query = InventoryTransaction::with(['variant.product', 'createdBy'])
-            ->where('variant_id', $variantId)
-            ->latest('created_at');
+        $query = InventoryTransaction::where('variant_id', $variantId)->orderBy('created_at', 'desc');
 
         if ($request && $request->type) {
             $query->where('type', $request->type);
@@ -47,8 +47,7 @@ class InventoryService
     public function adjust($variantId, $newQuantity, $note, $userId)
     {
         return DB::transaction(function () use ($variantId, $newQuantity, $note, $userId) {
-            $inventory = Inventory::where('variant_id', $variantId)->firstOrFail();
-
+            $inventory = Inventory::where('variant_id', $variantId)->lockForUpdate()->firstOrFail();
             $before = $inventory->quantity;
             $change = $newQuantity - $before;
 
@@ -56,61 +55,46 @@ class InventoryService
 
             InventoryTransaction::create([
                 'variant_id'      => $variantId,
+                'user_id'         => $userId,
                 'type'            => 'adjustment',
-                'reference_type'  => 'manual',
-                'reference_id'    => null,
                 'quantity_before' => $before,
                 'quantity_change' => $change,
                 'quantity_after'  => $newQuantity,
                 'note'            => $note ?? 'Điều chỉnh tồn kho thủ công',
-                'user_id'      => $userId,
             ]);
 
-            return $inventory->fresh(['variant.product']);
+            return $inventory;
         });
     }
 
-
-    public function getLowStock()
+    public function increaseStock($variantId, $quantity, $type = 'in', $referenceId = null, $userId = null, $note = null, $referenceType = null)
     {
-        return Inventory::with(['variant.product'])
-            ->whereColumn('quantity', '<=', 'min_quantity')
-            ->orderBy('quantity', 'asc')
-            ->get();
-    }
-
-    public function increaseStock($variantId, $quantity, $referenceType, $referenceId, $userId, $note = null)
-    {
-        return DB::transaction(function () use ($variantId, $quantity, $referenceType, $referenceId, $userId, $note) {
-            $inventory = Inventory::firstOrCreate(
-                ['variant_id' => $variantId],
-                ['quantity' => 0, 'min_quantity' => 5]
-            );
-
+        return DB::transaction(function () use ($variantId, $quantity, $type, $referenceId, $userId, $note, $referenceType) {
+            $inventory = Inventory::where('variant_id', $variantId)->lockForUpdate()->firstOrFail();
             $before = $inventory->quantity;
-            $after  = $before + $quantity;
+            $after = $before + $quantity;
 
-            $inventory->increment('quantity', $quantity);
+            $inventory->update(['quantity' => $after]);
 
             InventoryTransaction::create([
                 'variant_id'      => $variantId,
-                'type'            => 'in',
+                'user_id'         => $userId,
+                'type'            => $type,
                 'reference_type'  => $referenceType,
                 'reference_id'    => $referenceId,
                 'quantity_before' => $before,
                 'quantity_change' => $quantity,
                 'quantity_after'  => $after,
                 'note'            => $note,
-                'user_id'         => $userId,
             ]);
 
-            return $inventory->fresh(['variant.product']);
+            return $inventory;
         });
     }
 
-    public function decreaseStock($variantId, $quantity, $referenceType, $referenceId, $userId, $note = null)
+    public function decreaseStock($variantId, $quantity, $type = 'out', $referenceId = null, $userId = null, $note = null, $referenceType = null)
     {
-        return DB::transaction(function () use ($variantId, $quantity, $referenceType, $referenceId, $userId, $note) {
+        return DB::transaction(function () use ($variantId, $quantity, $type, $referenceId, $userId, $note, $referenceType) {
             $inventory = Inventory::where('variant_id', $variantId)->lockForUpdate()->firstOrFail();
 
             if ($inventory->quantity < $quantity) {
@@ -124,17 +108,148 @@ class InventoryService
 
             InventoryTransaction::create([
                 'variant_id'      => $variantId,
-                'type'            => 'out',
+                'user_id'         => $userId,
+                'type'            => $type,
                 'reference_type'  => $referenceType,
                 'reference_id'    => $referenceId,
                 'quantity_before' => $before,
                 'quantity_change' => -$quantity,
                 'quantity_after'  => $after,
                 'note'            => $note,
-                'user_id'         => $userId,
             ]);
 
             return $inventory->fresh(['variant.product']);
         });
+    }
+
+    public function getMonthlyReport($month, $year)
+    {
+        $startDate = \Carbon\Carbon::createFromDate($year, $month, 1)->startOfMonth();
+        $endDate = $startDate->copy()->endOfMonth();
+
+        // 1. Lấy toàn bộ dữ liệu để tính "Biến động trong tháng" (Totals) phục vụ các thẻ thống kê
+        $allInventories = Inventory::with(['variant.product', 'variant.attributes'])->get();
+
+        $transactionsInMonthRaw = DB::table('inventory_transactions')
+            ->select('variant_id', 'type', DB::raw('SUM(quantity_change) as total'))
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->groupBy('variant_id', 'type')
+            ->get()
+            ->groupBy('variant_id');
+
+        $totalValue = 0;
+        $totalImportCount = 0;
+        $totalExportCount = 0;
+        $totalAdjustCount = 0;
+        $totalReturnCount = 0;
+        $lowStockCount = 0;
+        $outOfStockCount = 0;
+
+        foreach ($allInventories as $inv) {
+            if (!$inv->variant) continue;
+
+            // Tính toán lượng thay đổi sau tháng báo cáo để ra endStock của tháng đó
+            $changesAfter = DB::table('inventory_transactions')
+                ->where('variant_id', $inv->variant_id)
+                ->where('created_at', '>', $endDate)
+                ->sum('quantity_change');
+
+            $endStock = $inv->quantity - $changesAfter;
+            $totalValue += $endStock * ($inv->variant->price ?? 0);
+
+            if ($endStock <= 0) $outOfStockCount++;
+            elseif ($endStock < $inv->min_quantity) $lowStockCount++;
+
+            if (isset($transactionsInMonthRaw[$inv->variant_id])) {
+                foreach ($transactionsInMonthRaw[$inv->variant_id] as $t) {
+                    if ($t->type === 'in') $totalImportCount += $t->total;
+                    elseif ($t->type === 'out') $totalExportCount += abs($t->total);
+                    elseif ($t->type === 'adjustment') $totalAdjustCount += $t->total;
+                    elseif ($t->type === 'return') $totalReturnCount += $t->total;
+                }
+            }
+        }
+
+        // 2. Lấy dữ liệu phân trang cho bảng hiển thị
+        $paginatedInventories = Inventory::with(['variant.product', 'variant.attributes'])->paginate(10);
+
+        $transactionsAfter = DB::table('inventory_transactions')
+            ->select('variant_id', DB::raw('SUM(quantity_change) as total'))
+            ->where('created_at', '>', $endDate)
+            ->whereIn('variant_id', $paginatedInventories->pluck('variant_id'))
+            ->groupBy('variant_id')
+            ->get()
+            ->keyBy('variant_id');
+
+        $reportItems = [];
+
+        foreach ($paginatedInventories as $inv) {
+            $variantData = $inv->variant;
+
+            $sku = $variantData->sku ?? 'N/A';
+            $productName = $variantData->product->name ?? 'Sản phẩm không xác định';
+            $attributes = ($variantData && $variantData->attributes) ? $variantData->attributes->pluck('attribute_value')->filter()->toArray() : [];
+            $origin = ($variantData && $variantData->product) ? ($variantData->product->origin ?? '') : '';
+
+            $detailsParts = $attributes;
+            if ($origin) $detailsParts[] = $origin;
+            $details = implode(' / ', $detailsParts);
+
+            $id = $variantData->id ?? 0;
+            $changesAfterMonth = ($id && isset($transactionsAfter[$id])) ? $transactionsAfter[$id]->total : 0;
+            $endStock = $inv->quantity - $changesAfterMonth;
+
+            $importQty = 0;
+            $exportQty = 0;
+            $adjustQty = 0;
+            $returnQty = 0;
+
+            if ($id && isset($transactionsInMonthRaw[$id])) {
+                foreach ($transactionsInMonthRaw[$id] as $t) {
+                    if ($t->type === 'in') $importQty += $t->total;
+                    elseif ($t->type === 'out') $exportQty += abs($t->total);
+                    elseif ($t->type === 'adjustment') $adjustQty += $t->total;
+                    elseif ($t->type === 'return') $returnQty += $t->total;
+                }
+            }
+
+            $changesInMonth = $importQty - $exportQty + $adjustQty + $returnQty;
+            $calculatedStartStock = $endStock - $changesInMonth;
+
+            $status = 'in_stock';
+            if ($endStock <= 0) {
+                $status = 'out_of_stock';
+            } elseif ($endStock < $inv->min_quantity) {
+                $status = 'low_stock';
+            }
+
+            $reportItems[] = [
+                'sku'            => $sku,
+                'productName'    => $productName,
+                'variantDetails' => $details ?: '-',
+                'startStock'     => $calculatedStartStock,
+                'importQty'      => $importQty,
+                'exportQty'      => $exportQty,
+                'adjustQty'      => $adjustQty,
+                'returnQty'      => $returnQty,
+                'endStock'       => $endStock,
+                'status'         => $status,
+                'price'          => $variantData->price ?? 0,
+            ];
+        }
+
+        return [
+            'items' => $paginatedInventories->setCollection(collect($reportItems)),
+            'summary' => [
+                'totalVariants'   => $allInventories->count(),
+                'totalValue'      => $totalValue,
+                'lowStockCount'   => $lowStockCount,
+                'outOfStockCount' => $outOfStockCount,
+                'totalImport'     => $totalImportCount,
+                'totalExport'     => $totalExportCount,
+                'totalAdjust'     => $totalAdjustCount,
+                'totalReturn'     => $totalReturnCount,
+            ]
+        ];
     }
 }

@@ -17,7 +17,7 @@ const AdminDashboard = () => {
           </span>
         </div>
       </div>
-
+      {/* 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
           {
@@ -64,16 +64,14 @@ const AdminDashboard = () => {
             </div>
           </div>
         ))}
-      </div>
+      </div> */}
 
       {/* Content area placeholder */}
       <div className="mt-8 bg-white rounded-2xl shadow-sm p-8 min-h-[400px] border border-gray-100 flex flex-col items-center justify-center text-gray-400">
         <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
           <LayoutDashboard className="h-8 w-8 text-gray-300" />
         </div>
-        <p className="text-lg font-medium">
-          Bắt đầu quản lý cửa hàng của bạn
-        </p>
+        <p className="text-lg font-medium">Bắt đầu quản lý cửa hàng của bạn</p>
         <p className="text-sm">
           Chọn một mục trong sidebar để quản lý dữ liệu chi tiết.
         </p>

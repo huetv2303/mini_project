@@ -9,8 +9,6 @@ import {
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
   headers: {
-    "Content-Type": "application/json",
-    "Content-Type": "multipart/form-data",
     Accept: "application/json",
   },
 });
@@ -69,11 +67,16 @@ api.interceptors.response.use(
       } catch (error) {
         processQueue(error);
         clearAuth();
-        window.location.href = "/login";
+        window.location.href = "/login?expired=1";
         return Promise.reject(error);
       } finally {
         isRefreshing = false;
       }
+    }
+
+    if (error.response?.status === 401 && !isAuthRoute) {
+      clearAuth();
+      window.location.href = "/login?expired=1";
     }
 
     return Promise.reject(error);

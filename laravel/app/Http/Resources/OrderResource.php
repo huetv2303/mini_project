@@ -30,17 +30,29 @@ class OrderResource extends JsonResource
             'created_by'       => $this->whenLoaded('staff', fn() => [
                 'id'   => $this->staff?->id,
                 'name' => $this->staff?->name,
+                'avatar' => $this->staff?->avatar,
             ]),
-            'items'            => $this->whenLoaded('items', fn() =>
+            'items'            => $this->whenLoaded(
+                'items',
+                fn() =>
                 $this->items->map(fn($item) => [
                     'id'           => $item->id,
                     'product_id'   => $item->product_id,
                     'variant_id'   => $item->product_variant_id,
+                    'image'        => $item->image
+                        ? asset('storage/' . $item->image)
+                        : ($item->variant?->image
+                            ? asset('storage/' . $item->variant->image)
+                            : ($item->product?->feature_image
+                                ? asset('storage/' . $item->product->feature_image)
+                                : null)
+                        ),
                     'product_name' => $item->product_name,
                     'variant_name' => $item->variant_name,
                     'sku'          => $item->sku,
                     'price'        => $item->price,
                     'quantity'     => $item->quantity,
+                    'returned_quantity' => $item->returnItems->sum('quantity'),
                     'subtotal'     => $item->subtotal,
                 ])
             ),

@@ -8,6 +8,7 @@ import {
   Users,
   Copyright,
   Warehouse,
+  RotateCcw,
 } from "lucide-react";
 
 const SidebarItem = ({ to, icon: Icon, label }) => (
@@ -41,7 +42,9 @@ const Sidebar = () => {
     <div className="flex flex-col h-full bg-white scrollbar-none">
       {/* Sidebar Branding (Optional Header inside sidebar) */}
       <div className="hidden lg:flex items-center justify-center p-8 border-b border-gray-50">
-        <span className="text-xl font-bold text-gray-900 tracking-wider">ADMIN</span>
+        <span className="text-xl font-bold text-gray-900 tracking-wider">
+          ADMIN
+        </span>
       </div>
 
       <nav className="flex-1 py-4">
@@ -58,6 +61,11 @@ const Sidebar = () => {
             icon={ShoppingCart}
             label="Đơn hàng"
           />
+          <SidebarItem
+            to="/admin/order-returns"
+            icon={RotateCcw}
+            label="Trả hàng"
+          />
           <SidebarItem to="/admin/categories" icon={Tag} label="Danh mục" />
           <SidebarItem
             to="/admin/suppliers"
@@ -65,8 +73,8 @@ const Sidebar = () => {
             label="Nhà cung cấp"
           />
           <SidebarItem to="/admin/products" icon={Package} label="Sản phẩm" />
-          <SidebarItem to="/admin/users" icon={Users} label="Người dùng" />
-          
+          {/* <SidebarItem to="/" icon={Users} label="Người dùng" /> */}
+
           <SidebarItem
             to="/admin/warehouse"
             icon={Warehouse}
@@ -74,10 +82,12 @@ const Sidebar = () => {
           />
         </div>
       </nav>
-      
+
       {/* Sidebar Footer info */}
       <div className="p-6 border-t border-gray-50 text-center">
-         <p className="text-[9px] font-bold text-gray-300 uppercase tracking-widest">S-Admin Version 3.2</p>
+        <p className="text-[9px] font-bold text-gray-300 uppercase ">
+          S-Admin Version 3.2
+        </p>
       </div>
     </div>
   );

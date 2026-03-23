@@ -23,6 +23,7 @@ import {
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import ConfirmModal from "../../../components/common/ConfirmModal";
+import Pagination from "../../../components/common/Pagination";
 
 const debounce = (func, delay) => {
   let timer;
@@ -68,9 +69,10 @@ const ProductListPage = () => {
 
       setProducts(items);
       setPagination({
-        total: meta.total || 0,
-        lastPage: meta.last_page || 1,
-        perPage: meta.per_page || 10,
+        currentPage: meta.current_page,
+        lastPage: meta.last_page,
+        total: meta.total,
+        perPage: meta.per_page,
       });
     } catch (error) {
       console.error("Failed to fetch products:", error);
@@ -150,13 +152,18 @@ const ProductListPage = () => {
     if (path.startsWith("http")) return path;
     return `${import.meta.env.VITE_URL_IMAGE}/${path}`;
   };
-
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= pagination.lastPage) {
+      getProducts(newPage, searchTerm);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
   return (
     <AdminLayout>
       <div className="pb-10">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-2xl font-medium text-gray-900">
               Quản lý sản phẩm
             </h1>
             <p className="mt-1 text-xs text-gray-500 font-medium">
@@ -165,13 +172,13 @@ const ProductListPage = () => {
           </div>
           <Link
             to="/admin/products/create"
-            className="inline-flex items-center px-6 py-3 bg-black text-white text-sm font-bold rounded-2xl hover:bg-black/90 transition-all shadow-lg active:scale-95"
+            className="inline-flex items-center px-4 py-3 bg-black text-white text-sm font-bold rounded-lg hover:bg-black/90 transition-all shadow-lg active:scale-95"
           >
             <Plus className="w-5 h-5 mr-2" /> Thêm sản phẩm
           </Link>
         </div>
 
-        <div className="bg-white rounded-[40px] border border-gray-100 shadow-2xl shadow-black/5 overflow-hidden">
+        <div className="bg-white rounded-lg border border-gray-100 shadow-2xl shadow-black/5 overflow-hidden">
           <div className="p-8 border-b border-gray-50 bg-gray-50/20 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -194,7 +201,7 @@ const ProductListPage = () => {
             )}
           </div>
 
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto overflow-y-auto max-h-[480px]">
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-gray-50/50">
@@ -231,7 +238,7 @@ const ProductListPage = () => {
                   <tr>
                     <td colSpan="5" className="px-6 py-24 text-center">
                       <Loader2 className="w-12 h-12 text-black animate-spin mx-auto mb-4" />
-                      <span className="text-gray-400 font-bold text-[10px] uppercase tracking-widest">
+                      <span className="text-gray-400 font-bold text-[10px] uppercase ">
                         Đang tải kho hàng...
                       </span>
                     </td>
@@ -244,7 +251,7 @@ const ProductListPage = () => {
                     return (
                       <tr
                         key={product.id}
-                        className={`border-b border-gray-50 transition-all group hover:bg-gray-50/50 hover:cursor-pointer ${selectedIds.includes(product.id) ? "bg-indigo-50/30" : ""}`}
+                        className={` border-b border-gray-50 transition-all group hover:bg-gray-50/50 hover:cursor-pointer ${selectedIds.includes(product.id) ? "bg-indigo-50/30" : ""}`}
                       >
                         <td className="px-8 py-5">
                           <input
@@ -271,17 +278,17 @@ const ProductListPage = () => {
                                 </div>
                               )}
 
-                              {variantsCount > 1 && (
+                              {/* {variantsCount > 1 && (
                                 <span className="absolute -top-2 -right-2 bg-indigo-500 text-white text-[10px] font-black w-6 h-6 flex items-center justify-center rounded-lg shadow-lg border-2 border-white">
                                   {variantsCount}
                                 </span>
-                              )}
+                              )} */}
                             </div>
                             <div>
                               <div className="font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">
                                 {product.name}
                               </div>
-                              <div className="text-[10px] text-gray-400 font-black font-mono mt-1 uppercase tracking-tighter">
+                              <div className="text-[0.7rem] text-gray-400   mt-1 uppercase">
                                 Slug: {product.slug}
                               </div>
                             </div>
@@ -298,10 +305,10 @@ const ProductListPage = () => {
                           </div>
                         </td>
                         <td className="px-6 py-5">
-                          <div className="font-mono text-sm font-bold text-gray-900">
+                          <div className=" text-sm font-bold text-gray-900">
                             {formatPrice(firstVariant.price)}
                           </div>
-                          <div className="text-[10px] text-gray-400 font-black uppercase mt-1">
+                          <div className="text-[0.7rem] text-gray-400 uppercase mt-1">
                             SKU: {firstVariant.sku || "N/A"}
                           </div>
                         </td>
@@ -352,40 +359,7 @@ const ProductListPage = () => {
             </table>
           </div>
 
-          {!loading && products.length > 0 && pagination.lastPage > 1 && (
-            <div className="p-8 border-t border-gray-50 flex items-center justify-between bg-gray-50/20">
-              <span className="text-[11px] text-gray-400 font-black uppercase tracking-[2px]">
-                Total: <span className="text-black">{pagination.total}</span>
-              </span>
-              <div className="flex items-center gap-2">
-                <button
-                  disabled={currentPage === 1}
-                  onClick={() => setCurrentPage((p) => p - 1)}
-                  className="p-3 rounded-2xl border border-gray-100 bg-white hover:bg-gray-50 disabled:opacity-30"
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                <div className="flex gap-1.5">
-                  {[...Array(pagination.lastPage)].map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setCurrentPage(i + 1)}
-                      className={`w-12 h-12 rounded-2xl text-sm font-bold transition-all ${currentPage === i + 1 ? "bg-black text-white shadow-xl" : "bg-white border border-gray-100 text-gray-500 hover:bg-gray-50"}`}
-                    >
-                      {i + 1}
-                    </button>
-                  ))}
-                </div>
-                <button
-                  disabled={currentPage === pagination.lastPage}
-                  onClick={() => setCurrentPage((p) => p + 1)}
-                  className="p-3 rounded-2xl border border-gray-100 bg-white hover:bg-gray-50 disabled:opacity-30"
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-          )}
+          <Pagination pagination={pagination} onPageChange={handlePageChange} />
         </div>
       </div>
       <ConfirmModal
