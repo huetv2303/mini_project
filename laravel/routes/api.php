@@ -95,6 +95,7 @@ Route::prefix('v1')->group(function () {
         });
 
         Route::prefix('orders')->group(function () {
+            Route::post('/bulk-update', [OrderController::class, 'bulkUpdate']);
             Route::get('/', [OrderController::class, 'index']);
             // ->middleware('permission:orders.view');
             Route::post('/', [OrderController::class, 'store']); // Ai đã đăng nhập cũng có thể tạo order (khách hàng/nv)
@@ -105,6 +106,7 @@ Route::prefix('v1')->group(function () {
         });
 
         Route::prefix('order-returns')->group(function () {
+            Route::post('/bulk-refund', [OrderReturnController::class, 'bulkRefund']);
             Route::get('/', [OrderReturnController::class, 'index']);
             Route::post('/', [OrderReturnController::class, 'store']);
             Route::get('/{id}', [OrderReturnController::class, 'show']);

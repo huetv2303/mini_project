@@ -92,4 +92,34 @@ class OrderController extends Controller
             ], 422);
         }
     }
+
+    public function bulkUpdate(Request $request)
+    {
+        $request->validate([
+            'ids'               => 'required|array',
+            'ids.*'             => 'exists:orders,id',
+            'action'            => 'required|string|in:update_status,cancel,pay,refund',
+            'status'            => 'nullable|required_if:action,update_status|string|in:pending,processing,shipped,delivered,cancelled',
+            'payment_method_id' => 'nullable|required_if:action,pay|exists:payment_methods,id',
+        ]);
+
+        try {
+            $result = $this->orderService->bulkUpdate(
+                $request->ids, 
+                $request->action, 
+                $request->status, 
+                $request->payment_method_id
+            );
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Thao tác hàng loạt thành công.',
+                'data'    => $result,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => $e->getMessage(),
+            ], 422);
+        }
+    }
 }

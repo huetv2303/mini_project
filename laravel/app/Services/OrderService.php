@@ -170,6 +170,82 @@ class OrderService
     }
 
 
+    public function bulkUpdate(array $ids, string $action, ?string $status = null, $paymentMethodId = null)
+    {
+        return DB::transaction(function () use ($ids, $action, $status, $paymentMethodId) {
+            $updatedCount = 0;
+            
+            $terminalStates = ['delivered', 'cancelled', 'returned', 'partially_returned'];
+
+            foreach ($ids as $id) {
+                $order = $this->orderRepo->findById($id);
+
+                // Common skip rules for status/cancel
+                if ($action !== 'pay' && $action !== 'refund') {
+                    if (in_array($order->status, $terminalStates)) {
+                        continue;
+                    }
+                    if ($action === 'cancel' && $order->status === 'shipped') {
+                        continue;
+                    }
+                }
+
+                try {
+                    if ($action === 'update_status') {
+                        if ($order->status === 'shipped' && $status !== 'delivered') {
+                            continue;
+                        }
+                        $this->updateOrder($id, ['status' => $status]);
+                        $updatedCount++;
+                    } elseif ($action === 'cancel') {
+                        $this->cancelOrder($id);
+                        $updatedCount++;
+                    } elseif ($action === 'pay') {
+                        // Business Rule: Skip if cancelled or fully returned
+                        if ($order->status === 'cancelled' || $order->status === 'returned') {
+                            continue;
+                        }
+                        // Skip if already paid
+                        if ($order->payment_status === 'paid') {
+                            continue;
+                        }
+
+                        $newPaymentStatus = 'paid';
+                        if ($order->status === 'partially_returned') {
+                            $newPaymentStatus = 'partially_paid';
+                        }
+
+                        $updateData = ['payment_status' => $newPaymentStatus];
+                        if ($paymentMethodId) {
+                            $updateData['payment_method_id'] = $paymentMethodId;
+                        }
+
+                        $order->update($updateData);
+                        $updatedCount++;
+                    } elseif ($action === 'refund') {
+                        $orderStatus = strtolower($order->status);
+                        $orderPaymentStatus = strtolower($order->payment_status);
+
+                        // Allow refund for Cancelled or Fully Returned orders
+                        if ($orderStatus !== 'cancelled' && $orderStatus !== 'returned') {
+                            continue;
+                        }
+
+                        // Must have been paid at some point
+                        if (in_array($orderPaymentStatus, ['paid', 'partially_paid', 'partially_refunded'])) {
+                            $order->update(['payment_status' => 'refunded']);
+                            $updatedCount++;
+                        }
+                    }
+                } catch (\Exception $e) {
+                    continue;
+                }
+            }
+            return ['updated_count' => $updatedCount];
+        });
+    }
+
+
     public function cancelOrder($id)
     {
         return DB::transaction(function () use ($id) {

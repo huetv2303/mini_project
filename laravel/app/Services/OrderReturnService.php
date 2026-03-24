@@ -166,6 +166,26 @@ class OrderReturnService
         });
     }
 
+    public function bulkRefund(array $ids, $userId)
+    {
+        $updatedCount = 0;
+        foreach ($ids as $id) {
+            try {
+                $orderReturn = $this->findById($id);
+                // Skip if already refunded or doesn't need to be refunded
+                if ($orderReturn->refund_status === 'refunded' || $orderReturn->refund_status === 'not_needed') {
+                    continue;
+                }
+                $this->refundMoney($id, $userId);
+                $updatedCount++;
+            } catch (\Exception $e) {
+                // Ignore exceptions for batch processing (e.g. invalid status for refund)
+                continue;
+            }
+        }
+        return $updatedCount;
+    }
+
     protected function updateOrderStatuses($order)
     {
         $totalOrderedItems = $order->items()->sum('quantity');

@@ -157,11 +157,11 @@ const OrderDetailsPage = () => {
                 <h1 className="text-2xl font-black text-gray-900">
                   Chi tiết Đơn hàng
                 </h1>
-                <span className="px-3 py-1 bg-black text-white text-[12px] font-black rounded-lg uppercase tracking-tighter">
+                <span className="px-3 py-1 bg-black text-white text-[12px] font-bold rounded-lg uppercase">
                   #{order.code}
                 </span>
               </div>
-              <p className="text-xs text-gray-400 font-medium">
+              <p className="text-xs text-gray-600">
                 Đặt ngày {new Date(order.created_at).toLocaleString("vi-VN")}
               </p>
             </div>
@@ -209,23 +209,23 @@ const OrderDetailsPage = () => {
                   {order.items?.length || 0} mục
                 </span>
               </div>
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto ">
                 <table className="w-full">
                   <thead>
                     <tr className="bg-gray-50/50">
-                      <th className="px-8 py-4 text-[0.8rem]  text-gray-500 uppercase text-left">
+                      <th className="px-8 py-4 text-[0.8rem]  text-gray-600 uppercase text-left">
                         Sản phẩm
                       </th>
-                      <th className="px-8 py-4 text-[0.8rem]  text-gray-500 uppercase text-left">
+                      <th className="px-8 py-4 text-[0.8rem]  text-gray-600 uppercase text-left">
                         Ảnh
                       </th>
-                      <th className="px-6 py-4 text-[0.8rem]  text-gray-500 uppercase text-center">
+                      <th className="px-6 py-4 text-[0.8rem]  text-gray-600 uppercase text-center">
                         Số lượng
                       </th>
-                      <th className="px-6 py-4 text-[0.8rem]  text-gray-500 uppercase text-right">
+                      <th className="px-6 py-4 text-[0.8rem]  text-gray-600 uppercase text-right">
                         Đơn giá
                       </th>
-                      <th className="px-8 py-4 text-[0.8rem]  text-gray-500 uppercase text-right">
+                      <th className="px-8 py-4 text-[0.8rem]  text-gray-600 uppercase text-right">
                         Thành tiền
                       </th>
                     </tr>
@@ -252,7 +252,7 @@ const OrderDetailsPage = () => {
                                   </span>
                                 )}
                               </span>
-                              <span className="text-[11px] text-gray-400 mt-0.5">
+                              <span className="text-[12px] text-gray-600 mt-0.5">
                                 Mã: {item.sku} | Loại: {item.variant_name}
                               </span>
                             </div>
@@ -321,14 +321,14 @@ const OrderDetailsPage = () => {
                     </div>
                     <div className="pt-4 border-t border-gray-200">
                       <div className="flex justify-between items-center mb-4">
-                        <span className="text-black font-black uppercase text-xs">
+                        <span className="text-black font-bold uppercase text-[0.8rem]">
                           Tổng thanh toán thực tế
                         </span>
                         <span className="text-2xl font-bold ">
                           {formatPrice(finalKeptAmount)}
                         </span>
                       </div>
-                      <div className="flex justify-between items-center text-[11px] text-gray-400 font-bold uppercase">
+                      <div className="flex justify-between items-center text-[0.8rem] text-gray-600 font-bold uppercase">
                         <div className="flex items-center gap-2">
                           <CreditCard className="w-3 h-3" />
                           Hình thức thanh toán
@@ -351,13 +351,13 @@ const OrderDetailsPage = () => {
               </h3>
               <div className="space-y-4">
                 <div>
-                  <label className="text-[10px] font-bold text-gray-400 uppercase  mb-2 block">
+                  <label className="text-[10px] font-bold text-gray-600 uppercase  mb-2 block">
                     Ghi chú từ khách hàng / nhân viên
                   </label>
                   <textarea
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
-                    className="w-full px-6 py-4 bg-gray-50 rounded-3xl border-none text-sm min-h-[100px] outline-none focus:ring-4 focus:ring-black/5"
+                    className="w-full px-6 py-4 bg-gray-50 rounded-lg border-none outline-none text-sm min-h-[100px]  "
                     placeholder="Nhập ghi chú..."
                   />
                 </div>
@@ -377,7 +377,7 @@ const OrderDetailsPage = () => {
                       )}
                     </div>
                     <div>
-                      <p className="text-[12px] text-gray-400 font-bold uppercase ">
+                      <p className="text-[12px] text-gray-600 font-medium uppercase ">
                         Nhân viên lên đơn
                       </p>
                       <p className="text-xs font-bold text-indigo-900">
@@ -404,21 +404,21 @@ const OrderDetailsPage = () => {
                     <User className="w-6 h-6" />
                   </div>
                   <div>
-                    <p className="text-sm font-black text-gray-900">
+                    <p className="text-sm font-bold text-gray-900">
                       {order.customer?.name}
                     </p>
-                    <div className="flex items-center gap-1 text-xs text-gray-400 font-medium">
+                    <div className="flex items-center gap-1 text-xs text-gray-600 font-medium">
                       <Phone className="w-3 h-3" />
                       {order.customer?.phone}
                     </div>
                   </div>
                 </div>
                 <div className="pt-6 border-t border-gray-50">
-                  <p className="text-[10px] font-bold text-gray-400 uppercase  mb-3">
+                  <p className="text-[0.8rem] font-bold text-gray-600 uppercase  mb-3">
                     Địa chỉ nhận hàng
                   </p>
                   <div className="flex gap-3 text-[1rem] text-gray-600 font-medium leading-relaxed">
-                    <MapPin className="w-4 h-4 text-gray-300 shrink-0" />
+                    <MapPin className="w-5 h-5 text-gray-300 shrink-0" />
                     {order.customer?.address}
                   </div>
                 </div>
@@ -428,14 +428,14 @@ const OrderDetailsPage = () => {
 
             {/* Status & Payment Action */}
             <div className=" rounded-lg p-8 shadow-2xl shadow-black/20 ">
-              <h3 className="text-sm font-bold uppercase flex items-center gap-2 mb-8 opacity-60">
+              <h3 className="text-sm font-bold uppercase flex items-center gap-2 mb-8 ">
                 <Save className="w-4 h-4" />
                 Xử lý đơn hàng
               </h3>
 
               <div className="space-y-6">
                 <div>
-                  <label className="text-[12px] font-bold uppercase  mb-3 block opacity-40">
+                  <label className="text-[12px] font-medium uppercase  mb-3 block opacity-70">
                     Trạng thái đơn hàng
                   </label>
                   <select
@@ -478,7 +478,7 @@ const OrderDetailsPage = () => {
                 </div>
 
                 <div>
-                  <label className="text-[12px] font-bold uppercase  mb-3 block opacity-40">
+                  <label className="text-[12px] font-medium uppercase  mb-3 block opacity-70">
                     Tình trạng thanh toán
                   </label>
                   <select

@@ -13,7 +13,9 @@ import {
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import Pagination from "../../../components/common/Pagination";
+import BulkRefundModal from "../../../components/common/BulkRefundModal";
 import { formatPrice } from "./OrderListPage";
+import { ReturnStatusBadge, ReceiveStatusBadge, RefundStatusBadge } from "../../../components/common/OrderBadges";
 
 const debounce = (func, delay) => {
   let timer;
@@ -23,97 +25,7 @@ const debounce = (func, delay) => {
   };
 };
 
-const getStatusTag = (status) => {
-  switch (status) {
-    case "returning":
-      return {
-        label: "Đang trả hàng",
-        bg: "bg-amber-50",
-        text: "text-amber-600",
-        border: "border-amber-100",
-      };
-    case "completed":
-      return {
-        label: "Lưu trữ",
-        bg: "bg-gray-50",
-        text: "text-gray-600",
-        border: "border-gray-100",
-      };
-    case "cancelled":
-      return {
-        label: "Đã hủy",
-        bg: "bg-rose-50",
-        text: "text-rose-600",
-        border: "border-rose-100",
-      };
-    default:
-      return {
-        label: status,
-        bg: "bg-gray-50",
-        text: "text-gray-600",
-        border: "border-gray-100",
-      };
-  }
-};
-
-const getReceiveStatusTag = (status) => {
-  switch (status) {
-    case "pending":
-      return {
-        label: "Chưa nhận hàng",
-        bg: "bg-amber-50",
-        text: "text-amber-600",
-        border: "border-amber-100",
-      };
-    case "received":
-      return {
-        label: "Đã nhận hàng",
-        bg: "bg-emerald-50",
-        text: "text-emerald-600",
-        border: "border-emerald-100",
-      };
-    default:
-      return {
-        label: status,
-        bg: "bg-gray-50",
-        text: "text-gray-600",
-        border: "border-gray-100",
-      };
-  }
-};
-
-const getRefundStatusTag = (status) => {
-  switch (status) {
-    case "pending":
-      return {
-        label: "Chưa hoàn tiền",
-        bg: "bg-amber-50",
-        text: "text-amber-600",
-        border: "border-amber-100",
-      };
-    case "refunded":
-      return {
-        label: "Đã hoàn tiền",
-        bg: "bg-emerald-50",
-        text: "text-emerald-600",
-        border: "border-emerald-100",
-      };
-    case "not_needed":
-      return {
-        label: "Không cần hoàn tiền",
-        bg: "bg-gray-50",
-        text: "text-gray-600",
-        border: "border-gray-100",
-      };
-    default:
-      return {
-        label: status,
-        bg: "bg-gray-50",
-        text: "text-gray-600",
-        border: "border-gray-100",
-      };
-  }
-};
+// Status tags formatting logic moved to generic OrderBadges component
 
 const OrderReturnListPage = () => {
   const [returns, setReturns] = useState([]);
@@ -125,6 +37,10 @@ const OrderReturnListPage = () => {
     lastPage: 1,
     perPage: 15,
   });
+
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [isBulkUpdating, setIsBulkUpdating] = useState(false);
+  const [refundModal, setRefundModal] = useState({ isOpen: false });
 
   const getReturns = async (page = 1, search = "") => {
     try {
@@ -146,6 +62,43 @@ const OrderReturnListPage = () => {
       toast.error("Không thể tải danh sách phiếu trả hàng");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === returns.length && returns.length > 0) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(returns.map((r) => r.id));
+    }
+  };
+
+  const toggleSelect = (id) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
+
+  const executeBulkRefund = async (validIds) => {
+    if (validIds.length === 0) {
+      setRefundModal({ isOpen: false });
+      return;
+    }
+
+    try {
+      setIsBulkUpdating(true);
+      const res = await OrderReturnService.bulkRefund(validIds);
+      toast.success(res.message || `Đã hoàn tiền thành công!`);
+      setSelectedIds([]);
+      setRefundModal({ isOpen: false });
+      getReturns(currentPage, searchTerm);
+    } catch (error) {
+      console.error("Bulk refund failed:", error);
+      toast.error(
+        error.response?.data?.message || "Hoàn tiền hàng loạt thất bại",
+      );
+    } finally {
+      setIsBulkUpdating(false);
     }
   };
 
@@ -187,7 +140,7 @@ const OrderReturnListPage = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-3xl border border-gray-100 shadow-2xl shadow-black/5 overflow-hidden">
+        <div className="bg-white rounded-lg border border-gray-100 shadow-2xl shadow-black/5 overflow-hidden">
           <div className="p-8 border-b border-gray-50 bg-gray-50/20">
             <div className="relative max-w-md">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -201,29 +154,64 @@ const OrderReturnListPage = () => {
             </div>
           </div>
 
+          {/* Bulk Action Bar */}
+          {selectedIds.length > 0 && (
+            <div className="bg-indigo-50/50 px-4 py-3 border-b border-indigo-100 flex items-center justify-between animate-in fade-in slide-in-from-top-2 duration-300">
+              <div className="flex items-center gap-4">
+                <span className="text-sm font-semibold text-indigo-700">
+                  Đã chọn {selectedIds.length} phiếu trả hàng
+                </span>
+                <div className="h-4 w-px bg-indigo-200"></div>
+                <button
+                  onClick={() => setRefundModal({ isOpen: true })}
+                  className="flex items-center gap-2 px-3 py-1.5 bg-white border border-indigo-200 rounded-lg text-xs font-medium text-indigo-600 hover:bg-indigo-50 transition-all font-bold"
+                >
+                  Hoàn tiền
+                </button>
+              </div>
+              <button
+                onClick={() => setSelectedIds([])}
+                className="text-xs font-bold text-gray-400 hover:text-gray-600 uppercase tracking-wider"
+              >
+                Hủy chọn
+              </button>
+            </div>
+          )}
+
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-gray-50/50">
-                  <th className="px-8 py-6 text-[10px] text-gray-400 font-bold uppercase ">
+                  <th className="w-12 px-6 py-6 text-center">
+                    <input
+                      type="checkbox"
+                      className="rounded hover:cursor-pointer w-4 h-4 text-indigo-600"
+                      onChange={toggleSelectAll}
+                      checked={
+                        returns.length > 0 &&
+                        selectedIds.length === returns.length
+                      }
+                    />
+                  </th>
+                  <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase  ">
                     Mã đơn trả / Ngày tạo
                   </th>
-                  <th className="px-6 py-6 text-[10px] text-gray-400 font-bold uppercase ">
+                  <th className="px-6 py-6 text-[0.8rem] text-gray-600  uppercase ">
                     Đơn hàng gốc / Khách hàng
                   </th>
-                  <th className="px-6 py-6 text-[10px] text-gray-400 font-bold uppercase  text-center">
+                  <th className="px-6 py-6 text-[0.8rem] text-gray-600  uppercase  text-center">
                     Sản phẩm
                   </th>
-                  <th className="px-6 py-6 text-[10px] text-gray-400 font-bold uppercase  text-center">
+                  <th className="px-6 py-6 text-[0.8rem] text-gray-600  uppercase  text-center">
                     Hoàn trả
                   </th>
-                  <th className="px-6 py-6 text-[10px] text-gray-400 font-bold uppercase  text-center">
+                  <th className="px-6 py-6 text-[0.8rem] text-gray-600  uppercase  text-center">
                     Nhận hàng
                   </th>
-                  <th className="px-6 py-6 text-[10px] text-gray-400 font-bold uppercase  text-center">
+                  <th className="px-6 py-6 text-[0.8rem] text-gray-600  uppercase  text-center">
                     Trạng thái
                   </th>
-                  <th className="px-8 py-6 text-[10px] text-gray-400 font-bold uppercase  text-right">
+                  <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase   text-center">
                     Thao tác
                   </th>
                 </tr>
@@ -240,20 +228,25 @@ const OrderReturnListPage = () => {
                   </tr>
                 ) : returns.length > 0 ? (
                   returns.map((item) => {
-                    const statusTag = getStatusTag(item.status);
-                    const receiveTag = getReceiveStatusTag(item.receive_status);
-                    const refundTag = getRefundStatusTag(item.refund_status);
                     return (
                       <tr
                         key={item.id}
-                        className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors group"
+                        className={`border-b border-gray-50 transition-colors group ${selectedIds.includes(item.id) ? "bg-indigo-50/20" : "hover:bg-gray-50/50"}`}
                       >
+                        <td className="px-6 py-5 text-center">
+                          <input
+                            type="checkbox"
+                            className="rounded text-indigo-600 hover:cursor-pointer w-4 h-4"
+                            checked={selectedIds.includes(item.id)}
+                            onChange={() => toggleSelect(item.id)}
+                          />
+                        </td>
                         <td className="px-8 py-5">
                           <div className="flex flex-col gap-1">
                             <span className="text-sm font-bold text-indigo-600">
                               #{item.return_code}
                             </span>
-                            <span className="text-[10px] text-gray-400 font-medium">
+                            <span className="text-[13px] text-gray-600 ">
                               {new Date(item.created_at).toLocaleString(
                                 "vi-VN",
                                 {
@@ -269,36 +262,24 @@ const OrderReturnListPage = () => {
                             <span className="text-sm font-bold text-gray-900">
                               #{item.order?.code}
                             </span>
-                            <span className="text-[11px] text-gray-500">
+                            <span className="text-[13px] text-gray-600 ">
                               {item.order?.customer_name || "Khách lẻ"}
                             </span>
                           </div>
                         </td>
                         <td className="px-6 py-5 text-center">
-                          <span className="text-sm font-medium text-gray-600">
+                          <span className="text-[1rem] text-gray-600 ">
                             {item.items?.length || 0} sản phẩm
                           </span>
                         </td>
                         <td className="px-6 py-5 text-center">
-                          <div
-                            className={`inline-flex items-center px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider border ${refundTag.bg} ${refundTag.text} ${refundTag.border}`}
-                          >
-                            {refundTag.label}
-                          </div>
+                          <RefundStatusBadge status={item.refund_status} />
                         </td>
                         <td className="px-6 py-5 text-center">
-                          <div
-                            className={`inline-flex items-center px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider border ${receiveTag.bg} ${receiveTag.text} ${receiveTag.border}`}
-                          >
-                            {receiveTag.label}
-                          </div>
+                          <ReceiveStatusBadge status={item.receive_status} />
                         </td>
                         <td className="px-6 py-5 text-center">
-                          <div
-                            className={`inline-flex items-center px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider border ${statusTag.bg} ${statusTag.text} ${statusTag.border}`}
-                          >
-                            {statusTag.label}
-                          </div>
+                          <ReturnStatusBadge status={item.status} />
                         </td>
                         <td className="px-8 py-5 text-right">
                           <Link
@@ -313,7 +294,7 @@ const OrderReturnListPage = () => {
                   })
                 ) : (
                   <tr>
-                    <td colSpan="7" className="px-6 py-24 text-center">
+                    <td colSpan="8" className="px-6 py-24 text-center">
                       <RotateCcw className="w-16 h-16 text-gray-100 mx-auto mb-4" />
                       <p className="text-gray-400 font-bold text-sm">
                         Chưa có phiếu trả hàng nào được ghi nhận.
@@ -328,6 +309,13 @@ const OrderReturnListPage = () => {
           <Pagination pagination={pagination} onPageChange={handlePageChange} />
         </div>
       </div>
+
+      <BulkRefundModal
+        isOpen={refundModal.isOpen}
+        onClose={() => setRefundModal({ isOpen: false })}
+        onConfirm={executeBulkRefund}
+        selectedReturns={returns.filter((r) => selectedIds.includes(r.id))}
+      />
     </AdminLayout>
   );
 };

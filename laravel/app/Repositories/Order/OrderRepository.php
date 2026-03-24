@@ -12,16 +12,43 @@ class OrderRepository implements OrderRepositoryInterface
         $query = Order::with(['paymentMethod', 'staff', 'items']);
 
         if ($request) {
-            if ($request->filled('status')) {
+            if ($request->filled('status') && $request->status !== 'all') {
                 $query->where('status', $request->status);
             }
+
             if ($request->filled('search')) {
-                $query->where('code', 'like', '%' . $request->search . '%')
-                    ->orWhere('customer_name', 'like', '%' . $request->search . '%')
-                    ->orWhere('customer_phone', 'like', '%' . $request->search . '%');
+                $search = $request->search;
+                $searchType = $request->query('search_type', 'all');
+
+                $query->where(function ($q) use ($search, $searchType) {
+                    switch ($searchType) {
+                        case 'code':
+                            $q->where('code', 'like', "%{$search}%");
+                            break;
+                        case 'phone':
+                            $q->where('customer_phone', 'like', "%{$search}%");
+                            break;
+                        case 'name':
+                            $q->where('customer_name', 'like', "%{$search}%");
+                            break;
+                        default:
+                            $q->where('code', 'like', "%{$search}%")
+                                ->orWhere('customer_name', 'like', "%{$search}%")
+                                ->orWhere('customer_phone', 'like', "%{$search}%");
+                            break;
+                    }
+                });
+            }
+
+            if ($request->filled('from_date')) {
+                $query->whereDate('created_at', '>=', $request->from_date);
+            }
+            if ($request->filled('to_date')) {
+                $query->whereDate('created_at', '<=', $request->to_date);
             }
         }
 
+        $perPage = $request ? $request->query('per_page', 15) : 15;
         return $query->latest()->paginate($perPage);
     }
 

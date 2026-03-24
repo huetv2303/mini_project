@@ -350,7 +350,7 @@ const CategoryListPage = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-[32px] border border-gray-100 shadow-xl shadow-black/5 overflow-hidden">
+        <div className="bg-white rounded-lg border border-gray-100 shadow-xl shadow-black/5 overflow-hidden">
           <div className="p-6 border-b border-gray-50 bg-gray-50/30 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -386,19 +386,19 @@ const CategoryListPage = () => {
                       )}
                     </button>
                   </th>
-                  <th className="px-6 py-5 text-xs font-semibold text-gray-400 uppercase tracking-wider leading-loose">
+                  <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase    ">
                     Tên danh mục
                   </th>
-                  <th className="px-6 py-5 text-xs font-semibold text-gray-400 uppercase tracking-wider leading-loose">
+                  <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase    ">
                     Đường dẫn
                   </th>
-                  <th className="px-6 py-5 text-xs font-semibold text-gray-400 uppercase tracking-wider text-center leading-loose">
+                  <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase   text-center  ">
                     Cấu trúc
                   </th>
-                  <th className="px-6 py-5 text-xs font-semibold text-gray-400 uppercase tracking-wider text-center leading-loose">
+                  <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase   text-center  ">
                     Ảnh
                   </th>
-                  <th className="px-6 py-5 text-xs font-semibold text-gray-400 uppercase tracking-wider text-right leading-loose">
+                  <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase   text-center ">
                     Thao tác
                   </th>
                 </tr>

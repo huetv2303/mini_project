@@ -48,3 +48,21 @@ export const cancelOrderRequest = async (id) => {
     throw error;
   }
 };
+
+export const bulkUpdateOrdersRequest = async (data) => {
+  try {
+    const response = await api.post("/orders/bulk-update", data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const fetchPaymentMethodsRequest = async () => {
+  try {
+    const response = await api.get("/payment-methods");
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

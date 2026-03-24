@@ -216,19 +216,19 @@ const ProductListPage = () => {
                       className="w-4 h-4 rounded border-gray-300 text-black focus:ring-black"
                     />
                   </th>
-                  <th className="px-6 py-6 text-xs font-semibold text-gray-500 uppercase tracking-wider text-left">
+                  <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase text-left">
                     Sản phẩm
                   </th>
-                  <th className="px-6 py-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase">
                     Thông tin
                   </th>
-                  <th className="px-6 py-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase">
                     Giá bán (Đại diện)
                   </th>
-                  <th className="px-6 py-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase">
                     Trạng thái
                   </th>
-                  <th className="px-6 py-6 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">
+                  <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase text-right">
                     Thao tác
                   </th>
                 </tr>
@@ -239,7 +239,7 @@ const ProductListPage = () => {
                     <td colSpan="5" className="px-6 py-24 text-center">
                       <Loader2 className="w-12 h-12 text-black animate-spin mx-auto mb-4" />
                       <span className="text-gray-400 font-bold text-[10px] uppercase ">
-                        Đang tải kho hàng...
+                        Đang tải sản phẩm...
                       </span>
                     </td>
                   </tr>
@@ -295,11 +295,11 @@ const ProductListPage = () => {
                           </div>
                         </td>
                         <td className="px-6 py-5 space-y-2">
-                          <div className="flex items-center text-[11px] text-gray-500 font-bold">
+                          <div className="flex items-center text-[11px] text-gray-600">
                             <Tag className="w-3.5 h-3.5 mr-2 text-indigo-400" />{" "}
                             {product.category?.name || "N/A"}
                           </div>
-                          <div className="flex items-center text-[11px] text-gray-500 font-bold">
+                          <div className="flex items-center text-[11px] text-gray-600">
                             <Building2 className="w-3.5 h-3.5 mr-2 text-emerald-400" />{" "}
                             {product.supplier?.name || "N/A"}
                           </div>

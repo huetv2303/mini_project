@@ -270,22 +270,22 @@ const InventoryListPage = () => {
                   <thead>
                     <tr className="bg-gray-50/80 border-b border-gray-200">
                       <th className="px-4 py-4 w-12 text-center text-[10px] font-semibold text-gray-500 uppercase tracking-wider"></th>
-                      <th className="px-4 py-4 w-20 text-[10px] font-semibold text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase">
                         Ảnh
                       </th>
-                      <th className="px-4 py-4 text-[10px] font-semibold text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase">
                         Tên sản phẩm
                       </th>
-                      <th className="px-4 py-4 text-[10px] font-semibold text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase">
                         Danh mục
                       </th>
-                      <th className="px-4 py-4 text-center text-[10px] font-semibold text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase">
                         Biến thể
                       </th>
-                      <th className="px-4 py-4 text-center text-[10px] font-semibold text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase">
                         Tổng tồn
                       </th>
-                      <th className="px-4 py-4 text-center text-[10px] font-semibold text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase">
                         Trạng thái
                       </th>
                     </tr>
@@ -472,9 +472,9 @@ const InventoryListPage = () => {
               </div>
 
               {/* Pagination UI */}
-              <Pagination 
-                pagination={pagination} 
-                onPageChange={handlePageChange} 
+              <Pagination
+                pagination={pagination}
+                onPageChange={handlePageChange}
                 label="sản phẩm"
               />
             </div>

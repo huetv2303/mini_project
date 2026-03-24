@@ -25,6 +25,11 @@ const OrderReturnService = {
     const response = await api.patch(`/order-returns/${id}/refund`);
     return response.data;
   },
+
+  bulkRefund: async (ids) => {
+    const response = await api.post("/order-returns/bulk-refund", { ids });
+    return response.data;
+  },
 };
 
 export default OrderReturnService;

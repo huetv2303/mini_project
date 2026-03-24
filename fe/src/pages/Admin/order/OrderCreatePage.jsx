@@ -237,11 +237,7 @@ const OrderCreatePage = () => {
           {/* Left Column: Customer & Items */}
           <div className="lg:col-span-8 space-y-8">
             {/* Product Search */}
-            <div className="bg-white rounded-lg border border-gray-100 p-8 shadow-sm relative z-20">
-              <h3 className="text-sm font-bold uppercase  flex items-center gap-2 mb-6">
-                <Search className="w-4 h-4 text-gray-400" />
-                Tìm kiếm sản phẩm
-              </h3>
+            <div className="bg-white rounded-lg border border-gray-100 p-4 shadow-sm relative z-20">
               <div className="relative">
                 <input
                   type="text"
@@ -445,7 +441,7 @@ const OrderCreatePage = () => {
                   </span>
                 </div>
                 <div className="pt-6 border-t border-white/10 flex justify-between items-center">
-                  <span className="text-xs font-bold uppercase  opacity-40">
+                  <span className="text-xs font-bold uppercase  opacity-70">
                     TỔNG CỘNG
                   </span>
                   <span className="text-xl font-black italic">
@@ -473,7 +469,7 @@ const OrderCreatePage = () => {
               </h3>
               <div className="space-y-6">
                 <div>
-                  <label className="text-[12px] font-bold text-gray-500 uppercase  mb-2 block">
+                  <label className="text-[12px] font-bold text-gray-600 uppercase  mb-2 block">
                     Tên khách hàng
                   </label>
                   <div className="relative">
@@ -482,14 +478,14 @@ const OrderCreatePage = () => {
                       onChange={(e) =>
                         setCustomer({ ...customer, name: e.target.value })
                       }
-                      className="w-full pl-10 pr-4 py-4 bg-gray-50 rounded-2xl border-none text-sm outline-none focus:ring-4 focus:ring-black/5"
+                      className="w-full pl-10 pr-4 py-4 bg-gray-50 rounded-lg text-sm outline-none "
                       placeholder="Nhập tên..."
                     />
                     <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
                   </div>
                 </div>
                 <div>
-                  <label className="text-[12px] font-bold text-gray-500 uppercase  mb-2 block">
+                  <label className="text-[12px] font-bold text-gray-600 uppercase  mb-2 block">
                     Số điện thoại
                   </label>
                   <div className="relative">
@@ -498,14 +494,14 @@ const OrderCreatePage = () => {
                       onChange={(e) =>
                         setCustomer({ ...customer, phone: e.target.value })
                       }
-                      className="w-full pl-10 pr-4 py-4 bg-gray-50 rounded-2xl border-none text-sm outline-none focus:ring-4 focus:ring-black/5"
+                      className="w-full pl-10 pr-4 py-4 bg-gray-50 rounded-lg text-sm outline-none "
                       placeholder="09xxxx..."
                     />
                     <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
                   </div>
                 </div>
                 <div>
-                  <label className="text-[12px] font-bold text-gray-500 uppercase  mb-2 block">
+                  <label className="text-[12px] font-bold text-gray-600 uppercase  mb-2 block">
                     Địa chỉ nhận hàng
                   </label>
                   <div className="relative">
@@ -514,7 +510,7 @@ const OrderCreatePage = () => {
                       onChange={(e) =>
                         setCustomer({ ...customer, address: e.target.value })
                       }
-                      className="w-full pl-10 pr-4 py-4 bg-gray-50 rounded-2xl border-none text-sm outline-none focus:ring-4 focus:ring-black/5 min-h-[80px]"
+                      className="w-full pl-10 pr-4 py-4 bg-gray-50 rounded-lg text-sm outline-none "
                       placeholder="Địa chỉ cụ thể..."
                     />
                     <MapPin className="absolute left-4 top-6 w-4 h-4 text-gray-300" />
@@ -565,7 +561,7 @@ const OrderCreatePage = () => {
                   <textarea
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
-                    className="w-full px-6 py-4 bg-gray-50 rounded-2xl border-none text-sm outline-none font-bold "
+                    className="w-full px-6 py-4 bg-gray-50 rounded-lg border-none text-sm outline-none "
                     placeholder="Ghi chú nội bộ..."
                   />
                 </div>

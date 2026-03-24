@@ -92,4 +92,27 @@ class OrderReturnController extends Controller
             ], 422);
         }
     }
+
+    public function bulkRefund(Request $request)
+    {
+        try {
+            $data = $request->validate([
+                'ids' => 'required|array',
+                'ids.*' => 'exists:order_returns,id',
+            ]);
+
+            $updatedCount = $this->orderReturnService->bulkRefund($data['ids'], auth()->id());
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Xác nhận hoàn tiền hàng loạt thành công.',
+                'updated_count' => $updatedCount
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => $e->getMessage(),
+            ], 422);
+        }
+    }
 }

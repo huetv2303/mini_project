@@ -7,7 +7,13 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
  * @param {Function} onPageChange - Callback function when page changes
  * @param {string} label - Label for total items (default: "sản phẩm")
  */
-const Pagination = ({ pagination, onPageChange, label = "sản phẩm" }) => {
+const Pagination = ({
+  pagination,
+  onPageChange,
+  itemsPerPage,
+  setItemsPerPage,
+  label = "sản phẩm",
+}) => {
   const { currentPage, lastPage, total } = pagination;
 
   if (lastPage <= 1) return null;
@@ -35,13 +41,18 @@ const Pagination = ({ pagination, onPageChange, label = "sản phẩm" }) => {
           }`}
         >
           {i}
-        </button>
+        </button>,
       );
     }
 
     // Add ellipses if needed
     if (startPage > 1) {
-      if (startPage > 2) pages.unshift(<span key="start-dots" className="px-1 text-gray-400">...</span>);
+      if (startPage > 2)
+        pages.unshift(
+          <span key="start-dots" className="px-1 text-gray-400">
+            ...
+          </span>,
+        );
       pages.unshift(
         <button
           key={1}
@@ -49,12 +60,17 @@ const Pagination = ({ pagination, onPageChange, label = "sản phẩm" }) => {
           className="min-w-[36px] h-9 rounded-lg text-sm font-semibold bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
         >
           1
-        </button>
+        </button>,
       );
     }
 
     if (endPage < lastPage) {
-      if (endPage < lastPage - 1) pages.push(<span key="end-dots" className="px-1 text-gray-400">...</span>);
+      if (endPage < lastPage - 1)
+        pages.push(
+          <span key="end-dots" className="px-1 text-gray-400">
+            ...
+          </span>,
+        );
       pages.push(
         <button
           key={lastPage}
@@ -62,7 +78,7 @@ const Pagination = ({ pagination, onPageChange, label = "sản phẩm" }) => {
           className="min-w-[36px] h-9 rounded-lg text-sm font-semibold bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
         >
           {lastPage}
-        </button>
+        </button>,
       );
     }
 
@@ -70,11 +86,29 @@ const Pagination = ({ pagination, onPageChange, label = "sản phẩm" }) => {
   };
 
   return (
-    <div className="px-6 py-4 bg-gray-50/50 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4 font-inter">
-      <div className="text-sm text-gray-500 order-2 sm:order-1">
-        Hiển thị <span className="font-semibold">{total > 0 ? currentPage * pagination.perPage - (pagination.perPage - 1) : 0}</span> - <span className="font-semibold">{Math.min(currentPage * pagination.perPage, total)}</span> trên <span className="font-semibold">{total}</span> {label}
+    <div className="px-6 py-4 bg-gray-50/50 border-t border-gray-200  flex justify-between">
+      <div className="flex items-center gap-4">
+        <span className="text-sm text-gray-500">
+          Hiển thị {(currentPage - 1) * pagination.perPage + 1} đến{" "}
+          {Math.min(currentPage * pagination.perPage, pagination.total)} trên
+          tổng {pagination.total}
+        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-500">Hiển thị</span>
+          <select
+            value={itemsPerPage}
+            onChange={(e) => setItemsPerPage(Number(e.target.value))}
+            className="px-2 py-1 border border-gray-300 rounded text-sm"
+          >
+            <option value={15}>15</option>
+            <option value={20}>20</option>
+            <option value={50}>50</option>
+            <option value={100}>100</option>
+          </select>
+          <span className="text-sm text-gray-500">Kết quả</span>
+        </div>
       </div>
-      
+
       <div className="flex items-center gap-2 order-1 sm:order-2">
         <button
           onClick={() => onPageChange(currentPage - 1)}
@@ -83,10 +117,8 @@ const Pagination = ({ pagination, onPageChange, label = "sản phẩm" }) => {
         >
           <ChevronLeft className="w-4 h-4" />
         </button>
-        
-        <div className="flex items-center gap-1">
-          {renderPageButtons()}
-        </div>
+
+        <div className="flex items-center gap-1">{renderPageButtons()}</div>
 
         <button
           onClick={() => onPageChange(currentPage + 1)}

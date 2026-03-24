@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { formatPrice } from "./OrderListPage";
+import { ReceiveStatusBadge, RefundStatusBadge } from "../../../components/common/OrderBadges";
 
 const OrderReturnDetailsPage = () => {
   const { id } = useParams();
@@ -60,97 +61,7 @@ const OrderReturnDetailsPage = () => {
     }
   };
 
-  const getStatusTag = (status) => {
-    switch (status) {
-      case "returning":
-        return {
-          label: "Đang trả hàng",
-          bg: "bg-amber-50",
-          text: "text-amber-600",
-          border: "border-amber-100",
-        };
-      case "completed":
-        return {
-          label: "Lưu trữ",
-          bg: "bg-emerald-50",
-          text: "text-emerald-600",
-          border: "border-emerald-100",
-        };
-      case "cancelled":
-        return {
-          label: "Đã hủy",
-          bg: "bg-rose-50",
-          text: "text-rose-600",
-          border: "border-rose-100",
-        };
-      default:
-        return {
-          label: status,
-          bg: "bg-gray-50",
-          text: "text-gray-600",
-          border: "border-gray-100",
-        };
-    }
-  };
-
-  const getReceiveStatusTag = (status) => {
-    switch (status) {
-      case "pending":
-        return {
-          label: "Chưa nhận hàng",
-          bg: "bg-amber-50",
-          text: "text-amber-600",
-          border: "border-amber-100",
-        };
-      case "received":
-        return {
-          label: "Đã nhận hàng",
-          bg: "bg-indigo-50",
-          text: "text-indigo-600",
-          border: "border-indigo-100",
-        };
-      default:
-        return {
-          label: status,
-          bg: "bg-gray-50",
-          text: "text-gray-600",
-          border: "border-gray-100",
-        };
-    }
-  };
-
-  const getRefundStatusTag = (status) => {
-    switch (status) {
-      case "pending":
-        return {
-          label: "Chưa hoàn tiền",
-          bg: "bg-amber-50",
-          text: "text-amber-600",
-          border: "border-amber-100",
-        };
-      case "refunded":
-        return {
-          label: "Đã hoàn tiền",
-          bg: "bg-emerald-50",
-          text: "text-emerald-600",
-          border: "border-emerald-100",
-        };
-      case "not_needed":
-        return {
-          label: "Không cần hoàn tiền",
-          bg: "bg-gray-50",
-          text: "text-gray-600",
-          border: "border-gray-100",
-        };
-      default:
-        return {
-          label: status,
-          bg: "bg-gray-50",
-          text: "text-gray-600",
-          border: "border-gray-100",
-        };
-    }
-  };
+  // Status formatting logic moved to OrderBadges.jsx
 
   useEffect(() => {
     getReturnDetails();
@@ -189,16 +100,8 @@ const OrderReturnDetailsPage = () => {
               <span className="px-3 py-1 bg-black text-white text-[12px] font-black rounded-lg uppercase tracking-tighter">
                 #{orderReturn.return_code}
               </span>
-              <div
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-bold uppercase  ${getReceiveStatusTag(orderReturn.receive_status).bg} ${getReceiveStatusTag(orderReturn.receive_status).text} ${getReceiveStatusTag(orderReturn.receive_status).border}`}
-              >
-                {getReceiveStatusTag(orderReturn.receive_status).label}
-              </div>
-              <div
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-bold uppercase  ${getRefundStatusTag(orderReturn.refund_status).bg} ${getRefundStatusTag(orderReturn.refund_status).text} ${getRefundStatusTag(orderReturn.refund_status).border}`}
-              >
-                {getRefundStatusTag(orderReturn.refund_status).label}
-              </div>
+              <ReceiveStatusBadge status={orderReturn.receive_status} />
+              <RefundStatusBadge status={orderReturn.refund_status} />
             </div>
             <p className="text-xs text-gray-400 font-bold uppercase  mt-1">
               Xử lý ngày{" "}

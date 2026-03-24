@@ -208,16 +208,16 @@ const SupplierListPage = () => {
                       )}
                     </button>
                   </th>
-                  <th className="px-6 py-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                  <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase    ">
                     Nhà cung cấp
                   </th>
-                  <th className="px-6 py-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                  <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase    ">
                     Liên hệ
                   </th>
-                  <th className="px-6 py-6 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                  <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase   ">
                     Trạng thái
                   </th>
-                  <th className="px-6 py-6 text-xs font-semibold text-gray-400 uppercase tracking-wider text-right">
+                  <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase  ">
                     Thao tác
                   </th>
                 </tr>
@@ -227,8 +227,8 @@ const SupplierListPage = () => {
                   <tr>
                     <td colSpan="5" className="px-6 py-24 text-center">
                       <Loader2 className="w-12 h-12 text-black animate-spin mx-auto mb-4" />
-                      <span className="text-gray-400 font-bold text-xs uppercase ">
-                        Đang tải danh sách...
+                      <span className="text-gray-400 font-bold text-[10px] uppercase ">
+                        Đang tải nhà cung cấp...
                       </span>
                     </td>
                   </tr>
@@ -265,7 +265,7 @@ const SupplierListPage = () => {
                             <div className="font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">
                               {sup.name}
                             </div>
-                            <div className="text-xs text-gray-400 font-medium  mt-1">
+                            <div className="text-[13px] text-gray-600  mt-1">
                               MST: {sup.tax_code || "N/A"}
                             </div>
                           </div>
@@ -273,11 +273,11 @@ const SupplierListPage = () => {
                       </td>
                       <td className="px-6 py-5">
                         <div className="space-y-1.5">
-                          <div className="flex items-center text-sm text-gray-600 font-medium">
+                          <div className="flex items-center text-sm text-gray-600 ">
                             <Mail className="w-3.5 h-3.5 mr-2 text-gray-400" />{" "}
                             {sup.email}
                           </div>
-                          <div className="flex items-center text-sm text-gray-600 font-medium">
+                          <div className="flex items-center text-sm text-gray-600 ">
                             <Phone className="w-3.5 h-3.5 mr-2 text-gray-400" />{" "}
                             {sup.phone || "N/A"}
                           </div>
