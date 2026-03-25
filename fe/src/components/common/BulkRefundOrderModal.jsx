@@ -82,13 +82,18 @@ const BulkRefundOrderModal = ({
             <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
             <div className="text-sm text-amber-800">
               <p className="font-bold mb-1">Cảnh báo !</p>
-              <p>Thao tác này sẽ chuyển trạng thái thanh toán của các đơn hợp lệ thành <b>HOÀN TIỀN</b>. Bạn cần tự liên hệ trả tiền cho khách ngoài hệ thống.</p>
+              <p>
+                Thao tác này sẽ chuyển trạng thái thanh toán của các đơn hợp lệ
+                thành <b>HOÀN TIỀN</b>. Bạn cần tự liên hệ trả tiền cho khách
+                ngoài hệ thống.
+              </p>
             </div>
           </div>
 
           <div className="space-y-4">
             <p className="text-sm text-gray-700">
-              Đã chọn <span className="font-bold">{selectedOrders.length}</span> đơn hàng, phân loại như sau:
+              Đã chọn <span className="font-bold">{selectedOrders.length}</span>{" "}
+              đơn hàng, phân loại như sau:
             </p>
             <div className="space-y-3 pl-2">
               <div className="flex justify-between items-center bg-emerald-50 p-2 rounded-lg border border-emerald-100">
@@ -96,23 +101,41 @@ const BulkRefundOrderModal = ({
                   <CheckCircle className="w-4 h-4" />
                   <span className="text-sm">Phù hợp để hoàn tiền</span>
                 </div>
+
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-bold">: {validOrders.length}</span>
-                  <span className="text-sm text-emerald-700 font-medium">({formatPrice(totalAmount)})</span>
+                  <span className="text-sm font-bold">
+                    : {validOrders.length}
+                  </span>
+                  <span className="text-sm text-emerald-700 font-medium">
+                    ({formatPrice(totalAmount)})
+                  </span>
                 </div>
               </div>
 
               {invalidOrders.length > 0 && (
                 <div className="mt-4 p-4 border border-rose-100 rounded-xl bg-rose-50/20">
-                  <p className="text-xs font-bold text-rose-500 mb-2 uppercase tracking-tight">Không phù hợp ({invalidOrders.length})</p>
+                  <p className="text-xs font-bold text-rose-500 mb-2 uppercase tracking-tight">
+                    Không phù hợp ({invalidOrders.length})
+                  </p>
                   <div className="space-y-2">
-                    {Array.from(new Set(invalidOrders.map((i) => i.reason))).map((reason) => (
-                      <div key={reason} className="flex justify-between items-center text-xs">
+                    {Array.from(
+                      new Set(invalidOrders.map((i) => i.reason)),
+                    ).map((reason) => (
+                      <div
+                        key={reason}
+                        className="flex justify-between items-center text-xs"
+                      >
                         <div className="flex items-center gap-2 text-gray-500">
                           <XCircle className="w-3 h-3 text-rose-400" />
                           <span>{reason}</span>
                         </div>
-                        <span className="font-bold text-gray-700">: {invalidOrders.filter((i) => i.reason === reason).length}</span>
+                        <span className="font-bold text-gray-700">
+                          :{" "}
+                          {
+                            invalidOrders.filter((i) => i.reason === reason)
+                              .length
+                          }
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -134,7 +157,8 @@ const BulkRefundOrderModal = ({
             disabled={validOrders.length === 0}
             className="px-6 py-2.5 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-indigo-200"
           >
-            Xác nhận hoàn tiền {validOrders.length > 0 && `(${validOrders.length})`}
+            Xác nhận hoàn tiền{" "}
+            {validOrders.length > 0 && `(${validOrders.length})`}
           </button>
         </div>
       </div>

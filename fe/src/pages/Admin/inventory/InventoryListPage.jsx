@@ -143,6 +143,51 @@ const InventoryListPage = () => {
     );
   };
 
+  const calculateTotalAvailable = (variants) => {
+    if (!variants || variants.length === 0) return 0;
+    return variants.reduce((acc, curr) => {
+      const inv = curr.inventory || {};
+      const available =
+        (parseInt(inv.quantity) || 0) -
+        (parseInt(inv.reserved) || 0) -
+        (parseInt(inv.unavailable) || 0) -
+        (parseInt(inv.packing) || 0);
+      return acc + Math.max(0, available);
+    }, 0);
+  };
+
+  const calculateTotalReserved = (variants) => {
+    if (!variants || variants.length === 0) return 0;
+    return variants.reduce(
+      (acc, curr) => acc + (parseInt(curr.inventory?.reserved) || 0),
+      0,
+    );
+  };
+
+  const calculateTotalUnavailable = (variants) => {
+    if (!variants || variants.length === 0) return 0;
+    return variants.reduce(
+      (acc, curr) => acc + (parseInt(curr.inventory?.unavailable) || 0),
+      0,
+    );
+  };
+
+  const calculateTotalReturning = (variants) => {
+    if (!variants || variants.length === 0) return 0;
+    return variants.reduce(
+      (acc, curr) => acc + (parseInt(curr.inventory?.returning) || 0),
+      0,
+    );
+  };
+
+  const calculateTotalPacking = (variants) => {
+    if (!variants || variants.length === 0) return 0;
+    return variants.reduce(
+      (acc, curr) => acc + (parseInt(curr.inventory?.packing) || 0),
+      0,
+    );
+  };
+
   const calculateTotalMinQuantity = (variants) => {
     if (!variants || variants.length === 0) return 0;
     return variants.reduce(
@@ -276,16 +321,25 @@ const InventoryListPage = () => {
                       <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase">
                         Tên sản phẩm
                       </th>
-                      <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase">
-                        Danh mục
-                      </th>
-                      <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase">
-                        Biến thể
-                      </th>
-                      <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase">
+                      <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase text-center">
                         Tổng tồn
                       </th>
-                      <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase">
+                      <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase text-center bg-emerald-50/50">
+                        Có thể bán
+                      </th>
+                      <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase text-center">
+                        Đang giao dịch
+                      </th>
+                      <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase text-center">
+                        Không thể bán
+                      </th>
+                      <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase text-center">
+                        Đang về kho
+                      </th>
+                      <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase text-center">
+                        Đang đóng gói
+                      </th>
+                      <th className="px-6 py-6 text-[10px] text-gray-400 uppercase text-center w-28">
                         Trạng thái
                       </th>
                     </tr>
@@ -363,26 +417,43 @@ const InventoryListPage = () => {
                               <td className="px-4 py-4 w-96">
                                 <div className="font-semibold text-gray-800 text-sm">
                                   {product.name}
+                                  <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded bg-gray-100 text-gray-500 text-[10px] font-bold">
+                                    {variantsCount} BIẾN THỂ
+                                  </span>
                                 </div>
                                 <div className="text-xs text-gray-500 mt-0.5">
+                                  {product.category?.name || "N/A"} |{" "}
                                   {product.supplier?.name || "No Brand"}
                                 </div>
                               </td>
-                              <td className="px-4 py-4">
-                                <span className="text-sm text-gray-600">
-                                  {product.category?.name || "N/A"}
-                                </span>
-                              </td>
                               <td className="px-4 py-4 text-center">
-                                <span className="inline-flex items-center px-2 py-1 rounded bg-gray-100 text-gray-600 text-xs font-semibold">
-                                  {variantsCount} biến thể
-                                </span>
-                              </td>
-                              <td className="px-4 py-4 text-center">
-                                <span
-                                  className={`text-sm font-bold ${totalStock <= 0 ? "text-red-500" : "text-gray-800"}`}
-                                >
+                                <span className="text-sm font-bold text-gray-800">
                                   {totalStock}
+                                </span>
+                              </td>
+                              <td className="px-4 py-4 text-center bg-emerald-50/20">
+                                <span className="text-sm font-black text-blue-600">
+                                  {calculateTotalAvailable(product.variants)}
+                                </span>
+                              </td>
+                              <td className="px-4 py-4 text-center">
+                                <span className="text-sm font-medium text-amber-600">
+                                  {calculateTotalReserved(product.variants)}
+                                </span>
+                              </td>
+                              <td className="px-4 py-4 text-center">
+                                <span className="text-sm font-medium text-amber-600">
+                                  {calculateTotalUnavailable(product.variants)}
+                                </span>
+                              </td>
+                              <td className="px-4 py-4 text-center">
+                                <span className="text-sm font-medium text-amber-600">
+                                  {calculateTotalReturning(product.variants)}
+                                </span>
+                              </td>
+                              <td className="px-4 py-4 text-center">
+                                <span className="text-sm font-medium text-amber-600">
+                                  {calculateTotalPacking(product.variants)}
                                 </span>
                               </td>
                               <td className="px-4 py-4 text-center">
@@ -404,29 +475,107 @@ const InventoryListPage = () => {
                                   <td colSpan="2"></td>
                                   <td className="px-4 py-3 pb-4">
                                     <div className="flex items-start">
-                                      {/* Connector Line */}
                                       <div className="w-4 h-4 border-l-2 border-b-2 border-gray-200 rounded-bl-lg mr-3 mt-1.5 opacity-60"></div>
                                       <div>
                                         <div className="text-sm font-semibold text-gray-700">
-                                          {variant.color?.name || ""}{" "}
-                                          {variant.size?.name
-                                            ? `/ ${variant.size?.name}`
-                                            : ""}
+                                          {variant.name || "Default"}
                                         </div>
-                                        <div className="text-xs text-gray-600 uppercase mt-0.5 tracking-wider">
+                                        <div className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">
                                           SKU: {variant.sku}
                                         </div>
                                       </div>
                                     </div>
                                   </td>
-                                  <td colSpan="2"></td>
                                   <td className="px-4 py-3 text-center">
-                                    <span
-                                      className={`text-sm font-bold ${variant.inventory?.quantity <= 0 ? "text-red-500" : variant.inventory?.quantity < variant.inventory?.min_quantity ? "text-yellow-600" : "text-emerald-600"}`}
-                                    >
+                                    <span className="text-sm font-bold text-gray-600">
                                       {variant.inventory?.quantity || 0}
                                     </span>
                                   </td>
+                                  <td className="px-4 py-3 text-center bg-emerald-50/10">
+                                    <span className="text-sm font-black text-emerald-500">
+                                      {Math.max(
+                                        0,
+                                        (parseInt(
+                                          variant.inventory?.quantity,
+                                        ) || 0) -
+                                          (parseInt(
+                                            variant.inventory?.reserved,
+                                          ) || 0) -
+                                          (parseInt(
+                                            variant.inventory?.unavailable,
+                                          ) || 0) -
+                                          (parseInt(
+                                            variant.inventory?.packing,
+                                          ) || 0),
+                                      )}
+                                    </span>
+                                  </td>
+                                  <td className="px-4 py-3 text-center">
+                                    <div className="flex flex-col gap-1 items-center">
+                                      <span
+                                        className="text-xs "
+                                        title="Đang giao dịch"
+                                      >
+                                        {variant.inventory?.reserved || 0}
+                                      </span>
+                                    </div>
+                                  </td>
+                                  <td className="px-4 py-3 text-center">
+                                    <div className="flex flex-col gap-1 items-center">
+                                      <span
+                                        className="text-xs "
+                                        title="Không thể bán"
+                                      >
+                                        {variant.inventory?.unavailable || 0}
+                                      </span>
+                                    </div>
+                                  </td>
+                                  <td className="px-4 py-3 text-center">
+                                    <div className="flex flex-col gap-1 items-center">
+                                      <span
+                                        className="text-xs "
+                                        title="Đang về kho"
+                                      >
+                                        {variant.inventory?.returning || 0}
+                                      </span>
+                                    </div>
+                                  </td>
+                                  <td className="px-4 py-3 text-center">
+                                    <div className="flex flex-col gap-1 items-center">
+                                      <span
+                                        className="text-xs "
+                                        title="Đang đóng gói"
+                                      >
+                                        {variant.inventory?.packing || 0}
+                                      </span>
+                                    </div>
+                                  </td>
+
+                                  {/* <td className="px-4 py-3 text-center">
+                                    <div className="flex flex-col gap-1 items-center">
+                                      <div className="flex gap-2">
+                                        <span
+                                          className="text-[10px] text-red-400"
+                                          title="Không thể bán"
+                                        >
+                                          H:{" "}
+                                          {variant.inventory?.unavailable || 0}
+                                        </span>
+                                        <span
+                                          className="text-[10px] text-blue-400"
+                                          title="Đang về kho"
+                                        >
+                                          V: {variant.inventory?.returning || 0}
+                                        </span>
+                                        <span
+                                          className="text-[10px] text-indigo-400"
+                                          title="Đang đóng gói"
+                                        >
+                                          P: {variant.inventory?.packing || 0}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </td> */}
                                   <td className="px-4 py-3 text-center">
                                     <div className="flex items-center justify-center gap-1.5 opacity-90">
                                       <button

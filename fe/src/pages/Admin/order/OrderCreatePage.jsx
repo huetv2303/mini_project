@@ -21,8 +21,10 @@ import {
 import { fetchProductsRequest } from "../../../services/ProductService";
 import { fetchPaymentMethodsRequest } from "../../../services/PaymentService";
 import { createOrderRequest } from "../../../services/OrderService";
+import ShippingMethodService from "../../../services/ShippingMethodService";
 import toast from "react-hot-toast";
 import { formatPrice } from "./OrderListPage";
+import SelectSearch from "../../../components/common/SelectSearch";
 
 const debounce = (func, delay) => {
   let timer;
@@ -46,9 +48,11 @@ const OrderCreatePage = () => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [discountAmount, setDiscountAmount] = useState(0);
   const [paymentMethods, setPaymentMethods] = useState([]);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
+  const [shippingMethods, setShippingMethods] = useState([]);
+  const [selectedShippingMethod, setSelectedShippingMethod] = useState(null);
+  const [shippingFee, setShippingFee] = useState(0);
   const [note, setNote] = useState("");
-
   // Customer state
   const [customer, setCustomer] = useState({
     name: "",
@@ -57,19 +61,27 @@ const OrderCreatePage = () => {
   });
 
   useEffect(() => {
-    const loadPaymentMethods = async () => {
+    const loadInitData = async () => {
       try {
-        const res = await fetchPaymentMethodsRequest();
-        setPaymentMethods(res.data || []);
-        if (res.data?.length > 0) {
-          setSelectedPaymentMethod(res.data[0].id);
-        }
+        const [paymentRes, shippingRes] = await Promise.all([
+          fetchPaymentMethodsRequest(),
+          ShippingMethodService.getActive(),
+        ]);
+
+        setPaymentMethods(paymentRes.data || []);
+        setShippingMethods(shippingRes.data || []);
       } catch (error) {
-        console.error("Failed to load payment methods", error);
+        console.error("Failed to load init data", error);
       }
     };
-    loadPaymentMethods();
+    loadInitData();
   }, []);
+
+  const handleShippingChange = (methodId) => {
+    setSelectedShippingMethod(methodId);
+    const method = shippingMethods.find((m) => m.id == methodId);
+    setShippingFee(method ? Number(method.cost) : 0);
+  };
 
   const searchProducts = async (term) => {
     if (!term || term.length < 2) {
@@ -148,7 +160,10 @@ const OrderCreatePage = () => {
   };
 
   const calculateTotal = () => {
-    return Math.max(0, calculateSubtotal() - discountAmount);
+    return Math.max(
+      0,
+      calculateSubtotal() + Number(shippingFee) - Number(discountAmount),
+    );
   };
 
   const handlePlaceOrder = async (e) => {
@@ -162,6 +177,9 @@ const OrderCreatePage = () => {
     if (!selectedPaymentMethod) {
       return toast.error("Vui lòng chọn hình thức thanh toán");
     }
+    if (!selectedShippingMethod) {
+      return toast.error("Vui lòng chọn phương thức vận chuyển");
+    }
 
     try {
       setSubmitting(true);
@@ -172,6 +190,7 @@ const OrderCreatePage = () => {
         })),
         discount_amount: discountAmount,
         payment_method_id: selectedPaymentMethod,
+        shipping_method_id: selectedShippingMethod,
         note: note,
         customer_name: customer.name,
         customer_phone: customer.phone,
@@ -222,7 +241,7 @@ const OrderCreatePage = () => {
           <button
             onClick={handlePlaceOrder}
             disabled={submitting || selectedItems.length === 0}
-            className="inline-flex items-center px-8 py-4 bg-black text-white text-sm font-black rounded-2xl shadow-2xl hover:bg-black/80 transition-all active:scale-95 disabled:opacity-50"
+            className="inline-flex items-center px-4 py-4  text-sm font-bold bg-blue-600 text-white rounded-lg shadow-lg transition-all active:scale-95 disabled:opacity-50"
           >
             {submitting ? (
               <Loader2 className="w-5 h-5 animate-spin mr-2" />
@@ -257,7 +276,7 @@ const OrderCreatePage = () => {
                 {/* Search Results Dropdown */}
                 {(searchResults.length > 0 || (searchTerm && !isSearching)) &&
                   searchTerm.length >= 1 && (
-                    <div className="absolute top-full left-0 w-full mt-4 bg-white border border-gray-100 rounded-[32px] shadow-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="absolute top-full left-0 w-full mt-4 bg-white border border-gray-100 rounded-lg shadow-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-300">
                       {searchResults.length > 0 ? (
                         <div className="max-h-[400px] overflow-y-auto">
                           {searchResults.map((product) => (
@@ -280,25 +299,65 @@ const OrderCreatePage = () => {
                                     </span>
                                   </div>
                                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 ml-16">
-                                    {product.variants?.map((variant) => (
-                                      <button
-                                        key={variant.id}
-                                        onClick={() =>
-                                          addItemToOrder(product, variant)
-                                        }
-                                        className="flex items-center justify-between p-3 bg-gray-50 hover:bg-black hover:text-white rounded-xl transition-all group"
-                                      >
-                                        <div className="text-left">
-                                          <p className="text-[0.9rem] uppercase  opacity-70 group-hover:opacity-100">
-                                            {variant.name || "Default"}
-                                          </p>
-                                          <p className="text-xs font-bold ">
-                                            {formatPrice(variant.price)}
-                                          </p>
-                                        </div>
-                                        <Plus className="w-4 h-4" />
-                                      </button>
-                                    ))}
+                                    {product.variants?.map((variant) => {
+                                      const isOutOfStock =
+                                        variant.inventory?.quantity -
+                                          (variant.inventory?.reserved || 0) <=
+                                        0;
+
+                                      return (
+                                        <button
+                                          key={variant.id}
+                                          onClick={() =>
+                                            addItemToOrder(product, variant)
+                                          }
+                                          disabled={isOutOfStock}
+                                          className={`flex items-center justify-between p-3 rounded-xl transition-all group ${
+                                            isOutOfStock
+                                              ? "bg-gray-200 cursor-not-allowed opacity-60"
+                                              : " hover:bg-blue-50 "
+                                          }`}
+                                        >
+                                          <div className="text-left">
+                                            <div className="flex items-center gap-2">
+                                              <p
+                                                className={`text-[0.9rem] uppercase opacity-70 ${!isOutOfStock && "group-hover:opacity-100"}`}
+                                              >
+                                                {variant.name || "Default"}
+                                              </p>
+                                            </div>
+
+                                            <p className="text-xs font-bold ">
+                                              {formatPrice(variant.price)}
+                                            </p>
+                                            <div className="flex items-center gap-2 pt-1">
+                                              <span className="text-xs">
+                                                Có thể bán:{" "}
+                                              </span>
+                                              <span
+                                                className={`text-xs ${
+                                                  variant.inventory?.quantity <
+                                                  variant.inventory
+                                                    ?.min_quantity
+                                                    ? "text-yellow-600"
+                                                    : isOutOfStock
+                                                      ? "text-red-600"
+                                                      : "text-green-600"
+                                                } font-medium`}
+                                              >
+                                                {variant.inventory?.quantity -
+                                                  (variant.inventory
+                                                    ?.reserved || 0)}
+                                              </span>
+                                            </div>
+                                          </div>
+
+                                          <Plus
+                                            className={`w-4 h-4 ${isOutOfStock ? "opacity-30" : ""}`}
+                                          />
+                                        </button>
+                                      );
+                                    })}
                                   </div>
                                 </>
                               )}
@@ -432,6 +491,44 @@ const OrderCreatePage = () => {
                     {formatPrice(calculateSubtotal())}
                   </span>
                 </div>
+                {shippingFee > 0 && (
+                  <>
+                    <div className="flex justify-between items-center opacity-60">
+                      <span className="text-[12px] font-bold uppercase ">
+                        Phí vận chuyển
+                      </span>
+                      <span className=" text-sm text-indigo-500">
+                        {formatPrice(shippingFee)}
+                      </span>
+                    </div>
+                    {selectedShippingMethod && (
+                      <div className="flex justify-between items-center opacity-60">
+                        <span className="text-[12px] font-bold uppercase ">
+                          Dự kiến giao
+                        </span>
+                        <span className=" text-sm text-gray-900 italic">
+                          {(() => {
+                            const method = shippingMethods.find(
+                              (m) => m.id == selectedShippingMethod,
+                            );
+                            if (!method) return "";
+                            const start = new Date();
+                            start.setDate(start.getDate() + 1);
+                            const end = new Date();
+                            end.setDate(
+                              end.getDate() + Number(method.estimated_days),
+                            );
+                            const options = {
+                              day: "2-digit",
+                              month: "2-digit",
+                            };
+                            return `${start.toLocaleDateString("vi-VN", options)} - ${end.toLocaleDateString("vi-VN", options)}`;
+                          })()}
+                        </span>
+                      </div>
+                    )}
+                  </>
+                )}
                 <div className="flex justify-between items-center text-rose-400">
                   <span className="text-[12px] font-bold uppercase ">
                     Giảm giá
@@ -527,21 +624,28 @@ const OrderCreatePage = () => {
               </h3>
               <div className="space-y-6">
                 <div>
-                  <label className="text-[12px] font-bold text-gray-500 uppercase  mb-2 block ">
-                    Hình thức
-                  </label>
-                  <select
+                  <SelectSearch
+                    label="Hình thức thanh toán"
+                    placeholder="Chọn hình thức thanh toán"
+                    options={paymentMethods.map((method) => ({
+                      value: method.id,
+                      label: method.name,
+                    }))}
                     value={selectedPaymentMethod}
-                    onChange={(e) => setSelectedPaymentMethod(e.target.value)}
-                    className="w-full bg-gray-50 border-none rounded-2xl text-sm outline-none hover:cursor-pointer font-bold py-4 px-6 "
-                  >
-                    <option value="">Chọn hình thức</option>
-                    {paymentMethods.map((method) => (
-                      <option key={method.id} value={method.id}>
-                        {method.name}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(val) => setSelectedPaymentMethod(val)}
+                  />
+                </div>
+                <div>
+                  <SelectSearch
+                    label="Vận chuyển"
+                    placeholder="Chọn vận chuyển"
+                    options={shippingMethods.map((method) => ({
+                      value: method.id,
+                      label: method.name,
+                    }))}
+                    value={selectedShippingMethod}
+                    onChange={handleShippingChange}
+                  />
                 </div>
                 <div>
                   <label className="text-[12px] font-bold text-gray-500 uppercase  mb-2 block ">

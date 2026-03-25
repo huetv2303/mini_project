@@ -9,6 +9,7 @@ import {
   Copyright,
   Warehouse,
   RotateCcw,
+  Truck,
 } from "lucide-react";
 
 const SidebarItem = ({ to, icon: Icon, label }) => (
@@ -73,10 +74,15 @@ const Sidebar = () => {
             label="Nhà cung cấp"
           />
           <SidebarItem to="/admin/products" icon={Package} label="Sản phẩm" />
+          <SidebarItem
+            to="/admin/shipping-methods"
+            icon={Truck}
+            label="Vận chuyển"
+          />
           {/* <SidebarItem to="/" icon={Users} label="Người dùng" /> */}
 
           <SidebarItem
-            to="/admin/warehouse"
+            to="/admin/inventory"
             icon={Warehouse}
             label="Quản lý kho"
           />

@@ -12,6 +12,9 @@ class Inventory extends Model
         'variant_id',
         'quantity',
         'reserved',
+        'unavailable',
+        'returning',
+        'packing',
         'min_quantity',
     ];
     public function variant()

@@ -28,6 +28,7 @@ import OrderCreatePage from "./pages/Admin/order/OrderCreatePage";
 import InventoryListPage from "./pages/Admin/inventory/InventoryListPage";
 import OrderReturnListPage from "./pages/Admin/order/OrderReturnListPage";
 import OrderReturnDetailsPage from "./pages/Admin/order/OrderReturnDetailsPage";
+import ShippingMethodPage from "./pages/Admin/shipping/ShippingMethodPage";
 
 const App = () => {
   return (
@@ -101,9 +102,7 @@ const App = () => {
             path="/admin/dashboard"
             element={
               <AuthGuard>
-                <RoleGuard
-                  permission="admin.manage"
-                >
+                <RoleGuard permission="admin.manage">
                   <AdminDashboard />
                 </RoleGuard>
               </AuthGuard>
@@ -114,9 +113,7 @@ const App = () => {
             path="/admin/categories"
             element={
               <AuthGuard>
-                <RoleGuard
-                  permission="admin.manage"
-                >
+                <RoleGuard permission="admin.manage">
                   <CategoryListPage />
                 </RoleGuard>
               </AuthGuard>
@@ -127,9 +124,7 @@ const App = () => {
             path="/admin/categories/create"
             element={
               <AuthGuard>
-                <RoleGuard
-                  permission="admin.manage"
-                >
+                <RoleGuard permission="admin.manage">
                   <CategoryForm />
                 </RoleGuard>
               </AuthGuard>
@@ -140,9 +135,7 @@ const App = () => {
             path="/admin/categories/edit/:slug"
             element={
               <AuthGuard>
-                <RoleGuard
-                  permission="admin.manage"
-                >
+                <RoleGuard permission="admin.manage">
                   <CategoryForm />
                 </RoleGuard>
               </AuthGuard>
@@ -154,9 +147,7 @@ const App = () => {
             path="/admin/suppliers"
             element={
               <AuthGuard>
-                <RoleGuard
-                  permission="admin.manage"
-                >
+                <RoleGuard permission="admin.manage">
                   <SupplierListPage />
                 </RoleGuard>
               </AuthGuard>
@@ -167,9 +158,7 @@ const App = () => {
             path="/admin/suppliers/create"
             element={
               <AuthGuard>
-                <RoleGuard
-                  permission="admin.manage"
-                >
+                <RoleGuard permission="admin.manage">
                   <SupplierForm />
                 </RoleGuard>
               </AuthGuard>
@@ -180,9 +169,7 @@ const App = () => {
             path="/admin/suppliers/edit/:slug"
             element={
               <AuthGuard>
-                <RoleGuard
-                  permission="admin.manage"
-                >
+                <RoleGuard permission="admin.manage">
                   <SupplierForm />
                 </RoleGuard>
               </AuthGuard>
@@ -194,9 +181,7 @@ const App = () => {
             path="/admin/products"
             element={
               <AuthGuard>
-                <RoleGuard
-                  permission="admin.manage"
-                >
+                <RoleGuard permission="admin.manage">
                   <ProductListPage />
                 </RoleGuard>
               </AuthGuard>
@@ -207,9 +192,7 @@ const App = () => {
             path="/admin/products/create"
             element={
               <AuthGuard>
-                <RoleGuard
-                  permission="admin.manage"
-                >
+                <RoleGuard permission="admin.manage">
                   <ProductForm />
                 </RoleGuard>
               </AuthGuard>
@@ -220,9 +203,7 @@ const App = () => {
             path="/admin/products/edit/:slug"
             element={
               <AuthGuard>
-                <RoleGuard
-                  permission="admin.manage"
-                >
+                <RoleGuard permission="admin.manage">
                   <ProductForm />
                 </RoleGuard>
               </AuthGuard>
@@ -234,9 +215,7 @@ const App = () => {
             path="/admin/orders"
             element={
               <AuthGuard>
-                <RoleGuard
-                  permission="admin.manage"
-                >
+                <RoleGuard permission="admin.manage">
                   <OrderListPage />
                 </RoleGuard>
               </AuthGuard>
@@ -247,9 +226,7 @@ const App = () => {
             path="/admin/orders/create"
             element={
               <AuthGuard>
-                <RoleGuard
-                  permission="admin.manage"
-                >
+                <RoleGuard permission="admin.manage">
                   <OrderCreatePage />
                 </RoleGuard>
               </AuthGuard>
@@ -260,9 +237,7 @@ const App = () => {
             path="/admin/orders/:id"
             element={
               <AuthGuard>
-                <RoleGuard
-                  permission="admin.manage"
-                >
+                <RoleGuard permission="admin.manage">
                   <OrderDetailsPage />
                 </RoleGuard>
               </AuthGuard>
@@ -290,16 +265,26 @@ const App = () => {
               </AuthGuard>
             }
           />
-          
+
           {/* Inventory / Warehouse */}
           <Route
-            path="/admin/warehouse"
+            path="/admin/inventory"
             element={
               <AuthGuard>
-                <RoleGuard
-                  permission="admin.manage"
-                >
+                <RoleGuard permission="admin.manage">
                   <InventoryListPage />
+                </RoleGuard>
+              </AuthGuard>
+            }
+          />
+
+          {/* Shipping Methods */}
+          <Route
+            path="/admin/shipping-methods"
+            element={
+              <AuthGuard>
+                <RoleGuard permission="admin.manage">
+                  <ShippingMethodPage />
                 </RoleGuard>
               </AuthGuard>
             }

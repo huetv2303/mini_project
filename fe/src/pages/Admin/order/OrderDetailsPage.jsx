@@ -28,6 +28,7 @@ import {
 import ReturnOrderModal from "../../../components/Admin/Order/ReturnOrderModal";
 import toast from "react-hot-toast";
 import { formatPrice } from "./OrderListPage";
+import SelectSearch from "../../../components/common/SelectSearch";
 
 const OrderDetailsPage = () => {
   const { id } = useParams();
@@ -39,6 +40,23 @@ const OrderDetailsPage = () => {
   const [paymentStatus, setPaymentStatus] = useState("");
   const [note, setNote] = useState("");
   const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
+
+  const statusOptions = [
+    { value: "pending", label: "Chờ xử lý" },
+    { value: "processing", label: "Đang đóng gói" },
+    { value: "shipped", label: "Đang giao" },
+    { value: "delivered", label: "Đã giao" },
+    { value: "cancelled", label: "Hủy đơn" },
+    { value: "returned", label: "Đã trả hàng" },
+    { value: "partially_returned", label: "Trả hàng một phần" },
+  ];
+
+  const paymentStatusOptions = [
+    { value: "unpaid", label: "Chưa thanh toán" },
+    { value: "paid", label: "Đã thanh toán" },
+    { value: "refunded", label: "Đã hoàn tiền" },
+    { value: "partially_refunded", label: "Hoàn tiền một phần" },
+  ];
 
   const getOrderDetails = async () => {
     try {
@@ -300,7 +318,9 @@ const OrderDetailsPage = () => {
                   }, 0) || 0;
                 const finalKeptAmount = Math.max(
                   0,
-                  totalKeptAmount - (order.discount_amount || 0),
+                  totalKeptAmount +
+                    Number(order.shipping_fee) -
+                    Number(order.discount_amount),
                 );
 
                 return (
@@ -311,6 +331,14 @@ const OrderDetailsPage = () => {
                       </span>
                       <span>{formatPrice(totalKeptAmount)}</span>
                     </div>
+                    {order.shipping_fee > 0 && (
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-gray-500 font-bold uppercase text-[12px]">
+                          Phí vận chuyển
+                        </span>
+                        <span>{formatPrice(order.shipping_fee)}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between items-center text-sm">
                       <span className="text-rose-500 font-bold uppercase text-[12px]">
                         Giảm giá
@@ -319,6 +347,26 @@ const OrderDetailsPage = () => {
                         -{formatPrice(order.discount_amount)}
                       </span>
                     </div>
+                    {order.expected_delivery_date && (
+                      <div className="flex justify-between items-center text-sm mt-2">
+                        <span className="text-indigo-600 font-bold uppercase text-[12px] flex items-center gap-2">
+                          <Truck className="w-4 h-4" />
+                          Dự kiến giao hàng
+                        </span>
+                        <span className="font-semibold text-gray-700">
+                          {(() => {
+                            const start = new Date(order.created_at);
+                            start.setDate(start.getDate() + 1);
+                            const end = new Date(order.expected_delivery_date);
+                            const options = {
+                              day: "2-digit",
+                              month: "2-digit",
+                            };
+                            return `${start.toLocaleDateString("vi-VN", options)} - ${end.toLocaleDateString("vi-VN", { ...options, year: "numeric" })}`;
+                          })()}
+                        </span>
+                      </div>
+                    )}
                     <div className="pt-4 border-t border-gray-200">
                       <div className="flex justify-between items-center mb-4">
                         <span className="text-black font-bold uppercase text-[0.8rem]">
@@ -331,10 +379,19 @@ const OrderDetailsPage = () => {
                       <div className="flex justify-between items-center text-[0.8rem] text-gray-600 font-bold uppercase">
                         <div className="flex items-center gap-2">
                           <CreditCard className="w-3 h-3" />
-                          Hình thức thanh toán
+                          Thanh toán
                         </div>
                         <span>
                           {order.payment_method?.name || "Chưa xác định"}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center text-[0.8rem] text-gray-600 font-bold uppercase mt-2">
+                        <div className="flex items-center gap-2">
+                          <Truck className="w-3 h-3" />
+                          Vận chuyển
+                        </div>
+                        <span>
+                          {order.shipping_method?.name || "Chưa xác định"}
                         </span>
                       </div>
                     </div>
@@ -435,74 +492,27 @@ const OrderDetailsPage = () => {
 
               <div className="space-y-6">
                 <div>
-                  <label className="text-[12px] font-medium uppercase  mb-3 block opacity-70">
-                    Trạng thái đơn hàng
-                  </label>
-                  <select
+                  <SelectSearch
+                    label="Trạng thái đơn hàng"
                     value={status}
-                    onChange={(e) => setStatus(e.target.value)}
+                    onChange={(val) => setStatus(val)}
+                    options={statusOptions}
                     disabled={
                       order.status === "cancelled" ||
                       order.status === "delivered" ||
                       order.status === "returned" ||
                       order.status === "partially_returned"
                     }
-                    className="w-full bg-gray-200 hover:cursor-pointer border-none rounded-2xl text-sm font-bold py-3 px-4 outline-none focus:ring-2 focus:ring-white/20 appearance-none disabled:opacity-50"
-                  >
-                    <option value="pending" className="text-black">
-                      Chờ xử lý
-                    </option>
-                    <option value="processing" className="text-black">
-                      Đang đóng gói
-                    </option>
-                    <option value="shipped" className="text-black">
-                      Đang giao
-                    </option>
-                    <option value="delivered" className="text-black">
-                      Đã giao
-                    </option>
-                    <option value="cancelled" className="text-black">
-                      Hủy đơn
-                    </option>
-                    <option value="returned" className="text-black" disabled>
-                      Đã trả hàng
-                    </option>
-                    <option
-                      value="partially_returned"
-                      className="text-black"
-                      disabled
-                    >
-                      Trả hàng một phần
-                    </option>
-                  </select>
+                  />
                 </div>
 
                 <div>
-                  <label className="text-[12px] font-medium uppercase  mb-3 block opacity-70">
-                    Tình trạng thanh toán
-                  </label>
-                  <select
+                  <SelectSearch
+                    label="Tình trạng thanh toán"
                     value={paymentStatus}
-                    onChange={(e) => setPaymentStatus(e.target.value)}
-                    className="w-full bg-gray-200 hover:cursor-pointer border-none rounded-2xl text-sm font-bold py-3 px-4 outline-none focus:ring-2 focus:ring-white/20 appearance-none"
-                  >
-                    <option value="unpaid" className="text-black">
-                      Chưa thanh toán
-                    </option>
-                    <option value="paid" className="text-black">
-                      Đã thanh toán
-                    </option>
-                    <option value="refunded" className="text-black" disabled>
-                      Đã hoàn tiền
-                    </option>
-                    <option
-                      value="partially_refunded"
-                      className="text-black"
-                      disabled
-                    >
-                      Hoàn tiền một phần
-                    </option>
-                  </select>
+                    onChange={(val) => setPaymentStatus(val)}
+                    options={paymentStatusOptions}
+                  />
                 </div>
 
                 <div className="pt-4 space-y-3">

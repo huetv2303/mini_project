@@ -122,6 +122,82 @@ class InventoryService
         });
     }
 
+    public function reserveStock($variantId, $quantity)
+    {
+        return DB::transaction(function () use ($variantId, $quantity) {
+            $inventory = Inventory::where('variant_id', $variantId)->lockForUpdate()->firstOrFail();
+
+            if (($inventory->quantity - $inventory->reserved) < $quantity) {
+                throw new \Exception("Không đủ hàng khả dụng (sau khi trừ đã đặt) cho biến thể ID: {$variantId}");
+            }
+
+            $inventory->increment('reserved', $quantity);
+
+            return $inventory;
+        });
+    }
+
+    public function releaseBooking($variantId, $quantity)
+    {
+        return DB::transaction(function () use ($variantId, $quantity) {
+            $inventory = Inventory::where('variant_id', $variantId)->lockForUpdate()->firstOrFail();
+
+            if ($inventory->reserved < $quantity) {
+                $inventory->update(['reserved' => 0]);
+            } else {
+                $inventory->decrement('reserved', $quantity);
+            }
+
+            return $inventory;
+        });
+    }
+
+    public function updateReturningStock($variantId, $quantity, $isIncreasing = true)
+    {
+        return DB::transaction(function () use ($variantId, $quantity, $isIncreasing) {
+            $inventory = Inventory::where('variant_id', $variantId)->lockForUpdate()->firstOrFail();
+            if ($isIncreasing) {
+                $inventory->increment('returning', $quantity);
+            } else {
+                $inventory->decrement('returning', max(0, $quantity));
+            }
+            return $inventory;
+        });
+    }
+
+    public function markAsUnavailable($variantId, $quantity)
+    {
+        return DB::transaction(function () use ($variantId, $quantity) {
+            $inventory = Inventory::where('variant_id', $variantId)->lockForUpdate()->firstOrFail();
+
+            if ($inventory->quantity < $quantity) {
+                throw new \Exception("Không đủ hàng trong kho để chuyển vào mục Không thể bán.");
+            }
+
+            $inventory->decrement('quantity', $quantity);
+            $inventory->increment('unavailable', $quantity);
+
+            return $inventory;
+        });
+    }
+
+    public function updatePackingStock($variantId, $quantity, $isStarting = true)
+    {
+        return DB::transaction(function () use ($variantId, $quantity, $isStarting) {
+            $inventory = Inventory::where('variant_id', $variantId)->lockForUpdate()->firstOrFail();
+            if ($isStarting) {
+                $inventory->increment('packing', $quantity);
+            } else {
+                if ($inventory->packing < $quantity) {
+                    $inventory->update(['packing' => 0]);
+                } else {
+                    $inventory->decrement('packing', $quantity);
+                }
+            }
+            return $inventory;
+        });
+    }
+
     public function getMonthlyReport($month, $year)
     {
         $startDate = \Carbon\Carbon::createFromDate($year, $month, 1)->startOfMonth();

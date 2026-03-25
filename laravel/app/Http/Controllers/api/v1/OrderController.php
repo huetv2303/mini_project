@@ -62,7 +62,7 @@ class OrderController extends Controller
     {
         try {
             $order = $this->orderService->updateOrder($id, $request->validated());
-            $order->load(['paymentMethod', 'staff', 'items']);
+            $order->load(['paymentMethod', 'shippingMethod', 'staff', 'items']);
             return response()->json([
                 'status'  => 'success',
                 'message' => 'Cập nhật đơn hàng thành công.',

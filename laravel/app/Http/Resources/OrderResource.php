@@ -15,6 +15,8 @@ class OrderResource extends JsonResource
             'payment_status'   => $this->payment_status,
             'total_amount'     => $this->total_amount,
             'discount_amount'  => $this->discount_amount,
+            'shipping_fee'     => $this->shipping_fee,
+            'expected_delivery_date' => $this->expected_delivery_date?->format('Y-m-d'),
             'final_amount'     => $this->final_amount,
             'note'             => $this->note,
             'customer'         => [
@@ -22,6 +24,11 @@ class OrderResource extends JsonResource
                 'phone'   => $this->customer_phone,
                 'address' => $this->customer_address,
             ],
+            'shipping_method'  => $this->whenLoaded('shippingMethod', fn() => [
+                'id'   => $this->shippingMethod?->id,
+                'name' => $this->shippingMethod?->name,
+                'cost' => $this->shippingMethod?->cost,
+            ]),
             'payment_method'   => $this->whenLoaded('paymentMethod', fn() => [
                 'id'   => $this->paymentMethod?->id,
                 'name' => $this->paymentMethod?->name,

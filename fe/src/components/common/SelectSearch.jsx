@@ -1,24 +1,24 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ChevronDown, Search, Check, X } from "lucide-react";
 
-/**
- * Reusable SelectSearch Component
- * @param {string} label - Tiêu đề của ô select
- * @param {Array} options - Danh sách tùy chọn: [{ value: any, label: string }]
- * @param {any} value - Giá trị hiện tại
- * @param {function} onChange - Callback khi chọn hoặc thay đổi
- * @param {string} placeholder - Nội dung hiển thị gợi ý
- */
 const SelectSearch = ({
   label,
   options = [],
   value,
   onChange,
   placeholder = "N/A",
+  disabled = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const dropdownRef = useRef(null);
+
+  // Mở menu
+  const toggleDropdown = () => {
+    if (!disabled) {
+      setIsOpen(!isOpen);
+    }
+  };
 
   // Tìm label dựa trên value đã chọn
   const selectedOption = options.find(
@@ -62,10 +62,11 @@ const SelectSearch = ({
 
       {/* Ô hiển thị giá trị hiện tại */}
       <div
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={toggleDropdown}
         className={`
-          flex items-center justify-between w-full px-4 py-3 border rounded-lg cursor-pointer transition-all outline-none
-          ${isOpen ? "border-black ring-2 ring-black/5" : "border-gray-200 hover:border-gray-300 bg-white"}
+          flex items-center justify-between w-full px-4 py-3 border rounded-lg transition-all outline-none
+          ${disabled ? "bg-gray-100 cursor-not-allowed border-gray-200" : "cursor-pointer"}
+          ${!disabled && isOpen ? "border-black ring-2 ring-black/5" : "border-gray-200 hover:border-gray-300 bg-white"}
         `}
       >
         <span
@@ -74,10 +75,13 @@ const SelectSearch = ({
           {selectedOption ? selectedOption.label : placeholder}
         </span>
         <div className="flex items-center gap-2">
-          {value && (
+          {value && !disabled && (
             <X
               className="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-pointer"
-              onClick={handleClear}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleClear();
+              }}
             />
           )}
           <ChevronDown
@@ -99,6 +103,7 @@ const SelectSearch = ({
               placeholder="Tìm kiếm nhanh..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              required
             />
             {searchTerm && (
               <X

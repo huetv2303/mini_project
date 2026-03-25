@@ -44,10 +44,10 @@ class OrderReturnService
             }
 
             $returnCode = 'RET-' . date('Ymd') . '-' . strtoupper(Str::random(5));
-            
+
             // Determine initial refund status
-            $refundStatus = ($order->payment_status === 'paid' || $order->payment_status === 'partially_refunded') 
-                ? 'pending' 
+            $refundStatus = ($order->payment_status === 'paid' || $order->payment_status === 'partially_refunded')
+                ? 'pending'
                 : 'not_needed';
 
             $orderReturn = $this->orderReturnRepo->create([
@@ -91,6 +91,13 @@ class OrderReturnService
 
             $orderReturn->update(['total_return_amount' => $totalReturnAmount]);
 
+            // Cập nhật số lượng "Đang về kho" (returning) trong tồn kho
+            foreach ($orderReturn->items as $item) {
+                if ($item->product_variant_id) {
+                    $this->inventoryService->updateReturningStock($item->product_variant_id, $item->quantity, true);
+                }
+            }
+
             return $orderReturn->load(['order', 'staff', 'items.orderItem']);
         });
     }
@@ -107,6 +114,7 @@ class OrderReturnService
             foreach ($orderReturn->items as $item) {
                 // Update inventory
                 if ($item->product_variant_id) {
+                    // 1. Tăng kho thực tế
                     $this->inventoryService->increaseStock(
                         $item->product_variant_id,
                         $item->quantity,
@@ -116,6 +124,9 @@ class OrderReturnService
                         "Nhập kho từ trả hàng đơn hàng: " . $orderReturn->order->code,
                         'order_return'
                     );
+
+                    // 2. Giảm số lượng "Đang về kho"
+                    $this->inventoryService->updateReturningStock($item->product_variant_id, $item->quantity, false);
                 }
 
                 // Decrement sold_count
@@ -172,7 +183,6 @@ class OrderReturnService
         foreach ($ids as $id) {
             try {
                 $orderReturn = $this->findById($id);
-                // Skip if already refunded or doesn't need to be refunded
                 if ($orderReturn->refund_status === 'refunded' || $orderReturn->refund_status === 'not_needed') {
                     continue;
                 }
@@ -198,9 +208,7 @@ class OrderReturnService
         if ($totalReturnedItems <= 0) return;
 
         $newOrderStatus = ($totalReturnedItems >= $totalOrderedItems) ? 'returned' : 'partially_returned';
-        
-        // Update payment status based on refund_status
-        // Count total items that have been refunded
+
         $totalRefundedItems = DB::table('order_return_items')
             ->whereIn('order_return_id', $order->returns()->pluck('id'))
             ->join('order_returns', 'order_return_items.order_return_id', '=', 'order_returns.id')

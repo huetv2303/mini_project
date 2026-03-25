@@ -1,21 +1,16 @@
 import React, { useEffect, useState, useCallback } from "react";
 import OrderReturnService from "../../../services/OrderReturnService";
 import AdminLayout from "../../../components/layout/Admin/AdminLayout";
-import {
-  Search,
-  Eye,
-  Loader2,
-  RotateCcw,
-  Calendar,
-  User,
-  ShoppingBag,
-} from "lucide-react";
+import { Search, Eye, Loader2, RotateCcw } from "lucide-react";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import Pagination from "../../../components/common/Pagination";
 import BulkRefundModal from "../../../components/common/BulkRefundModal";
-import { formatPrice } from "./OrderListPage";
-import { ReturnStatusBadge, ReceiveStatusBadge, RefundStatusBadge } from "../../../components/common/OrderBadges";
+import {
+  ReturnStatusBadge,
+  ReceiveStatusBadge,
+  RefundStatusBadge,
+} from "../../../components/common/OrderBadges";
 
 const debounce = (func, delay) => {
   let timer;
@@ -75,7 +70,7 @@ const OrderReturnListPage = () => {
 
   const toggleSelect = (id) => {
     setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
     );
   };
 
@@ -243,7 +238,7 @@ const OrderReturnListPage = () => {
                         </td>
                         <td className="px-8 py-5">
                           <div className="flex flex-col gap-1">
-                            <span className="text-sm font-bold text-indigo-600">
+                            <span className="text-sm text-blue-500 font-medium">
                               #{item.return_code}
                             </span>
                             <span className="text-[13px] text-gray-600 ">
@@ -259,7 +254,7 @@ const OrderReturnListPage = () => {
                         </td>
                         <td className="px-6 py-5">
                           <div className="flex flex-col gap-1">
-                            <span className="text-sm font-bold text-gray-900">
+                            <span className="text-sm  text-gray-900">
                               #{item.order?.code}
                             </span>
                             <span className="text-[13px] text-gray-600 ">

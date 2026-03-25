@@ -74,6 +74,7 @@ const ProductListPage = () => {
         total: meta.total,
         perPage: meta.per_page,
       });
+      console.log(items);
     } catch (error) {
       console.error("Failed to fetch products:", error);
       toast.error("Không thể tải danh sách sản phẩm");
@@ -226,6 +227,9 @@ const ProductListPage = () => {
                     Giá bán (Đại diện)
                   </th>
                   <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase">
+                    Số lượng bán
+                  </th>
+                  <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase">
                     Trạng thái
                   </th>
                   <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase text-right">
@@ -310,6 +314,11 @@ const ProductListPage = () => {
                           </div>
                           <div className="text-[0.7rem] text-gray-400 uppercase mt-1">
                             SKU: {firstVariant.sku || "N/A"}
+                          </div>
+                        </td>
+                        <td className="px-6 py-5">
+                          <div className=" text-sm font-bold text-gray-900 text-center">
+                            {product.sold_count}
                           </div>
                         </td>
                         <td className="px-6 py-5">

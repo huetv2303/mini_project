@@ -18,6 +18,7 @@ class StoreOrderRequest extends FormRequest
             'customer_phone'            => 'required|string|max:20',
             'customer_address'          => 'required|string',
             'payment_method_id'         => 'required|exists:payment_methods,id',
+            'shipping_method_id'        => 'required|exists:shipping_methods,id',
             'discount_amount'           => 'nullable|numeric|min:0',
             'note'                      => 'nullable|string',
             'items'                     => 'required|array|min:1',

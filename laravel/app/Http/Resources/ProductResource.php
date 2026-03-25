@@ -77,6 +77,9 @@ class ProductResource extends JsonResource
                             'reserved'     => $variant->inventories->first()->reserved,
                             'available'    => $variant->inventories->first()->quantity - $variant->inventories->first()->reserved,
                             'min_quantity' => $variant->inventories->first()->min_quantity,
+                            'unavailable'  => $variant->inventories->first()->unavailable,
+                            'returning'    => $variant->inventories->first()->returning,
+                            'packing'      => $variant->inventories->first()->packing,
                         ]
                         : null,
                 ])
