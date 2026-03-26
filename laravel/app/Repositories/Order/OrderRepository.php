@@ -9,7 +9,7 @@ class OrderRepository implements OrderRepositoryInterface
 {
     public function getAll($request = null, $perPage = 15)
     {
-        $query = Order::with(['paymentMethod', 'shippingMethod', 'staff', 'items']);
+        $query = Order::with(['paymentMethod', 'shippingMethod', 'staff', 'items', 'taxRate']);
 
         if ($request) {
             if ($request->filled('status') && $request->status !== 'all') {
@@ -54,7 +54,7 @@ class OrderRepository implements OrderRepositoryInterface
 
     public function findById($id)
     {
-        return Order::with(['paymentMethod', 'shippingMethod', 'staff', 'items.variant', 'items.product', 'items.returnItems'])->findOrFail($id);
+        return Order::with(['paymentMethod', 'shippingMethod', 'staff', 'items.variant', 'items.product', 'items.returnItems', 'taxRate'])->findOrFail($id);
     }
 
     public function createOrder(array $data): Order

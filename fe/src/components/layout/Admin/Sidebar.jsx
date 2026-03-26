@@ -10,6 +10,7 @@ import {
   Warehouse,
   RotateCcw,
   Truck,
+  Percent,
 } from "lucide-react";
 
 const SidebarItem = ({ to, icon: Icon, label }) => (
@@ -78,6 +79,11 @@ const Sidebar = () => {
             to="/admin/shipping-methods"
             icon={Truck}
             label="Vận chuyển"
+          />
+          <SidebarItem
+            to="/admin/tax-rates"
+            icon={Percent}
+            label="Thuế"
           />
           {/* <SidebarItem to="/" icon={Users} label="Người dùng" /> */}
 

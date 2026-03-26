@@ -324,7 +324,7 @@ const CategoryListPage = () => {
       <div className="animate-in fade-in duration-500 pb-10">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-medium text-gray-900">
+            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
               Danh mục sản phẩm
             </h1>
             <p className="mt-1 text-sm text-gray-500 font-medium italic">

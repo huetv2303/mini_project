@@ -29,6 +29,7 @@ import InventoryListPage from "./pages/Admin/inventory/InventoryListPage";
 import OrderReturnListPage from "./pages/Admin/order/OrderReturnListPage";
 import OrderReturnDetailsPage from "./pages/Admin/order/OrderReturnDetailsPage";
 import ShippingMethodPage from "./pages/Admin/shipping/ShippingMethodPage";
+import TaxRatePage from "./pages/Admin/tax/TaxRatePage";
 
 const App = () => {
   return (
@@ -285,6 +286,17 @@ const App = () => {
               <AuthGuard>
                 <RoleGuard permission="admin.manage">
                   <ShippingMethodPage />
+                </RoleGuard>
+              </AuthGuard>
+            }
+          />
+          {/* Tax Rates */}
+          <Route
+            path="/admin/tax-rates"
+            element={
+              <AuthGuard>
+                <RoleGuard permission="admin.manage">
+                  <TaxRatePage />
                 </RoleGuard>
               </AuthGuard>
             }

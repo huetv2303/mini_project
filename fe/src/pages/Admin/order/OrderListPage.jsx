@@ -30,7 +30,10 @@ import Pagination from "../../../components/common/Pagination";
 import ConfirmBulkActionModal from "../../../components/common/ConfirmBulkActionModal";
 import BulkPaymentModal from "../../../components/common/BulkPaymentModal";
 import BulkRefundOrderModal from "../../../components/common/BulkRefundOrderModal";
-import { OrderStatusBadge, PaymentStatusBadge } from "../../../components/common/OrderBadges";
+import {
+  OrderStatusBadge,
+  PaymentStatusBadge,
+} from "../../../components/common/OrderBadges";
 import {
   fetchOrdersRequest,
   bulkUpdateOrdersRequest,
@@ -293,7 +296,9 @@ const OrderListPage = () => {
         action: "pay",
         payment_method_id: paymentMethodId,
       });
-      toast.success(res.message || `Đã thanh toán cho ${res.updated_count || 0} đơn hàng`);
+      toast.success(
+        res.message || `Đã thanh toán cho ${res.updated_count || 0} đơn hàng`,
+      );
       setSelectedIds([]);
       setPaymentModal({ isOpen: false });
       getOrders(
@@ -327,7 +332,9 @@ const OrderListPage = () => {
         ids: validIds,
         action: "refund",
       });
-      toast.success(res.message || `Đã cập nhật ${res.updated_count || 0} đơn hàng`);
+      toast.success(
+        res.message || `Đã cập nhật ${res.updated_count || 0} đơn hàng`,
+      );
       setSelectedIds([]);
       setRefundModal({ isOpen: false });
       getOrders(
@@ -349,18 +356,12 @@ const OrderListPage = () => {
     }
   };
 
-  // Skip down to return section for layout update
-  // ... (the tool will handle the replacement based on TargetContent)
-
-  // Status formatting logic moved to generic OrderBadges component
-
   return (
     <AdminLayout>
       <div className="pb-10">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-2xl font-medium text-gray-900 flex items-center gap-3">
-              <ShoppingBag className="w-8 h-8 text-black" />
+            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
               Quản lý đơn hàng
             </h1>
           </div>
@@ -637,7 +638,6 @@ const OrderListPage = () => {
         </div>
       </div>
 
-      {/* Confirmation Modal */}
       <ConfirmBulkActionModal
         isOpen={bulkModal.isOpen}
         onClose={() =>
@@ -649,7 +649,6 @@ const OrderListPage = () => {
         targetStatus={bulkModal.targetStatus}
       />
 
-      {/* Bulk Payment Modal */}
       <BulkPaymentModal
         isOpen={paymentModal.isOpen}
         onClose={() => setPaymentModal({ isOpen: false })}
@@ -658,7 +657,6 @@ const OrderListPage = () => {
         paymentMethods={paymentMethods}
       />
 
-      {/* Bulk Refund Modal */}
       <BulkRefundOrderModal
         isOpen={refundModal.isOpen}
         onClose={() => setRefundModal({ isOpen: false })}

@@ -17,6 +17,9 @@ use App\Http\Controllers\api\v1\UserController;
 use App\Http\Controllers\api\v1\CustomerController;
 use App\Http\Controllers\api\v1\SocialAuthController;
 use App\Http\Controllers\api\v1\OrderReturnController;
+use App\Http\Controllers\api\v1\ShippingMethodController;
+use App\Http\Controllers\api\v1\TaxRateController;
+use App\Http\Controllers\api\v1\DashboardController;
 
 Route::group(['prefix' => 'v1'], function () {
     Route::post('/register', [AuthController::class, 'register']);
@@ -134,17 +137,27 @@ Route::group(['prefix' => 'v1'], function () {
             Route::post('/import', [InventoryController::class, 'import']);
         });
 
-        Route::get('/dashboard/statistics', [\App\Http\Controllers\api\v1\DashboardController::class, 'statistics']);
+        Route::get('/dashboard/statistics', [DashboardController::class, 'statistics']);
 
         Route::get('/payment-methods', [PaymentMethodController::class, 'index']);
 
         // Shipping Methods
         Route::prefix('shipping-methods')->group(function () {
-            Route::get('/', [\App\Http\Controllers\api\v1\ShippingMethodController::class, 'index']);
-            Route::get('/active', [\App\Http\Controllers\api\v1\ShippingMethodController::class, 'active']);
-            Route::post('/', [\App\Http\Controllers\api\v1\ShippingMethodController::class, 'store']);
-            Route::put('/{id}', [\App\Http\Controllers\api\v1\ShippingMethodController::class, 'update']);
-            Route::delete('/{id}', [\App\Http\Controllers\api\v1\ShippingMethodController::class, 'destroy']);
+            Route::get('/', [ShippingMethodController::class, 'index']);
+            Route::get('/active', [ShippingMethodController::class, 'active']);
+            Route::post('/', [ShippingMethodController::class, 'store']);
+            Route::put('/{id}', [ShippingMethodController::class, 'update']);
+            Route::delete('/{id}', [ShippingMethodController::class, 'destroy']);
+        });
+
+        // Tax Rates
+        Route::prefix('tax-rates')->group(function () {
+            Route::get('/statistics', [TaxRateController::class, 'statistics']);
+            Route::get('/', [TaxRateController::class, 'index']);
+            Route::get('/active', [TaxRateController::class, 'active']);
+            Route::post('/', [TaxRateController::class, 'store']);
+            Route::put('/{id}', [TaxRateController::class, 'update']);
+            Route::delete('/{id}', [TaxRateController::class, 'destroy']);
         });
 
         Route::get('/user', function (Request $request) {

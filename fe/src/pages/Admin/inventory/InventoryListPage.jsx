@@ -226,7 +226,9 @@ const InventoryListPage = () => {
       <div className="pb-10 space-y-6">
         {/* Header section */}
         <div>
-          <h1 className="text-2xl font-meidum text-gray-900">Quản lý kho</h1>
+          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+            Quản lý kho
+          </h1>
         </div>
 
         {/* Tabs section */}
@@ -431,8 +433,8 @@ const InventoryListPage = () => {
                                   {totalStock}
                                 </span>
                               </td>
-                              <td className="px-4 py-4 text-center bg-emerald-50/20">
-                                <span className="text-sm font-black text-blue-600">
+                              <td className="px-4 py-4 text-center ">
+                                <span className="text-sm font-bold text-green-500">
                                   {calculateTotalAvailable(product.variants)}
                                 </span>
                               </td>
@@ -492,7 +494,7 @@ const InventoryListPage = () => {
                                     </span>
                                   </td>
                                   <td className="px-4 py-3 text-center bg-emerald-50/10">
-                                    <span className="text-sm font-black text-emerald-500">
+                                    <span className="text-sm font-bold text-gray-800">
                                       {Math.max(
                                         0,
                                         (parseInt(

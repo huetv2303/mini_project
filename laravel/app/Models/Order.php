@@ -25,6 +25,9 @@ class Order extends Model
         'customer_address',
         'shipping_method_id',
         'expected_delivery_date',
+        'tax_rate_id',
+        'tax_rate_snapshot',
+        'tax_amount',
     ];
 
     protected $casts = [
@@ -54,5 +57,10 @@ class Order extends Model
     public function returns()
     {
         return $this->hasMany(OrderReturn::class);
+    }
+
+    public function taxRate()
+    {
+        return $this->belongsTo(TaxRate::class);
     }
 }

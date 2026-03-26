@@ -125,8 +125,7 @@ const OrderReturnListPage = () => {
       <div className="pb-10">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3 uppercase ">
-              <RotateCcw className="w-8 h-8 text-black" />
+            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
               Quản lý trả hàng
             </h1>
             <p className="mt-1 text-xs text-gray-400 font-bold uppercase ">

@@ -76,7 +76,20 @@ class OrderService
             $expectedDeliveryDate = now()->addDays($shippingMethod->estimated_days)->format('Y-m-d');
 
             $discountAmount = $data['discount_amount'] ?? 0;
-            $finalAmount    = max(0, $totalAmount + $shippingFee - $discountAmount);
+            
+            // Tính thuế
+            $taxRateId = $data['tax_rate_id'] ?? null;
+            $taxRateSnapshot = 0;
+            $taxAmount = 0;
+            if ($taxRateId) {
+                $taxRate = \App\Models\TaxRate::find($taxRateId);
+                if ($taxRate) {
+                    $taxRateSnapshot = $taxRate->rate;
+                    $taxAmount = ($totalAmount - $discountAmount) * ($taxRateSnapshot / 100);
+                }
+            }
+
+            $finalAmount = max(0, ($totalAmount - $discountAmount) + $taxAmount + $shippingFee);
 
             $code = 'ORD-' . date('Ymd') . '-' . strtoupper(Str::random(5));
 
@@ -96,6 +109,9 @@ class OrderService
                 'customer_name'          => $data['customer_name'],
                 'customer_phone'         => $data['customer_phone'],
                 'customer_address'       => $data['customer_address'],
+                'tax_rate_id'            => $taxRateId,
+                'tax_rate_snapshot'      => $taxRateSnapshot,
+                'tax_amount'             => $taxAmount,
             ]);
 
             // Tạo OrderItems

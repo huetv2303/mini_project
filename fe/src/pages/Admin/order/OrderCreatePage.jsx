@@ -22,6 +22,7 @@ import { fetchProductsRequest } from "../../../services/ProductService";
 import { fetchPaymentMethodsRequest } from "../../../services/PaymentService";
 import { createOrderRequest } from "../../../services/OrderService";
 import ShippingMethodService from "../../../services/ShippingMethodService";
+import TaxRateService from "../../../services/TaxRateService";
 import toast from "react-hot-toast";
 import { formatPrice } from "./OrderListPage";
 import SelectSearch from "../../../components/common/SelectSearch";
@@ -52,6 +53,9 @@ const OrderCreatePage = () => {
   const [shippingMethods, setShippingMethods] = useState([]);
   const [selectedShippingMethod, setSelectedShippingMethod] = useState(null);
   const [shippingFee, setShippingFee] = useState(0);
+  const [taxRates, setTaxRates] = useState([]);
+  const [selectedTaxRate, setSelectedTaxRate] = useState(null);
+  const [taxAmount, setTaxAmount] = useState(0);
   const [note, setNote] = useState("");
   // Customer state
   const [customer, setCustomer] = useState({
@@ -63,13 +67,15 @@ const OrderCreatePage = () => {
   useEffect(() => {
     const loadInitData = async () => {
       try {
-        const [paymentRes, shippingRes] = await Promise.all([
+        const [paymentRes, shippingRes, taxRes] = await Promise.all([
           fetchPaymentMethodsRequest(),
           ShippingMethodService.getActive(),
+          TaxRateService.getActive(),
         ]);
 
         setPaymentMethods(paymentRes.data || []);
         setShippingMethods(shippingRes.data || []);
+        setTaxRates(taxRes.data || []);
       } catch (error) {
         console.error("Failed to load init data", error);
       }
@@ -159,10 +165,22 @@ const OrderCreatePage = () => {
     );
   };
 
+  const calculateTax = () => {
+    if (!selectedTaxRate) return 0;
+    const taxRate = taxRates.find((t) => t.id == selectedTaxRate);
+    if (!taxRate) return 0;
+    return (
+      (calculateSubtotal() - Number(discountAmount)) * (taxRate.rate / 100)
+    );
+  };
+
   const calculateTotal = () => {
     return Math.max(
       0,
-      calculateSubtotal() + Number(shippingFee) - Number(discountAmount),
+      calculateSubtotal() +
+        Number(shippingFee) +
+        calculateTax() -
+        Number(discountAmount),
     );
   };
 
@@ -195,6 +213,7 @@ const OrderCreatePage = () => {
         customer_name: customer.name,
         customer_phone: customer.phone,
         customer_address: customer.address,
+        tax_rate_id: selectedTaxRate,
       };
 
       const res = await createOrderRequest(orderData);
@@ -537,6 +556,12 @@ const OrderCreatePage = () => {
                     -{formatPrice(discountAmount)}
                   </span>
                 </div>
+                <div className="flex justify-between items-center opacity-60">
+                  <span className="text-[12px] font-bold uppercase ">Thuế</span>
+                  <span className=" text-sm text-gray-900">
+                    {formatPrice(calculateTax())}
+                  </span>
+                </div>
                 <div className="pt-6 border-t border-white/10 flex justify-between items-center">
                   <span className="text-xs font-bold uppercase  opacity-70">
                     TỔNG CỘNG
@@ -645,6 +670,18 @@ const OrderCreatePage = () => {
                     }))}
                     value={selectedShippingMethod}
                     onChange={handleShippingChange}
+                  />
+                </div>
+                <div>
+                  <SelectSearch
+                    label="Thuế suất"
+                    placeholder="Chọn mức thuế"
+                    options={taxRates.map((tax) => ({
+                      value: tax.id,
+                      label: `${tax.name} (${tax.rate}%)`,
+                    }))}
+                    value={selectedTaxRate}
+                    onChange={(val) => setSelectedTaxRate(val)}
                   />
                 </div>
                 <div>

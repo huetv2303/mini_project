@@ -316,10 +316,12 @@ const OrderDetailsPage = () => {
                         (item.quantity - (item.returned_quantity || 0))
                     );
                   }, 0) || 0;
+                const taxOnKept = Math.max(0, (totalKeptAmount - Number(order.discount_amount)) * (Number(order.tax_rate_snapshot) / 100));
                 const finalKeptAmount = Math.max(
                   0,
                   totalKeptAmount +
-                    Number(order.shipping_fee) -
+                    Number(order.shipping_fee) +
+                    taxOnKept -
                     Number(order.discount_amount),
                 );
 
@@ -347,6 +349,14 @@ const OrderDetailsPage = () => {
                         -{formatPrice(order.discount_amount)}
                       </span>
                     </div>
+                    {order.tax_amount > 0 && (
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-gray-500 font-bold uppercase text-[12px]">
+                          Thuế ({order.tax_rate_snapshot}%)
+                        </span>
+                        <span>{formatPrice(order.tax_amount)}</span>
+                      </div>
+                    )}
                     {order.expected_delivery_date && (
                       <div className="flex justify-between items-center text-sm mt-2">
                         <span className="text-indigo-600 font-bold uppercase text-[12px] flex items-center gap-2">
