@@ -381,6 +381,23 @@ class OrderService
         });
     }
 
+    public function updatePaymentMethod($id, $paymentMethodId)
+    {
+        return DB::transaction(function () use ($id, $paymentMethodId) {
+            $order = $this->orderRepo->findById($id);
+
+            if ($order->payment_status === 'paid') {
+                throw new \Exception('Không thể thay đổi phương thức thanh toán cho đơn hàng đã thanh toán.');
+            }
+
+            $order->update([
+                'payment_method_id' => $paymentMethodId,
+            ]);
+
+            return $order->load(['paymentMethod', 'shippingMethod', 'staff', 'items']);
+        });
+    }
+
     private function getItemImage($variant)
     {
         // 1. Ưu tiên ảnh của biến thể

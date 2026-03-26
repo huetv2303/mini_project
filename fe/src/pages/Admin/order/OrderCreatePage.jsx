@@ -653,6 +653,7 @@ const OrderCreatePage = () => {
                     label="Hình thức thanh toán"
                     placeholder="Chọn hình thức thanh toán"
                     options={paymentMethods.map((method) => ({
+                      icon: getImageUrl(method.image),
                       value: method.id,
                       label: method.name,
                     }))}

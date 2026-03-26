@@ -3,6 +3,7 @@ import { ChevronDown, Search, Check, X } from "lucide-react";
 
 const SelectSearch = ({
   label,
+  icon,
   options = [],
   value,
   onChange,
@@ -69,11 +70,20 @@ const SelectSearch = ({
           ${!disabled && isOpen ? "border-black ring-2 ring-black/5" : "border-gray-200 hover:border-gray-300 bg-white"}
         `}
       >
-        <span
-          className={`text-sm ${selectedOption ? "text-gray-900" : "text-gray-400"}`}
-        >
-          {selectedOption ? selectedOption.label : placeholder}
-        </span>
+        <div className="flex items-center gap-3">
+          {selectedOption?.icon && (
+            <img
+              src={selectedOption.icon}
+              alt=""
+              className="w-5 h-5 object-contain rounded-md"
+            />
+          )}
+          <span
+            className={`text-sm ${selectedOption ? "text-gray-900" : "text-gray-400"}`}
+          >
+            {selectedOption ? selectedOption.label : placeholder}
+          </span>
+        </div>
         <div className="flex items-center gap-2">
           {value && !disabled && (
             <X
@@ -120,12 +130,22 @@ const SelectSearch = ({
                 <div
                   key={option.value}
                   onClick={() => handleSelect(option)}
-                  className={`
-                    flex items-center justify-between px-4 py-2.5 text-sm cursor-pointer transition-colors
-                    ${String(option.value) === String(value) ? "bg-black text-white" : "text-gray-700 hover:bg-gray-50"}
-                  `}
+                  className={`flex items-center justify-between px-4 py-2.5 text-sm cursor-pointer transition-colors ${
+                    String(option.value) === String(value)
+                      ? "bg-black text-white"
+                      : "text-gray-700 hover:bg-gray-50"
+                  }`}
                 >
-                  <span>{option.label}</span>
+                  <div className="flex items-center gap-3">
+                    {option.icon && (
+                      <img
+                        src={option.icon}
+                        alt=""
+                        className="w-5 h-5 object-contain rounded-md"
+                      />
+                    )}
+                    <span>{option.label}</span>
+                  </div>
                   {String(option.value) === String(value) && (
                     <Check className="w-4 h-4" />
                   )}

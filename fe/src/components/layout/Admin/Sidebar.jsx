@@ -11,6 +11,7 @@ import {
   RotateCcw,
   Truck,
   Percent,
+  CreditCard,
 } from "lucide-react";
 
 const SidebarItem = ({ to, icon: Icon, label }) => (
@@ -84,6 +85,11 @@ const Sidebar = () => {
             to="/admin/tax-rates"
             icon={Percent}
             label="Thuế"
+          />
+          <SidebarItem
+            to="/admin/payment-methods"
+            icon={CreditCard}
+            label="Thanh toán"
           />
           {/* <SidebarItem to="/" icon={Users} label="Người dùng" /> */}
 

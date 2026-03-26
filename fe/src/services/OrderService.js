@@ -66,3 +66,14 @@ export const fetchPaymentMethodsRequest = async () => {
     throw error;
   }
 };
+
+export const updatePaymentMethodRequest = async (id, paymentMethodId) => {
+  try {
+    const response = await api.patch(`/orders/${id}/update-payment-method`, {
+      payment_method_id: paymentMethodId,
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

@@ -4,7 +4,13 @@ import {
   fetchOrderRequest,
   updateOrderRequest,
   cancelOrderRequest,
+  fetchPaymentMethodsRequest,
+  updatePaymentMethodRequest,
 } from "../../../services/OrderService";
+import {
+  createVNPayPaymentRequest,
+  getBankConfigRequest,
+} from "../../../services/PaymentService";
 import AdminLayout from "../../../components/layout/Admin/AdminLayout";
 import {
   ArrowLeft,
@@ -40,6 +46,9 @@ const OrderDetailsPage = () => {
   const [paymentStatus, setPaymentStatus] = useState("");
   const [note, setNote] = useState("");
   const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
+  const [bankConfig, setBankConfig] = useState(null);
+  const [paymentMethods, setPaymentMethods] = useState([]);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
 
   const statusOptions = [
     { value: "pending", label: "Chờ xử lý" },
@@ -67,6 +76,14 @@ const OrderDetailsPage = () => {
       setStatus(data.status);
       setPaymentStatus(data.payment_status);
       setNote(data.note || "");
+      if (
+        data.payment_method?.code === "bank_transfer" &&
+        data.payment_status === "unpaid"
+      ) {
+        getBankConfigRequest()
+          .then((res) => setBankConfig(res?.data))
+          .catch(console.error);
+      }
       console.log(data);
     } catch (error) {
       console.error("Failed to fetch order:", error);
@@ -77,8 +94,18 @@ const OrderDetailsPage = () => {
     }
   };
 
+  const getPaymentMethods = async () => {
+    try {
+      const res = await fetchPaymentMethodsRequest();
+      setPaymentMethods(res?.data || []);
+    } catch (error) {
+      console.error("Failed to fetch payment methods:", error);
+    }
+  };
+
   useEffect(() => {
     getOrderDetails();
+    getPaymentMethods();
   }, [id]);
 
   const getImageUrl = (path) => {
@@ -108,6 +135,19 @@ const OrderDetailsPage = () => {
     }
   };
 
+  const handleVnpayPayment = async () => {
+    try {
+      const res = await createVNPayPaymentRequest(id);
+      if (res?.data?.payment_url) {
+        window.location.href = res.data.payment_url;
+      }
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Lỗi tạo link thanh toán VNPay",
+      );
+    }
+  };
+
   const handleCancelOrder = async () => {
     if (
       !window.confirm(
@@ -124,6 +164,23 @@ const OrderDetailsPage = () => {
     } catch (error) {
       console.error("Cancel failed:", error);
       toast.error(error.response?.data?.message || "Hủy đơn hàng thất bại");
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handleUpdatePaymentMethod = async (paymentMethodId) => {
+    try {
+      setUpdating(true);
+      await updatePaymentMethodRequest(id, paymentMethodId);
+      toast.success("Cập nhật phương thức thanh toán thành công");
+      getOrderDetails();
+    } catch (error) {
+      console.error("Update payment method failed:", error);
+      toast.error(
+        error.response?.data?.message ||
+          "Cập nhật phương thức thanh toán thất bại",
+      );
     } finally {
       setUpdating(false);
     }
@@ -316,7 +373,11 @@ const OrderDetailsPage = () => {
                         (item.quantity - (item.returned_quantity || 0))
                     );
                   }, 0) || 0;
-                const taxOnKept = Math.max(0, (totalKeptAmount - Number(order.discount_amount)) * (Number(order.tax_rate_snapshot) / 100));
+                const taxOnKept = Math.max(
+                  0,
+                  (totalKeptAmount - Number(order.discount_amount)) *
+                    (Number(order.tax_rate_snapshot) / 100),
+                );
                 const finalKeptAmount = Math.max(
                   0,
                   totalKeptAmount +
@@ -392,7 +453,16 @@ const OrderDetailsPage = () => {
                           Thanh toán
                         </div>
                         <span>
-                          {order.payment_method?.name || "Chưa xác định"}
+                          <div className="flex items-center gap-2">
+                            {order.payment_method?.image && (
+                              <img
+                                src={getImageUrl(order.payment_method.image)}
+                                alt=""
+                                className="w-5 h-5 object-contain"
+                              />
+                            )}
+                            {order.payment_method?.name || "Chưa xác định"}
+                          </div>
                         </span>
                       </div>
                       <div className="flex justify-between items-center text-[0.8rem] text-gray-600 font-bold uppercase mt-2">
@@ -491,7 +561,68 @@ const OrderDetailsPage = () => {
                 </div>
               </div>
             </div>
+
             {/* Payment Method Details */}
+            {order.payment_status === "unpaid" && (
+              <div className="bg-white rounded-lg border border-gray-100 p-8 shadow-sm">
+                <h3 className="text-sm font-bold uppercase flex items-center gap-2 mb-6">
+                  <CreditCard className="w-4 h-4" />
+                  Thanh toán đơn hàng
+                </h3>
+
+                <div className="mb-6">
+                  <SelectSearch
+                    label="Thay đổi phương thức"
+                    value={order.payment_method_id}
+                    onChange={(val) => handleUpdatePaymentMethod(val)}
+                    options={paymentMethods.map((pm) => ({
+                      icon: getImageUrl(pm.image),
+                      value: pm.id,
+                      label: pm.name,
+                    }))}
+                    disabled={updating || order.payment_status === "paid"}
+                  />
+                </div>
+
+                {order.payment_method?.code === "vnpay" && (
+                  <button
+                    onClick={handleVnpayPayment}
+                    className="w-full py-3 bg-[#005BA9] hover:bg-[#004e92] text-white font-bold rounded-lg transition-all"
+                  >
+                    Thanh toán qua VNPay
+                  </button>
+                )}
+
+                {order.payment_method?.code === "bank_transfer" &&
+                  bankConfig && (
+                    <div className="flex flex-col items-center">
+                      <p className="text-sm font-medium mb-4 text-center">
+                        Quét mã QR để thanh toán (VietQR)
+                      </p>
+                      <img
+                        src={`https://img.vietqr.io/image/${bankConfig.bank_id}-${bankConfig.account_no}-compact2.png?amount=${Math.floor(order.final_amount)}&addInfo=${encodeURIComponent("Thanh toan don hang " + order.code)}&accountName=${encodeURIComponent(bankConfig.account_name)}`}
+                        alt="VietQR"
+                        className="w-48 h-48 border rounded-lg shadow-sm"
+                      />
+                      <div className="mt-4 text-center text-xs text-gray-500 space-y-1">
+                        <p>
+                          Ngân hàng: <strong>{bankConfig.bank_id}</strong>
+                        </p>
+                        <p>
+                          Số TK: <strong>{bankConfig.account_no}</strong>
+                        </p>
+                        <p>
+                          Chủ TK: <strong>{bankConfig.account_name}</strong>
+                        </p>
+                        <p>
+                          Nội dung:{" "}
+                          <strong>Thanh toan don hang {order.code}</strong>
+                        </p>
+                      </div>
+                    </div>
+                  )}
+              </div>
+            )}
 
             {/* Status & Payment Action */}
             <div className=" rounded-lg p-8 shadow-2xl shadow-black/20 ">

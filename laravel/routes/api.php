@@ -20,6 +20,7 @@ use App\Http\Controllers\api\v1\OrderReturnController;
 use App\Http\Controllers\api\v1\ShippingMethodController;
 use App\Http\Controllers\api\v1\TaxRateController;
 use App\Http\Controllers\api\v1\DashboardController;
+use App\Http\Controllers\api\v1\PaymentController;
 
 Route::group(['prefix' => 'v1'], function () {
     Route::post('/register', [AuthController::class, 'register']);
@@ -106,6 +107,7 @@ Route::group(['prefix' => 'v1'], function () {
             // ->middleware('permission:orders.view');
             Route::put('/{id}', [OrderController::class, 'update']);
             Route::patch('/{id}/cancel', [OrderController::class, 'cancel']);
+            Route::patch('/{id}/update-payment-method', [OrderController::class, 'updatePaymentMethod']);
         });
 
         Route::prefix('order-returns')->group(function () {
@@ -139,7 +141,20 @@ Route::group(['prefix' => 'v1'], function () {
 
         Route::get('/dashboard/statistics', [DashboardController::class, 'statistics']);
 
-        Route::get('/payment-methods', [PaymentMethodController::class, 'index']);
+        Route::prefix('payment-methods')->group(function () {
+            Route::get('/', [PaymentMethodController::class, 'index']);
+            Route::post('/', [PaymentMethodController::class, 'store']);
+            Route::get('/{id}', [PaymentMethodController::class, 'show']);
+            Route::put('/{id}', [PaymentMethodController::class, 'update']);
+            Route::delete('/{id}', [PaymentMethodController::class, 'destroy']);
+        });
+        // Payment Processing
+        Route::prefix('payments')->group(function () {
+            Route::post('/vnpay/create', [PaymentController::class, 'vnpayCreate']);
+            Route::get('/vnpay/verify', [PaymentController::class, 'vnpayVerify']);
+            // Get Bank Config for VietQR
+            Route::get('/bank-config', [PaymentController::class, 'bankConfig']);
+        });
 
         // Shipping Methods
         Route::prefix('shipping-methods')->group(function () {
@@ -165,4 +180,7 @@ Route::group(['prefix' => 'v1'], function () {
             return new \App\Http\Resources\UserResource($user);
         });
     });
+
+    // Webhooks should not be authenticated
+    Route::post('/payments/vnpay/ipn', [PaymentController::class, 'vnpayIpn']);
 });

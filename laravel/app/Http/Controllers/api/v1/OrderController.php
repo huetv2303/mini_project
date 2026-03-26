@@ -122,4 +122,25 @@ class OrderController extends Controller
             ], 422);
         }
     }
+
+    public function updatePaymentMethod(Request $request, $id)
+    {
+        $request->validate([
+            'payment_method_id' => 'required|exists:payment_methods,id',
+        ]);
+
+        try {
+            $order = $this->orderService->updatePaymentMethod($id, $request->payment_method_id);
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Cập nhật phương thức thanh toán thành công.',
+                'data'    => new OrderResource($order),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => $e->getMessage(),
+            ], 422);
+        }
+    }
 }

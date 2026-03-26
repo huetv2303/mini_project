@@ -30,6 +30,8 @@ import OrderReturnListPage from "./pages/Admin/order/OrderReturnListPage";
 import OrderReturnDetailsPage from "./pages/Admin/order/OrderReturnDetailsPage";
 import ShippingMethodPage from "./pages/Admin/shipping/ShippingMethodPage";
 import TaxRatePage from "./pages/Admin/tax/TaxRatePage";
+import PaymentResultPage from "./pages/Admin/order/PaymentResultPage";
+import PaymentMethodPage from "./pages/Admin/payment/PaymentMethodPage";
 
 const App = () => {
   return (
@@ -246,6 +248,17 @@ const App = () => {
           />
 
           <Route
+            path="/admin/payment-result"
+            element={
+              <AuthGuard>
+                <RoleGuard permission="admin.manage">
+                  <PaymentResultPage />
+                </RoleGuard>
+              </AuthGuard>
+            }
+          />
+
+          <Route
             path="/admin/order-returns"
             element={
               <AuthGuard>
@@ -297,6 +310,18 @@ const App = () => {
               <AuthGuard>
                 <RoleGuard permission="admin.manage">
                   <TaxRatePage />
+                </RoleGuard>
+              </AuthGuard>
+            }
+          />
+
+          {/* Payment Methods */}
+          <Route
+            path="/admin/payment-methods"
+            element={
+              <AuthGuard>
+                <RoleGuard permission="admin.manage">
+                  <PaymentMethodPage />
                 </RoleGuard>
               </AuthGuard>
             }
