@@ -166,7 +166,7 @@ Route::group(['prefix' => 'v1'], function () {
         Route::post('promotions/eligible', [PromotionController::class, 'getEligiblePromotions']);
 
         Route::get('/user', function (Request $request) {
-            $user = $request->user()->load('role.permissions');
+            $user = $request->user()->load(['role.permissions', 'customerProfile']);
             return new \App\Http\Resources\UserResource($user);
         });
     });

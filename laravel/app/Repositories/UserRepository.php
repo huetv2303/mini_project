@@ -18,16 +18,28 @@ class UserRepository implements UserRepositoryInterface
         $roleId = $data['role_id'] ?? null;
 
         if (!$roleId) {
-            $defaultRole = Role::where('code', 'staff')->first();
+            $defaultRole = Role::where('code', 'customer')->first();
             $roleId = $defaultRole ? $defaultRole->id : null;
         }
 
-        return User::create([
+        $user = User::create([
             'name' => $data['name'],
             'email'=> $data['email'],
             'password'=> Hash::make($data['password']),
             'role_id' => $roleId,
         ]);
+
+        if ($roleId) {
+            $customerRole = Role::where('code', 'customer')->first();
+            if ($customerRole && $roleId == $customerRole->id) {
+                // Tạo customer profile cho customer
+                \App\Models\CustomerProfile::create([
+                    'user_id' => $user->id,
+                ]);
+            }
+        }
+
+        return $user;
     }
 
     public function updateRole($userId, $roleId)

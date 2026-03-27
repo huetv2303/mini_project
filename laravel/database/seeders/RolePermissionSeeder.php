@@ -36,7 +36,7 @@ class RolePermissionSeeder extends Seeder
         }
 
         // 2. Tạo các Role và gán Permission
-        
+
         // Admin: Full quyền
         $adminRole = Role::updateOrCreate(
             ['code' => 'admin'],
@@ -44,23 +44,12 @@ class RolePermissionSeeder extends Seeder
         );
         $adminRole->permissions()->sync(Permission::all());
 
-        // Manager: Xem sản phẩm, đơn hàng, sửa đơn hàng
-        $managerRole = Role::updateOrCreate(
-            ['code' => 'manager'],
-            ['name' => 'Manager', 'description' => 'Quản lý cửa hàng']
-        );
-        $managerRole->permissions()->sync(
-            Permission::whereIn('code', ['products.view', 'orders.view', 'orders.edit'])->get()
-        );
 
-        // Staff: Chỉ xem sản phẩm, đơn hàng
-        $staffRole = Role::updateOrCreate(
-            ['code' => 'staff'],
-            ['name' => 'Staff', 'description' => 'Nhân viên bán hàng']
+        $customerRole = Role::updateOrCreate(
+            ['code' => 'customer'],
+            ['name' => 'Customer', 'description' => 'Khách hàng']
         );
-        $staffRole->permissions()->sync(
-            Permission::whereIn('code', ['products.view', 'orders.view'])->get()
-        );
+        $customerRole->permissions()->sync([]);
 
         // 3. Gán Role cho User test (nếu có)
         $adminUser = User::where('email', 'admin@example.com')->first();

@@ -114,7 +114,7 @@ class AuthController extends Controller
 
     protected function createNewToken($token)
     {
-        $user = auth('api')->user()->load('role.permissions');
+        $user = auth('api')->user()->load(['role.permissions', 'customerProfile']);
         return response()->json([
             'access_token' => $token,
             'expires_in' => auth('api')->factory()->getTTL() * 60,

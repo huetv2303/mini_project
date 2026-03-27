@@ -30,11 +30,17 @@ class Order extends Model
         'tax_amount',
         'promotion_id',
         'promotion_code_snapshot',
+        'customer_id',
     ];
 
     protected $casts = [
         'expected_delivery_date' => 'date',
     ];
+
+    public function customer()
+    {
+        return $this->belongsTo(User::class, 'customer_id');
+    }
 
     public function paymentMethod()
     {

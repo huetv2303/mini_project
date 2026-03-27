@@ -29,7 +29,7 @@ const Login = () => {
       setToken({ access_token: token });
       fetchUser()
         .then((userData) => {
-          if (userData?.role_id === 1) {
+          if (userData?.role?.code === "admin") {
             navigate("/admin/dashboard");
           } else {
             navigate("/");
@@ -75,7 +75,7 @@ const Login = () => {
       const data = await login(email, password);
       toast.success("Đăng nhập thành công!");
       const user = data.user.data || data.user;
-      if (user.role_id === 1) {
+      if (user.role?.code === "admin") {
         navigate("/admin/dashboard");
       } else {
         navigate("/");

@@ -37,6 +37,14 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     }
 
     /**
+     * Relationship với CustomerProfile
+     */
+    public function customerProfile()
+    {
+        return $this->hasOne(CustomerProfile::class);
+    }
+
+    /**
      * Kiểm tra User có Permission cụ thể không
      */
     public function hasPermission(string $permissionCode): bool

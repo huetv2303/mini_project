@@ -8,6 +8,7 @@ import VerifyEmail from "./components/Auth/VerifyEmail";
 
 // Page Components
 import Home from "./pages/Home";
+import Profile from "./pages/Customer/Profile";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 
 // Auth & Route Guards
@@ -93,15 +94,18 @@ const App = () => {
               </GuestGuard>
             }
           />
-          {/* 
           <Route
             path="/"
+            element={<Home />}
+          />
+          <Route
+            path="/profile"
             element={
               <AuthGuard>
-                <Home />
+                <Profile />
               </AuthGuard>
             }
-          /> */}
+          />
 
           <Route
             path="/admin/dashboard"

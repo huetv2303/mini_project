@@ -10,7 +10,7 @@ use Exception;
 
 class PromotionService
 {
-    public function validate(string $code, array $cartItems, string $channel, ?int $customerId = null): Promotion
+    public function validate(string $code, array $cartItems, string $channel, ?int $userId = null): Promotion
     {
         $promotion = Promotion::where('code', $code)->first();
 
@@ -39,9 +39,9 @@ class PromotionService
             throw new Exception('Mã khuyến mại đã hết lượt sử dụng.');
         }
 
-        if ($customerId && $promotion->usage_limit_per_user !== null) {
+        if ($userId && $promotion->usage_limit_per_user !== null) {
             $userUsageCount = PromotionUsage::where('promotion_id', $promotion->id)
-                ->where('customer_id', $customerId)
+                ->where('user_id', $userId)
                 ->count();
 
             if ($userUsageCount >= $promotion->usage_limit_per_user) {
@@ -112,14 +112,13 @@ class PromotionService
     }
 
 
-    public function redeem(Promotion $promotion, Order $order, ?int $customerId = null, ?int $userId = null): PromotionUsage
+    public function redeem(Promotion $promotion, Order $order, ?int $userId = null): PromotionUsage
     {
         $promotion->increment('used_count');
 
         return PromotionUsage::create([
             'promotion_id' => $promotion->id,
             'order_id' => $order->id,
-            'customer_id' => $customerId,
             'user_id' => $userId,
             'used_at' => Carbon::now(),
         ]);

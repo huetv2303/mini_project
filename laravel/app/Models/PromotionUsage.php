@@ -12,7 +12,6 @@ class PromotionUsage extends Model
     protected $fillable = [
         'promotion_id',
         'order_id',
-        'customer_id',
         'user_id',
         'used_at',
     ];
@@ -29,11 +28,6 @@ class PromotionUsage extends Model
     public function order()
     {
         return $this->belongsTo(Order::class);
-    }
-
-    public function customer()
-    {
-        return $this->belongsTo(Customer::class);
     }
 
     public function user()

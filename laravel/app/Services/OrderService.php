@@ -10,6 +10,7 @@ use App\Models\ProductVariant;
 use App\Models\Promotion;
 use Illuminate\Support\Facades\DB;
 use \Illuminate\Support\Str;
+use App\Models\User;
 
 class OrderService
 {
@@ -97,6 +98,21 @@ class OrderService
 
             $code = 'ORD-' . date('Ymd') . '-' . strtoupper(Str::random(5));
 
+            // Xử lý thông tin khách hàng (Snapshot)
+            $customerId = $data['customer_id'] ?? null;
+            $customerName = $data['customer_name'] ?? null;
+            $customerPhone = $data['customer_phone'] ?? null;
+            $customerAddress = $data['customer_address'] ?? null;
+
+            if ($customerId) {
+                $customerUser = User::with('customerProfile')->find($customerId);
+                if ($customerUser) {
+                    $customerName = $customerName ?? $customerUser->name;
+                    $customerPhone = $customerPhone ?? $customerUser->customerProfile?->phone;
+                    $customerAddress = $customerAddress ?? $customerUser->customerProfile?->address;
+                }
+            }
+
             $order = $this->orderRepo->createOrder([
                 'code'                   => $code,
                 'payment_method_id'      => $data['payment_method_id'],
@@ -110,9 +126,10 @@ class OrderService
                 'final_amount'           => $finalAmount,
                 'payment_status'         => 'unpaid',
                 'note'                   => $data['note'] ?? null,
-                'customer_name'          => $data['customer_name'],
-                'customer_phone'         => $data['customer_phone'],
-                'customer_address'       => $data['customer_address'],
+                'customer_id'            => $customerId,
+                'customer_name'          => $customerName,
+                'customer_phone'         => $customerPhone,
+                'customer_address'       => $customerAddress,
                 'tax_rate_id'            => $taxRateId,
                 'tax_rate_snapshot'      => $taxRateSnapshot,
                 'tax_amount'             => $taxAmount,
@@ -136,7 +153,7 @@ class OrderService
             if (!empty($data['promotion_id'])) {
                 $promotion = Promotion::find($data['promotion_id']);
                 if ($promotion) {
-                    $this->promotionService->redeem($promotion, $order, null, $staffId);
+                    $this->promotionService->redeem($promotion, $order, $customerId);
                 }
             }
 
