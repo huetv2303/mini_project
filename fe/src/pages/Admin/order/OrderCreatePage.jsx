@@ -228,7 +228,12 @@ const OrderCreatePage = () => {
       setIsSearching(true);
       const res = await api.get(`/products/search?q=${term}`);
       const data = res.data.data || res.data || [];
-      setSearchResults(Array.isArray(data) ? data : []);
+      // Chỉ lấy những sản phẩm đang hoạt động (active)
+      const activeProducts = Array.isArray(data) 
+        ? data.filter(p => p.status === 'active') 
+        : [];
+      setSearchResults(activeProducts);
+
     } catch (error) {
       console.error("Search failed", error);
     } finally {
@@ -378,6 +383,205 @@ const OrderCreatePage = () => {
     return `${url}/${path.replace(/^\//, "")}`;
   };
 
+  const ProductVariantSelector = ({ product, onAdd }) => {
+    const [selectedAttributes, setSelectedAttributes] = useState({});
+
+    const attributeGroups = useMemo(() => {
+      const groups = {};
+      product.variants?.forEach((v) => {
+        v.attributes?.forEach((attr) => {
+          if (!groups[attr.attribute_name]) {
+            groups[attr.attribute_name] = new Set();
+          }
+          groups[attr.attribute_name].add(attr.attribute_value);
+        });
+      });
+      const result = {};
+      Object.keys(groups).forEach((key) => {
+        result[key] = Array.from(groups[key]);
+      });
+      return result;
+    }, [product]);
+
+    const attributeNames = Object.keys(attributeGroups);
+
+    // Initial auto-selection logic
+    useEffect(() => {
+      if (
+        attributeNames.length > 0 &&
+        Object.keys(selectedAttributes).length === 0
+      ) {
+        // Find first available variant to pre-fill
+        const firstVariant =
+          product.variants?.find((v) => v.inventory?.quantity > 0) ||
+          product.variants?.[0];
+        if (firstVariant) {
+          const initial = {};
+          firstVariant.attributes?.forEach((attr) => {
+            initial[attr.attribute_name] = attr.attribute_value;
+          });
+          setSelectedAttributes(initial);
+        }
+      }
+    }, [product.variants, attributeNames]);
+
+    const getMatchingVariant = (attributes) => {
+      return product.variants?.find((v) => {
+        // Variant must match all currently selected attributes
+        return Object.entries(attributes).every(([name, value]) => {
+          const attr = v.attributes?.find((a) => a.attribute_name === name);
+          return attr?.attribute_value === value;
+        });
+      });
+    };
+
+    const matchingVariant = useMemo(
+      () => getMatchingVariant(selectedAttributes),
+      [product.variants, selectedAttributes],
+    );
+
+    const isOptionPossible = (name, value) => {
+      // Check if there is ANY variant that has this value AND matches other selections
+      return product.variants?.some((v) => {
+        const hasThisValue = v.attributes?.some(
+          (a) => a.attribute_name === name && a.attribute_value === value,
+        );
+        if (!hasThisValue) return false;
+
+        // Check compatibility with other selected attributes (exclude current one)
+        return Object.entries(selectedAttributes).every(([sName, sValue]) => {
+          if (sName === name) return true;
+          const attr = v.attributes?.find((a) => a.attribute_name === sName);
+          return attr?.attribute_value === sValue;
+        });
+      });
+    };
+
+    const handleSelect = (name, value) => {
+      const newSelection = { ...selectedAttributes, [name]: value };
+
+      Object.keys(newSelection).forEach((k) => {
+        if (k !== name) {
+          const stillPossible = product.variants?.some((v) => {
+            const hasNew = v.attributes?.some(
+              (a) => a.attribute_name === name && a.attribute_value === value,
+            );
+            const hasOld = v.attributes?.some(
+              (a) =>
+                a.attribute_name === k && a.attribute_value === newSelection[k],
+            );
+            return hasNew && hasOld;
+          });
+
+          if (!stillPossible) {
+            const replacement = product.variants
+              ?.find((v) =>
+                v.attributes?.some(
+                  (a) =>
+                    a.attribute_name === name && a.attribute_value === value,
+                ),
+              )
+              ?.attributes?.find(
+                (a) => a.attribute_name === k,
+              )?.attribute_value;
+
+            if (replacement) {
+              newSelection[k] = replacement;
+            } else {
+              delete newSelection[k];
+            }
+          }
+        }
+      });
+
+      setSelectedAttributes(newSelection);
+    };
+
+    const available = matchingVariant
+      ? (matchingVariant.inventory?.quantity || 0) -
+        (matchingVariant.inventory?.reserved || 0)
+      : 0;
+    const isOutOfStock = available <= 0;
+
+    return (
+      <div className="space-y-4 p-4 bg-gray-50/50 rounded-2xl border border-gray-100">
+        <div className="space-y-3">
+          {attributeNames.map((name) => {
+            const options = attributeGroups[name];
+            // If only one option exists across all variants for this attribute AND it's already selected,
+            // maybe we can skip showing it or just show it as label.
+            // But let's follow user's UI request to keep it consistent.
+
+            return (
+              <div key={name} className="space-y-1.5">
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                  Chọn {name}
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {options.map((value) => {
+                    const isPossible = isOptionPossible(name, value);
+                    const isSelected = selectedAttributes[name] === value;
+
+                    return (
+                      <button
+                        key={value}
+                        onClick={() => handleSelect(name, value)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                          isSelected
+                            ? "bg-black text-white shadow-md active:scale-95"
+                            : isPossible
+                              ? "bg-white text-gray-600 border border-gray-100 hover:border-gray-300 active:scale-95"
+                              : "bg-white text-gray-300 border border-gray-50 hover:border-gray-200 opacity-60 active:scale-95"
+                        }`}
+                      >
+                        {value}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {matchingVariant ? (
+          <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+            <div>
+              <p className="text-sm font-black text-gray-900">
+                {formatPrice(matchingVariant.price)}
+              </p>
+              <div className="flex items-center gap-1.5 text-[10px] font-bold">
+                <span className="text-gray-400">Tồn kho:</span>
+                <span
+                  className={isOutOfStock ? "text-red-500" : "text-green-600"}
+                >
+                  {available}
+                </span>
+              </div>
+            </div>
+            <button
+              onClick={() => onAdd(product, matchingVariant)}
+              disabled={isOutOfStock}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-xs transition-all ${
+                isOutOfStock
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200 active:scale-95"
+              }`}
+            >
+              <Plus className="w-3.5 h-3.5" />
+              THÊM
+            </button>
+          </div>
+        ) : (
+          <div className="text-[10px] font-bold text-rose-500 italic p-3 bg-rose-50 rounded-xl border border-rose-100 flex items-center gap-2 animate-pulse">
+            <AlertCircle className="w-3 h-3" />
+            Vui lòng chọn đầy đủ các thuộc tính
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <AdminLayout>
       <div className="pb-20 max-w-[1400px] mx-auto text-left">
@@ -435,6 +639,7 @@ const OrderCreatePage = () => {
                 )}
                 {searchTerm.length >= 1 &&
                   (searchResults.length > 0 || !isSearching) && (
+
                     <div className="absolute top-full left-0 w-full mt-4 bg-white border border-gray-100 rounded-lg shadow-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-300">
                       {searchResults.length > 0 ? (
                         <div className="max-h-[400px] overflow-y-auto">
@@ -456,52 +661,42 @@ const OrderCreatePage = () => {
                                   {product.name}
                                 </span>
                               </div>
-                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 ml-16">
-                                {product.variants?.map((variant) => {
-                                  const available =
-                                    (variant.inventory?.quantity || 0) -
-                                    (variant.inventory?.reserved || 0);
-                                  const isOutOfStock = available <= 0;
-
-                                  return (
+                              <div className="ml-16">
+                                {product.variants?.length === 1 &&
+                                (!product.variants[0].attributes ||
+                                  product.variants[0].attributes.length ===
+                                    0) ? (
+                                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                                    <div>
+                                      <p className="text-xs font-bold">
+                                        {formatPrice(product.variants[0].price)}
+                                      </p>
+                                      <p className="text-[10px] text-gray-400">
+                                        Tồn kho:{" "}
+                                        {(product.variants[0].inventory
+                                          ?.quantity || 0) -
+                                          (product.variants[0].inventory
+                                            ?.reserved || 0)}
+                                      </p>
+                                    </div>
                                     <button
-                                      key={variant.id}
                                       onClick={() =>
-                                        addItemToOrder(product, variant)
+                                        addItemToOrder(
+                                          product,
+                                          product.variants[0],
+                                        )
                                       }
-                                      disabled={isOutOfStock}
-                                      className={`flex items-center justify-between p-3 rounded-xl transition-all group ${
-                                        isOutOfStock
-                                          ? "bg-gray-100 cursor-not-allowed opacity-60"
-                                          : " hover:bg-blue-50 "
-                                      }`}
+                                      className="p-2 bg-blue-600 text-white rounded-lg shadow-sm"
                                     >
-                                      <div className="text-left">
-                                        <p className="text-[0.9rem] uppercase opacity-70 group-hover:opacity-100">
-                                          {variant.name || "Mặc định"}
-                                        </p>
-                                        <p className="text-xs font-bold">
-                                          {formatPrice(variant.price)}
-                                        </p>
-                                        <div className="flex items-center gap-2 pt-1 text-[10px]">
-                                          <span>Tồn kho:</span>
-                                          <span
-                                            className={
-                                              isOutOfStock
-                                                ? "text-red-500"
-                                                : "text-green-600"
-                                            }
-                                          >
-                                            {available}
-                                          </span>
-                                        </div>
-                                      </div>
-                                      <Plus
-                                        className={`w-4 h-4 ${isOutOfStock ? "opacity-30" : ""}`}
-                                      />
+                                      <Plus className="w-4 h-4" />
                                     </button>
-                                  );
-                                })}
+                                  </div>
+                                ) : (
+                                  <ProductVariantSelector
+                                    product={product}
+                                    onAdd={addItemToOrder}
+                                  />
+                                )}
                               </div>
                             </div>
                           ))}
