@@ -21,6 +21,7 @@ class CustomerProfileResource extends JsonResource
             'gender'        => $this->gender,
             'date_of_birth' => $this->date_of_birth,
             'address'       => $this->address,
+            'is_active'     => $this->is_active,
             'loyalty_tier'  => $this->loyalty_tier,
             'total_spent'   => $this->total_spent,
             'total_orders'  => $this->total_orders,

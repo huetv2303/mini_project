@@ -251,11 +251,15 @@ const CustomerNavbar = () => {
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="flex items-center gap-2"
               >
-                <div className="w-10 h-10 bg-black flex items-center justify-center rounded-xl">
-                  <ShoppingBag className="text-white" size={24} />
+                <div className=" flex items-center justify-center ">
+                  <img
+                    src={LogoTrendora}
+                    alt="Logo"
+                    className="w-10 h-10 object-cover rounded-lg"
+                  />
                 </div>
-                <span className="text-xl font-bold tracking-tight text-slate-900">
-                  MODERN<span className="text-gray-400">STORE</span>
+                <span className="text-xl font-bold tracking-tight text-slate-900  sm:block">
+                  TRENDORA<span className="text-gray-400">FASHION</span>
                 </span>
               </Link>
               <button

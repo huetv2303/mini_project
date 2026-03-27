@@ -56,6 +56,7 @@ Route::group(['prefix' => 'v1'], function () {
         });
 
         Route::prefix('customers')->group(function () {
+            Route::post('/bulk-update-status', [CustomerController::class, 'bulkUpdateStatus']);
             Route::get('/', [CustomerController::class, 'index']);
             Route::get('/{id}', [CustomerController::class, 'show']);
             Route::post('/', [CustomerController::class, 'store']);

@@ -6,12 +6,9 @@ import {
   Instagram,
   Twitter,
   Youtube,
-  Mail,
-  Phone,
-  MapPin,
   ArrowRight,
 } from "lucide-react";
-
+import LogoTrendora from "../../../assets/LogoTrendora.png";
 const CustomerFooter = () => {
   return (
     <footer className="bg-white border-t border-gray-100 pt-20 pb-10">
@@ -21,10 +18,10 @@ const CustomerFooter = () => {
           <div className="space-y-6">
             <Link to="/" className="flex items-center gap-2">
               <div className="w-10 h-10 bg-black flex items-center justify-center rounded-xl">
-                <ShoppingBag className="text-white" size={24} />
+                <img src={LogoTrendora} />
               </div>
               <span className="text-xl font-bold tracking-tight text-slate-900">
-                MODERN<span className="text-gray-400">STORE</span>
+                TRENDORA<span className="text-gray-400">FASHION</span>
               </span>
             </Link>
             <p className="text-gray-500 text-sm leading-relaxed max-w-xs">

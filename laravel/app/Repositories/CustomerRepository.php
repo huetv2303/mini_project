@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\User;
 use App\Models\Role;
 use App\Interfaces\CustomerRepositoryInterface;
+use App\Models\CustomerProfile;
 use Illuminate\Support\Facades\Hash;
 
 class CustomerRepository implements CustomerRepositoryInterface
@@ -17,7 +18,23 @@ class CustomerRepository implements CustomerRepositoryInterface
     public function getAllCustomers()
     {
         $roleId = $this->getCustomerRoleId();
-        return User::where('role_id', $roleId)->with('customerProfile')->get();
+        return User::where('role_id', $roleId)->with('customerProfile')->paginate(15);
+    }
+
+    public function searchCustomers(string $query)
+    {
+        $roleId = $this->getCustomerRoleId();
+        return User::where('role_id', $roleId)
+            ->with('customerProfile')
+            ->where(function ($q) use ($query) {
+                $q->where('name', 'like', "%{$query}%")
+                  ->orWhere('email', 'like', "%{$query}%")
+                  ->orWhereHas('customerProfile', function ($qp) use ($query) {
+                      $qp->where('phone', 'like', "%{$query}%");
+                  });
+            })
+            ->limit(10)
+            ->get();
     }
 
     public function createCustomer(array $data)
@@ -45,7 +62,6 @@ class CustomerRepository implements CustomerRepositoryInterface
     {
         $user = User::with('customerProfile')->findOrFail($id);
 
-        // Cập nhật thông tin cơ bản của User (avatar nằm ở bảng users)
         $userData = array_intersect_key($data, array_flip(['name', 'email', 'avatar', 'password']));
         if (!empty($userData)) {
             if (isset($userData['password'])) {
@@ -54,8 +70,6 @@ class CustomerRepository implements CustomerRepositoryInterface
             $user->update($userData);
         }
 
-
-        // Các trường thuộc về bảng customer_profiles
         $profileFields = ['phone', 'gender', 'date_of_birth', 'address', 'is_active'];
         $profileData = array_intersect_key($data, array_flip($profileFields));
 
@@ -69,6 +83,11 @@ class CustomerRepository implements CustomerRepositoryInterface
 
         return $user->refresh()->load('customerProfile');
     }
+    public function bulkUpdateStatus(array $ids, bool $isActive)
+    {
+        return CustomerProfile::whereIn('user_id', $ids)->update(['is_active' => $isActive]);
+    }
+
     public function deleteCustomer($id)
     {
         $user = User::findOrFail($id);

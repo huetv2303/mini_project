@@ -44,6 +44,57 @@ const OrderCreatePage = () => {
     phone: "",
     address: "",
   });
+
+  // Customer search states
+  const [customerSearchTerm, setCustomerSearchTerm] = useState("");
+  const [customerSearchResults, setCustomerSearchResults] = useState([]);
+  const [isSearchingCustomer, setIsSearchingCustomer] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+
+  const searchCustomers = async (term) => {
+    if (!term || term.length < 2) {
+      setCustomerSearchResults([]);
+      return;
+    }
+    try {
+      setIsSearchingCustomer(true);
+      const res = await api.get(`/customers?query=${term}`);
+      const data = res.data.data || res.data || [];
+      setCustomerSearchResults(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Customer search failed", error);
+    } finally {
+      setIsSearchingCustomer(false);
+    }
+  };
+
+  const debouncedCustomerSearch = useCallback(
+    debounce((val) => searchCustomers(val), 500),
+    [],
+  );
+
+  const handleCustomerSearchChange = (e) => {
+    setCustomerSearchTerm(e.target.value);
+    debouncedCustomerSearch(e.target.value);
+  };
+
+  const selectCustomer = (c) => {
+    setSelectedCustomer(c);
+    setCustomer({
+      name: c.name || "",
+      phone: c.customer_profile?.phone || "",
+      address: c.customer_profile?.address || "",
+    });
+    setCustomerSearchTerm("");
+    setCustomerSearchResults([]);
+    toast.success(`Đã chọn khách hàng: ${c.name}`);
+  };
+
+  const clearSelectedCustomer = () => {
+    setSelectedCustomer(null);
+    setCustomer({ name: "", phone: "", address: "" });
+  };
+
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
   const [shippingMethods, setShippingMethods] = useState([]);
@@ -76,9 +127,8 @@ const OrderCreatePage = () => {
         api.get("/tax-rates"),
       ]);
 
-      console.log("PM Response:", pmRes.data); // Xem cß║Ñu tr├║c trß║ú vß╗ü
+      console.log("PM Response:", pmRes.data);
 
-      // Logic th├┤ng minh: Lß║Ñy data.data nß║┐u c├│, kh├┤ng th├¼ lß║Ñy data
       const getArray = (res) => {
         if (res.data && Array.isArray(res.data.data)) return res.data.data;
         if (Array.isArray(res.data)) return res.data;
@@ -90,9 +140,7 @@ const OrderCreatePage = () => {
       setTaxRates(getArray(taxRes));
     } catch (error) {
       console.error("Failed to fetch initial data", error);
-      toast.error(
-        "Kh├┤ng thß╗â tß║úi th├┤ng tin ph╞░╞íng thß╗⌐c vß║¡n chuyß╗ân/thanh to├ín",
-      );
+      toast.error("Không thể tải thông tin phương thức vận chuyển/thanh toán");
     }
   };
 
@@ -279,7 +327,11 @@ const OrderCreatePage = () => {
       return toast.error("Vui lòng chọn ít nhất 1 sản phẩm");
     }
     if (!customer.name || !customer.phone || !customer.address) {
-      return toast.error("Vui lòng nhập đầy đủ thông tin khách hàng");
+      if (!selectedCustomer) {
+        return toast.error(
+          "Vui lòng nhập đầy đủ thông tin khách hàng hoặc chọn khách hàng có tài khoản",
+        );
+      }
     }
     if (!selectedPaymentMethod) {
       return toast.error("Vui lòng chọn hình thức thanh toán");
@@ -295,6 +347,7 @@ const OrderCreatePage = () => {
           product_variant_id: item.product_variant_id,
           quantity: item.quantity,
         })),
+        customer_id: selectedCustomer?.id || null,
         discount_amount: discountAmount,
         payment_method_id: selectedPaymentMethod,
         shipping_method_id: selectedShippingMethod,
@@ -337,7 +390,7 @@ const OrderCreatePage = () => {
               <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
             </Link>
             <div>
-              <h1 className="text-2xl font-black text-gray-900">
+              <h1 className="text-2xl font-bold text-gray-900">
                 Lên đơn hàng mới
               </h1>
               <p className="text-xs text-gray-400 font-medium">
@@ -731,14 +784,119 @@ const OrderCreatePage = () => {
           {/* Right Column: Customer Info & Summary */}
           <div className="lg:col-span-4 space-y-8">
             {/* Customer Form */}
-            <div className="bg-white rounded-lg border border-gray-100 p-8 shadow-sm">
-              <h3 className="text-sm font-bold uppercase  flex items-center gap-2 mb-8">
+            <div className="bg-white rounded-lg border border-gray-100 p-8 shadow-sm relative z-10">
+              <h3 className="text-sm font-bold uppercase flex items-center gap-2 mb-6">
                 <User className="w-4 h-4" />
                 Khách hàng
               </h3>
-              <div className="space-y-6">
+
+              {/* Selected Customer Badge */}
+              {selectedCustomer ? (
+                <div className="mb-6 p-4 bg-blue-50 border border-blue-100 rounded-2xl flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg  text-white flex items-center justify-center font-bold text-xs flex-shrink-0">
+                      {selectedCustomer.avatar ? (
+                        <img
+                          src={getImageUrl(selectedCustomer.avatar)}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center font-bold text-xs flex-shrink-0">
+                          {selectedCustomer.name?.[0]?.toUpperCase()}
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-gray-900">
+                        {selectedCustomer.name}
+                      </p>
+                      <p className="text-[10px] text-blue-600 font-bold uppercase">
+                        {selectedCustomer.customer_profile?.loyalty_tier ||
+                          "Thành viên"}{" "}
+                        · #{selectedCustomer.id}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={clearSelectedCustomer}
+                    className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                    title="Bỏ chọn"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                /* Search Existing Customer */
+                <div className="mb-6 relative">
+                  <label className="text-[12px] font-bold text-gray-600 uppercase mb-2 block">
+                    Tìm khách hàng có tài khoản
+                  </label>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                      type="text"
+                      value={customerSearchTerm}
+                      onChange={handleCustomerSearchChange}
+                      placeholder="Nhập tên, email, SĐT..."
+                      className="w-full pl-10 pr-4 py-3 bg-gray-50 rounded-xl text-sm outline-none border border-transparent focus:border-blue-200 transition-all"
+                    />
+                    {isSearchingCustomer && (
+                      <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-gray-400" />
+                    )}
+                  </div>
+                  {customerSearchResults.length > 0 && (
+                    <div className="absolute top-full left-0 w-full mt-1 bg-white border border-gray-100 rounded-xl shadow-2xl overflow-hidden z-50">
+                      {customerSearchResults.map((c) => (
+                        <button
+                          key={c.id}
+                          type="button"
+                          onClick={() => selectCustomer(c)}
+                          className="w-full flex items-center gap-3 px-4 py-3 hover:bg-blue-50 transition-colors text-left border-b border-gray-50 last:border-0"
+                        >
+                          <div className="w-8 h-8 rounded-lg  text-white flex items-center justify-center font-bold text-xs flex-shrink-0">
+                            {c.avatar ? (
+                              <img
+                                src={getImageUrl(c.avatar)}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center font-bold text-xs flex-shrink-0">
+                                {c.name?.[0]?.toUpperCase()}
+                              </div>
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-sm font-bold text-gray-900 truncate">
+                              {c.name}
+                            </p>
+                            <p className="text-[10px] text-gray-400 truncate">
+                              {c.email} ·{" "}
+                              {c.customer_profile?.phone || "Chưa có SĐT"}
+                            </p>
+                          </div>
+                          <ArrowRight className="w-4 h-4 text-gray-300 flex-shrink-0 ml-auto" />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Divider */}
+              <div className="flex items-center gap-3 mb-6">
+                <div className="flex-1 h-px bg-gray-100" />
+                <span className="text-[10px] font-bold text-gray-300 uppercase">
+                  {selectedCustomer
+                    ? "Chi tiết giao hàng"
+                    : "hoặc nhập thủ công"}
+                </span>
+                <div className="flex-1 h-px bg-gray-100" />
+              </div>
+
+              <div className="space-y-4">
                 <div>
-                  <label className="text-[12px] font-bold text-gray-600 uppercase  mb-2 block">
+                  <label className="text-[12px] font-bold text-gray-600 uppercase mb-2 block">
                     Tên khách hàng
                   </label>
                   <div className="relative">
@@ -747,14 +905,14 @@ const OrderCreatePage = () => {
                       onChange={(e) =>
                         setCustomer({ ...customer, name: e.target.value })
                       }
-                      className="w-full pl-10 pr-4 py-4 bg-gray-50 rounded-lg text-sm outline-none "
+                      className="w-full pl-10 pr-4 py-4 bg-gray-50 rounded-lg text-sm outline-none"
                       placeholder="Nhập tên..."
                     />
                     <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
                   </div>
                 </div>
                 <div>
-                  <label className="text-[12px] font-bold text-gray-600 uppercase  mb-2 block">
+                  <label className="text-[12px] font-bold text-gray-600 uppercase mb-2 block">
                     Số điện thoại
                   </label>
                   <div className="relative">
@@ -763,14 +921,14 @@ const OrderCreatePage = () => {
                       onChange={(e) =>
                         setCustomer({ ...customer, phone: e.target.value })
                       }
-                      className="w-full pl-10 pr-4 py-4 bg-gray-50 rounded-lg text-sm outline-none "
+                      className="w-full pl-10 pr-4 py-4 bg-gray-50 rounded-lg text-sm outline-none"
                       placeholder="09xxxx..."
                     />
                     <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
                   </div>
                 </div>
                 <div>
-                  <label className="text-[12px] font-bold text-gray-600 uppercase  mb-2 block">
+                  <label className="text-[12px] font-bold text-gray-600 uppercase mb-2 block">
                     Địa chỉ nhận hàng
                   </label>
                   <div className="relative">
@@ -779,7 +937,7 @@ const OrderCreatePage = () => {
                       onChange={(e) =>
                         setCustomer({ ...customer, address: e.target.value })
                       }
-                      className="w-full pl-10 pr-4 py-4 bg-gray-50 rounded-lg text-sm outline-none "
+                      className="w-full pl-10 pr-4 py-4 bg-gray-50 rounded-lg text-sm outline-none"
                       placeholder="Địa chỉ cụ thể..."
                     />
                     <MapPin className="absolute left-4 top-6 w-4 h-4 text-gray-300" />

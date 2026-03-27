@@ -20,9 +20,14 @@ class CustomerController extends Controller
         $this->uploadService = $uploadService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $customers = $this->customerRepo->getAllCustomers();
+        $query = $request->get('query');
+        if ($query) {
+            $customers = $this->customerRepo->searchCustomers($query);
+        } else {
+            $customers = $this->customerRepo->getAllCustomers();
+        }
         return response()->json([
             'status' => 'success',
             'data' => UserResource::collection($customers)
@@ -84,6 +89,22 @@ class CustomerController extends Controller
             'status' => 'success',
             'message' => 'Cập nhật khách hàng thành công',
             'data' => new UserResource($customer)
+        ]);
+    }
+
+    public function bulkUpdateStatus(Request $request)
+    {
+        $validated = $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:users,id',
+            'is_active' => 'required|boolean'
+        ]);
+
+        $this->customerRepo->bulkUpdateStatus($validated['ids'], $validated['is_active']);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Cập nhật trạng thái hàng loạt thành công'
         ]);
     }
 

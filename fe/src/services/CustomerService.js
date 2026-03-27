@@ -52,6 +52,15 @@ export const updateCustomerRequest = async (id, data) => {
     }
 };
 
+export const bulkUpdateCustomerStatusRequest = async (ids, isActive) => {
+    try {
+        const response = await api.post("/customers/bulk-update-status", { ids, is_active: isActive });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
 export const deleteCustomerRequest = async (id) => {
     try {
         const response = await api.delete(`/customers/${id}`);

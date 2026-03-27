@@ -3,11 +3,14 @@
 namespace App\Services;
 
 use App\Interfaces\Order\OrderRepositoryInterface;
+use App\Models\CustomerProfile;
 use App\Models\Inventory;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\Promotion;
+use App\Models\ShippingMethod;
+use App\Models\TaxRate;
 use Illuminate\Support\Facades\DB;
 use \Illuminate\Support\Str;
 use App\Models\User;
@@ -76,7 +79,7 @@ class OrderService
             }
 
             // Tính phí vận chuyển và ngày dự kiến
-            $shippingMethod = \App\Models\ShippingMethod::findOrFail($data['shipping_method_id']);
+            $shippingMethod = ShippingMethod::findOrFail($data['shipping_method_id']);
             $shippingFee = $shippingMethod->cost;
             $expectedDeliveryDate = now()->addDays($shippingMethod->estimated_days)->format('Y-m-d');
 
@@ -87,7 +90,7 @@ class OrderService
             $taxRateSnapshot = 0;
             $taxAmount = 0;
             if ($taxRateId) {
-                $taxRate = \App\Models\TaxRate::find($taxRateId);
+                $taxRate = TaxRate::find($taxRateId);
                 if ($taxRate) {
                     $taxRateSnapshot = $taxRate->rate;
                     $taxAmount = ($totalAmount - $discountAmount) * ($taxRateSnapshot / 100);
@@ -155,6 +158,12 @@ class OrderService
                 if ($promotion) {
                     $this->promotionService->redeem($promotion, $order, $customerId);
                 }
+            }
+
+            // Cập nhật thống kê khách hàng
+            if ($customerId) {
+                CustomerProfile::where('user_id', $customerId)->increment('total_orders');
+                CustomerProfile::where('user_id', $customerId)->increment('total_spent', $finalAmount);
             }
 
             return $order->load(['paymentMethod', 'shippingMethod', 'staff', 'items']);
@@ -272,6 +281,16 @@ class OrderService
                                 ->decrement('sold_count', $item->quantity);
                         }
                     }
+                }
+
+
+
+                // Hoàn thống kê khách hàng khi hủy đơn
+                if ($order->customer_id) {
+                    CustomerProfile::where('user_id', $order->customer_id)
+                        ->decrement('total_orders');
+                    CustomerProfile::where('user_id', $order->customer_id)
+                        ->decrement('total_spent', max(0, $order->final_amount));
                 }
             }
 
@@ -406,6 +425,14 @@ class OrderService
             }
 
             $order->update(['status' => 'cancelled']);
+
+            // Hoàn thống kê khách hàng
+            if ($order->customer_id) {
+                \App\Models\CustomerProfile::where('user_id', $order->customer_id)
+                    ->decrement('total_orders');
+                \App\Models\CustomerProfile::where('user_id', $order->customer_id)
+                    ->decrement('total_spent', max(0, $order->final_amount));
+            }
 
             return $order;
         });

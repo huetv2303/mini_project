@@ -35,6 +35,7 @@ import PaymentResultPage from "./pages/Admin/order/PaymentResultPage";
 import PaymentMethodPage from "./pages/Admin/payment/PaymentMethodPage";
 import PromotionPage from "./pages/Admin/promotion/PromotionPage";
 import PromotionFormPage from "./pages/Admin/promotion/PromotionFormPage";
+import CustomerListPage from "./pages/Admin/customer/CustomerListPage";
 
 const App = () => {
   return (
@@ -146,6 +147,18 @@ const App = () => {
               <AuthGuard>
                 <RoleGuard permission="admin.manage">
                   <CategoryForm />
+                </RoleGuard>
+              </AuthGuard>
+            }
+          />
+
+          {/* Customers */}
+          <Route
+            path="/admin/customers"
+            element={
+              <AuthGuard>
+                <RoleGuard permission="admin.manage">
+                  <CustomerListPage />
                 </RoleGuard>
               </AuthGuard>
             }

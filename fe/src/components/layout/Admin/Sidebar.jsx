@@ -97,8 +97,11 @@ const Sidebar = () => {
             icon={CreditCard}
             label="Thanh toán"
           />
-          {/* <SidebarItem to="/" icon={Users} label="Người dùng" /> */}
-
+          <SidebarItem
+            to="/admin/customers"
+            icon={Users}
+            label="Khách hàng"
+          />
           <SidebarItem
             to="/admin/inventory"
             icon={Warehouse}

@@ -95,11 +95,6 @@ const Home = () => {
       <section className="relative h-[90vh] flex items-center overflow-hidden">
         {/* Hero Background Image */}
         <div className="absolute inset-0 z-0">
-          <img
-            src="/storefront_hero_banner_1774595122297.png"
-            alt="Hero Banner"
-            className="w-full h-full object-cover scale-105 animate-pulse-slow shadow-2xl"
-          />
           <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
         </div>
 
