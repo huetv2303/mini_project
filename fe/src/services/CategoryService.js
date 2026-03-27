@@ -1,6 +1,10 @@
 import api from "../api/axios";
 
-export const fetchCategoriesRequest = async ({ all = false, search = "", page = 1 } = {}) => {
+export const fetchCategoriesRequest = async ({
+  all = false,
+  search = "",
+  page = 1,
+} = {}) => {
   try {
     const params = new URLSearchParams();
     if (all) params.append("all", "true");

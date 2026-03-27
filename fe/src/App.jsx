@@ -32,6 +32,8 @@ import ShippingMethodPage from "./pages/Admin/shipping/ShippingMethodPage";
 import TaxRatePage from "./pages/Admin/tax/TaxRatePage";
 import PaymentResultPage from "./pages/Admin/order/PaymentResultPage";
 import PaymentMethodPage from "./pages/Admin/payment/PaymentMethodPage";
+import PromotionPage from "./pages/Admin/promotion/PromotionPage";
+import PromotionFormPage from "./pages/Admin/promotion/PromotionFormPage";
 
 const App = () => {
   return (
@@ -322,6 +324,38 @@ const App = () => {
               <AuthGuard>
                 <RoleGuard permission="admin.manage">
                   <PaymentMethodPage />
+                </RoleGuard>
+              </AuthGuard>
+            }
+          />
+
+          {/* Promotions */}
+          <Route
+            path="/admin/promotions"
+            element={
+              <AuthGuard>
+                <RoleGuard permission="admin.manage">
+                  <PromotionPage />
+                </RoleGuard>
+              </AuthGuard>
+            }
+          />
+          <Route
+            path="/admin/promotions/create"
+            element={
+              <AuthGuard>
+                <RoleGuard permission="admin.manage">
+                  <PromotionFormPage />
+                </RoleGuard>
+              </AuthGuard>
+            }
+          />
+          <Route
+            path="/admin/promotions/edit/:id"
+            element={
+              <AuthGuard>
+                <RoleGuard permission="admin.manage">
+                  <PromotionFormPage />
                 </RoleGuard>
               </AuthGuard>
             }

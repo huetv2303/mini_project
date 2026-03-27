@@ -310,7 +310,7 @@ const StatCard = ({ icon: Icon, label, value, sub, color = "indigo" }) => {
         <Icon className="w-5 h-5" />
       </div>
       <p className="text-[1rem] font-bold text-gray-800  mb-1">{label}</p>
-      <p className="text-2xl font-black text-gray-900">{value}</p>
+      <p className="text-2xl font-bold text-gray-900">{value}</p>
       {sub && <p className="text-xs text-gray-400 mt-1">{sub}</p>}
     </div>
   );

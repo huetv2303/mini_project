@@ -18,6 +18,7 @@ class ProductResource extends JsonResource
             'feature_image'     => $this->feature_image
                 ? asset('storage/' . $this->feature_image)
                 : null,
+            'category_id'       => $this->category_id,
             'status'            => $this->status,
             'sold_count'        => $this->sold_count,
             'category'          => $this->whenLoaded('category', fn() => [

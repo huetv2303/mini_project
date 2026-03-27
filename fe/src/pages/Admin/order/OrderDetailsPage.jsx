@@ -108,6 +108,13 @@ const OrderDetailsPage = () => {
     getPaymentMethods();
   }, [id]);
 
+  useEffect(() => {
+    if (order?.payment_method?.id) {
+      setSelectedPaymentMethod(order.payment_method.id);
+      console.log("alo", selectedPaymentMethod);
+    }
+  }, [order]);
+
   const getImageUrl = (path) => {
     if (!path) return "/no-image.png";
     if (path.startsWith("http")) return path;
@@ -573,7 +580,7 @@ const OrderDetailsPage = () => {
                 <div className="mb-6">
                   <SelectSearch
                     label="Thay đổi phương thức"
-                    value={order.payment_method_id}
+                    value={selectedPaymentMethod}
                     onChange={(val) => handleUpdatePaymentMethod(val)}
                     options={paymentMethods.map((pm) => ({
                       icon: getImageUrl(pm.image),

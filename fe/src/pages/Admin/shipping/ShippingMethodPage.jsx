@@ -175,7 +175,7 @@ const ShippingMethodPage = () => {
                             {method.name}
                           </span>
                         </td>
-                        <td className="py-4 px-6 text-right font-medium text-gray-700">
+                        <td className="py-4 px-6 text-right text-gray-700">
                           {new Intl.NumberFormat("vi-VN").format(method.cost)}
                         </td>
                         <td className="py-4 px-6 text-center text-gray-600">

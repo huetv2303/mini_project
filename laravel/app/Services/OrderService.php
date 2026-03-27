@@ -7,6 +7,7 @@ use App\Models\Inventory;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Models\Promotion;
 use Illuminate\Support\Facades\DB;
 use \Illuminate\Support\Str;
 
@@ -14,13 +15,16 @@ class OrderService
 {
     protected $orderRepo;
     protected $inventoryService;
+    protected $promotionService;
 
     public function __construct(
         OrderRepositoryInterface $orderRepo,
-        InventoryService $inventoryService
+        InventoryService $inventoryService,
+        PromotionService $promotionService
     ) {
         $this->orderRepo = $orderRepo;
         $this->inventoryService = $inventoryService;
+        $this->promotionService = $promotionService;
     }
 
     public function getAll($request = null)
@@ -76,7 +80,7 @@ class OrderService
             $expectedDeliveryDate = now()->addDays($shippingMethod->estimated_days)->format('Y-m-d');
 
             $discountAmount = $data['discount_amount'] ?? 0;
-            
+
             // Tính thuế
             $taxRateId = $data['tax_rate_id'] ?? null;
             $taxRateSnapshot = 0;
@@ -112,6 +116,8 @@ class OrderService
                 'tax_rate_id'            => $taxRateId,
                 'tax_rate_snapshot'      => $taxRateSnapshot,
                 'tax_amount'             => $taxAmount,
+                'promotion_id'           => $data['promotion_id'] ?? null,
+                'promotion_code_snapshot' => $data['promotion_code_snapshot'] ?? null,
             ]);
 
             // Tạo OrderItems
@@ -125,6 +131,13 @@ class OrderService
                     $item['product_variant_id'],
                     $item['quantity']
                 );
+            }
+
+            if (!empty($data['promotion_id'])) {
+                $promotion = Promotion::find($data['promotion_id']);
+                if ($promotion) {
+                    $this->promotionService->redeem($promotion, $order, null, $staffId);
+                }
             }
 
             return $order->load(['paymentMethod', 'shippingMethod', 'staff', 'items']);

@@ -12,13 +12,8 @@ import {
   Trash2,
   AlertCircle,
   Loader2,
-  ChevronLeft,
-  ChevronRight,
-  Package,
-  Layers,
   Building2,
   Tag,
-  Eye,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -56,7 +51,7 @@ const ProductListPage = () => {
     isOpen: false,
     slug: null,
     name: "",
-    type: "single", // "single" or "bulk"
+    type: "single",
   });
 
   const getProducts = async (page = 1, search = "") => {
@@ -289,7 +284,7 @@ const ProductListPage = () => {
                               )} */}
                             </div>
                             <div>
-                              <div className="font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                              <div className="font-medium text-gray-900 group-hover:text-indigo-600 transition-colors">
                                 {product.name}
                               </div>
                               <div className="text-[0.7rem] text-gray-400   mt-1 uppercase">
@@ -309,7 +304,7 @@ const ProductListPage = () => {
                           </div>
                         </td>
                         <td className="px-6 py-5">
-                          <div className=" text-sm font-bold text-gray-900">
+                          <div className=" text-sm  text-gray-900">
                             {formatPrice(firstVariant.price)}
                           </div>
                           <div className="text-[0.7rem] text-gray-400 uppercase mt-1">
@@ -317,7 +312,7 @@ const ProductListPage = () => {
                           </div>
                         </td>
                         <td className="px-6 py-5">
-                          <div className=" text-sm font-bold text-gray-900 text-center">
+                          <div className=" text-sm text-gray-900 text-center">
                             {product.sold_count}
                           </div>
                         </td>

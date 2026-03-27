@@ -132,4 +132,38 @@ class ProductController extends Controller
             ], 500);
         }
     }
+
+    public function search(Request $request)
+    {
+        $query = $request->query('q');
+        if (!$query) {
+            return response()->json([
+                'status' => 'success',
+                'data' => []
+            ]);
+        }
+
+        $products = $this->productService->search($query);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => ProductResource::collection($products)
+        ]);
+    }
+
+    public function getBySku($sku)
+    {
+        $product = $this->productService->getBySku($sku);
+        if (!$product) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Product not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => new ProductResource($product)
+        ]);
+    }
 }

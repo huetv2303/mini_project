@@ -348,4 +348,14 @@ class ProductService
 
         return true;
     }
+
+    public function search($query)
+    {
+        return $this->productRepo->search($query);
+    }
+
+    public function getBySku($sku)
+    {
+        return $this->productRepo->getBySku($sku);
+    }
 }

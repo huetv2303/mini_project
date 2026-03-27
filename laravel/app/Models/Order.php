@@ -28,6 +28,8 @@ class Order extends Model
         'tax_rate_id',
         'tax_rate_snapshot',
         'tax_amount',
+        'promotion_id',
+        'promotion_code_snapshot',
     ];
 
     protected $casts = [
@@ -62,5 +64,10 @@ class Order extends Model
     public function taxRate()
     {
         return $this->belongsTo(TaxRate::class);
+    }
+
+    public function promotion()
+    {
+        return $this->belongsTo(Promotion::class);
     }
 }

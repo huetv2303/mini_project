@@ -519,9 +519,7 @@ const OrderListPage = () => {
                   <th className="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Mã đơn hàng
                   </th>
-                  <th className="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Ngày đặt hàng
-                  </th>
+
                   <th className="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Khách hàng
                   </th>
@@ -568,22 +566,25 @@ const OrderListPage = () => {
                           />
                         </td>
                         <td className="px-4 py-4">
-                          <Link
-                            to={`/admin/orders/${order.id}`}
-                            className="text-blue-600 font-medium hover:underline"
-                          >
-                            #{order.code}
+                          <Link to={`/admin/orders/${order.id}`}>
+                            <div className="text-blue-600 font-medium hover:underline text-sm ">
+                              #{order.code}
+                            </div>
+                            <div className="text-xs ">
+                              {new Date(order.created_at).toLocaleString(
+                                "vi-VN",
+                                {
+                                  day: "2-digit",
+                                  month: "2-digit",
+                                  year: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                },
+                              )}
+                            </div>
                           </Link>
                         </td>
-                        <td className="px-4 py-4 text-sm text-gray-600">
-                          {new Date(order.created_at).toLocaleString("vi-VN", {
-                            day: "2-digit",
-                            month: "2-digit",
-                            year: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </td>
+
                         <td className="px-4 py-4">
                           <div className="text-sm font-medium text-gray-900">
                             {order.customer?.name}
@@ -592,7 +593,7 @@ const OrderListPage = () => {
                             {order.customer?.phone}
                           </div>
                         </td>
-                        <td className="px-4 py-4 text-sm font-medium text-gray-900 tabular-nums">
+                        <td className="px-4 py-4 text-sm text-gray-900 ">
                           {formatPrice(order.final_amount)}
                         </td>
                         <td className="px-4 py-4">

@@ -21,6 +21,8 @@ class StoreOrderRequest extends FormRequest
             'shipping_method_id'        => 'required|exists:shipping_methods,id',
             'discount_amount'           => 'nullable|numeric|min:0',
             'tax_rate_id'               => 'nullable|exists:tax_rates,id',
+            'promotion_id'              => 'nullable|exists:promotions,id',
+            'promotion_code_snapshot'   => 'nullable|string',
             'note'                      => 'nullable|string',
             'items'                     => 'required|array|min:1',
             'items.*.product_variant_id' => 'required|exists:product_variants,id',

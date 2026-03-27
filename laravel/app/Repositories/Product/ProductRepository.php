@@ -11,10 +11,10 @@ class ProductRepository implements ProductRepositoryInterface
     {
         $query = Product::with(['category', 'supplier', 'images', 'attributes', 'variants.attributes', 'variants.inventories']);
         if ($request == null) {
-            return  $query->paginate(5);
+            return  $query->paginate(15);
         }
 
-        return $query->when($request->search, fn($q, $v) => $q->where('name', 'like', '%' . $v . '%'))->paginate(5);
+        return $query->when($request->search, fn($q, $v) => $q->where('name', 'like', '%' . $v . '%'))->paginate(15);
     }
     public function findBySlug($slug)
     {
@@ -45,5 +45,26 @@ class ProductRepository implements ProductRepositoryInterface
             return $product;
         }
         return false;
+    }
+
+    public function search($query)
+    {
+        return Product::with(['images', 'variants.inventories', 'variants.attributes'])
+            ->where(function ($q) use ($query) {
+                $q->where('name', 'like', '%' . $query . '%')
+                    ->orWhereHas('variants', function ($v) use ($query) {
+                        $v->where('sku', 'like', '%' . $query . '%');
+                    });
+            })
+            ->get();
+    }
+
+    public function getBySku($sku)
+    {
+        return Product::with(['images', 'variants.inventories', 'variants.attributes'])
+            ->whereHas('variants', function ($q) use ($sku) {
+                $q->where('sku', $sku);
+            })
+            ->first();
     }
 }

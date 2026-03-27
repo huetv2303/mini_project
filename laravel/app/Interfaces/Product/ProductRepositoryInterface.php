@@ -10,4 +10,6 @@ interface ProductRepositoryInterface
     public function createProduct(array $data);
     public function updateProduct(array $data, $slug);
     public function deleteProduct($slug);
+    public function search($query);
+    public function getBySku($sku);
 }

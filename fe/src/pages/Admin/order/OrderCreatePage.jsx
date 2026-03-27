@@ -1,104 +1,186 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import AdminLayout from "../../../components/layout/Admin/AdminLayout";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   Search,
   Plus,
-  Trash2,
-  Package,
-  User,
-  CreditCard,
-  Save,
-  Loader2,
-  ArrowLeft,
   Minus,
+  Trash2,
   ShoppingCart,
-  Check,
-  AlertCircle,
+  User,
   Phone,
   MapPin,
+  CreditCard,
+  Tag,
+  ArrowLeft,
+  ArrowRight,
+  AlertCircle,
+  Loader2,
+  Save,
 } from "lucide-react";
-import { fetchProductsRequest } from "../../../services/ProductService";
-import { fetchPaymentMethodsRequest } from "../../../services/PaymentService";
-import { createOrderRequest } from "../../../services/OrderService";
-import ShippingMethodService from "../../../services/ShippingMethodService";
-import TaxRateService from "../../../services/TaxRateService";
+import { Link, useNavigate } from "react-router-dom";
+import PromotionService from "../../../services/PromotionService";
 import toast from "react-hot-toast";
 import { formatPrice } from "./OrderListPage";
 import SelectSearch from "../../../components/common/SelectSearch";
+import AdminLayout from "../../../components/layout/Admin/AdminLayout";
+import api from "../../../api/axios";
+import PromotionModal from "./components/PromotionModal";
 
 const debounce = (func, delay) => {
   let timer;
   return (...args) => {
     clearTimeout(timer);
-    timer = setTimeout(() => func(...args), delay);
+    timer = setTimeout(() => func.apply(this, args), delay);
   };
 };
 
 const OrderCreatePage = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-
-  // Products search state
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
-
-  // Order state
   const [selectedItems, setSelectedItems] = useState([]);
-  const [discountAmount, setDiscountAmount] = useState(0);
-  const [paymentMethods, setPaymentMethods] = useState([]);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
-  const [shippingMethods, setShippingMethods] = useState([]);
-  const [selectedShippingMethod, setSelectedShippingMethod] = useState(null);
-  const [shippingFee, setShippingFee] = useState(0);
-  const [taxRates, setTaxRates] = useState([]);
-  const [selectedTaxRate, setSelectedTaxRate] = useState(null);
-  const [taxAmount, setTaxAmount] = useState(0);
-  const [note, setNote] = useState("");
-  // Customer state
   const [customer, setCustomer] = useState({
     name: "",
     phone: "",
     address: "",
   });
+  const [paymentMethods, setPaymentMethods] = useState([]);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
+  const [shippingMethods, setShippingMethods] = useState([]);
+  const [selectedShippingMethod, setSelectedShippingMethod] = useState(null);
+  const [taxRates, setTaxRates] = useState([]);
+  const [selectedTaxRate, setSelectedTaxRate] = useState(null);
+  const [note, setNote] = useState("");
+
+  // Promotion state
+  const [promotionCode, setPromotionCode] = useState("");
+  const [appliedPromotion, setAppliedPromotion] = useState(null);
+  const [discountAmount, setDiscountAmount] = useState(0);
+  const [isApplyingPromo, setIsApplyingPromo] = useState(false);
+
+  const [isPromotionModalOpen, setIsPromotionModalOpen] = useState(false);
+  const [eligiblePromotions, setEligiblePromotions] = useState([]);
+  const [isLoadingEligible, setIsLoadingEligible] = useState(false);
+
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    const loadInitData = async () => {
-      try {
-        const [paymentRes, shippingRes, taxRes] = await Promise.all([
-          fetchPaymentMethodsRequest(),
-          ShippingMethodService.getActive(),
-          TaxRateService.getActive(),
-        ]);
-
-        setPaymentMethods(paymentRes.data || []);
-        setShippingMethods(shippingRes.data || []);
-        setTaxRates(taxRes.data || []);
-      } catch (error) {
-        console.error("Failed to load init data", error);
-      }
-    };
-    loadInitData();
+    fetchInitialData();
   }, []);
+
+  const fetchInitialData = async () => {
+    try {
+      const [pmRes, smRes, taxRes] = await Promise.all([
+        api.get("/payment-methods"),
+        api.get("/shipping-methods"),
+        api.get("/tax-rates"),
+      ]);
+
+      console.log("PM Response:", pmRes.data); // Xem cß║Ñu tr├║c trß║ú vß╗ü
+
+      // Logic th├┤ng minh: Lß║Ñy data.data nß║┐u c├│, kh├┤ng th├¼ lß║Ñy data
+      const getArray = (res) => {
+        if (res.data && Array.isArray(res.data.data)) return res.data.data;
+        if (Array.isArray(res.data)) return res.data;
+        return [];
+      };
+
+      setPaymentMethods(getArray(pmRes));
+      setShippingMethods(getArray(smRes));
+      setTaxRates(getArray(taxRes));
+    } catch (error) {
+      console.error("Failed to fetch initial data", error);
+      toast.error(
+        "Kh├┤ng thß╗â tß║úi th├┤ng tin ph╞░╞íng thß╗⌐c vß║¡n chuyß╗ân/thanh to├ín",
+      );
+    }
+  };
 
   const handleShippingChange = (methodId) => {
     setSelectedShippingMethod(methodId);
-    const method = shippingMethods.find((m) => m.id == methodId);
-    setShippingFee(method ? Number(method.cost) : 0);
+  };
+
+  const handleTaxRateChange = (taxId) => {
+    setSelectedTaxRate(taxId);
+  };
+  const fetchEligiblePromotions = async () => {
+    if (selectedItems.length === 0) {
+      toast.error("Vui lòng thêm sản phẩm vào giỏ hàng trước");
+      return;
+    }
+
+    try {
+      setIsLoadingEligible(true);
+      setIsPromotionModalOpen(true);
+      const cartItems = selectedItems.map((item) => ({
+        product_id: item.product_id,
+        category_id: item.category_id,
+        subtotal: item.price * item.quantity,
+      }));
+
+      const res = await PromotionService.getEligible({
+        cart_items: cartItems,
+        channel: "pos",
+        customer_id: null,
+      });
+
+      const data = res.data.data || res.data || [];
+      setEligiblePromotions(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Failed to fetch eligible promotions", error);
+      toast.error("Không thể tải danh sách khuyến mại hợp lệ");
+    } finally {
+      setIsLoadingEligible(false);
+    }
+  };
+  const applyPromotion = async (codeToApply = promotionCode) => {
+    if (!codeToApply || !codeToApply.trim() || selectedItems.length === 0)
+      return;
+
+    try {
+      setIsApplyingPromo(true);
+      const cartItems = selectedItems.map((item) => ({
+        product_id: item.product_id,
+        category_id: item.category_id,
+        subtotal: item.price * item.quantity,
+      }));
+      const res = await PromotionService.apply({
+        code: codeToApply,
+        cart_items: cartItems,
+        channel: "pos",
+        customer_id: null,
+      });
+
+      if (res.data.status === "success") {
+        setAppliedPromotion(res.data.data);
+        setDiscountAmount(res.data.data.discount_amount);
+        setPromotionCode("");
+        toast.success(`Đã áp dụng mã: ${res.data.data.promotion.code}`);
+      }
+    } catch (error) {
+      console.error("Apply promo failed", error);
+      toast.error(error.response?.data?.message || "Không thể áp dụng mã này");
+    } finally {
+      setIsApplyingPromo(false);
+    }
+  };
+
+  const selectPromotion = (promo) => {
+    setPromotionCode(promo.code);
+    applyPromotion(promo.code);
+    setIsPromotionModalOpen(false);
   };
 
   const searchProducts = async (term) => {
-    if (!term || term.length < 2) {
+    if (!term || term.length < 1) {
       setSearchResults([]);
       return;
     }
     try {
       setIsSearching(true);
-      const res = await fetchProductsRequest({ search: term, per_page: 10 });
-      // structure: { status, data: { data: [...] } }
-      setSearchResults(res.data?.data || []);
+      const res = await api.get(`/products/search?q=${term}`);
+      const data = res.data.data || res.data || [];
+      setSearchResults(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Search failed", error);
     } finally {
@@ -132,6 +214,7 @@ const OrderCreatePage = () => {
           product_id: product.id,
           product_variant_id: variant.id,
           product_name: product.name,
+          category_id: product.category_id,
           variant_name: variant.name,
           sku: variant.sku,
           price: variant.price,
@@ -164,6 +247,12 @@ const OrderCreatePage = () => {
       0,
     );
   };
+
+  const shippingFee = useMemo(() => {
+    if (!selectedShippingMethod) return 0;
+    const method = shippingMethods.find((m) => m.id == selectedShippingMethod);
+    return method ? Number(method.cost || 0) : 0;
+  }, [selectedShippingMethod, shippingMethods]);
 
   const calculateTax = () => {
     if (!selectedTaxRate) return 0;
@@ -216,9 +305,9 @@ const OrderCreatePage = () => {
         tax_rate_id: selectedTaxRate,
       };
 
-      const res = await createOrderRequest(orderData);
+      const res = await api.post("/orders", orderData);
       toast.success("Lên đơn hàng thành công!");
-      navigate(`/admin/orders/${res.data.id}`);
+      navigate(`/admin/orders/${res.data.data.id || res.data.id}`);
     } catch (error) {
       console.error("Failed to create order", error);
       toast.error(error.response?.data?.message || "Lỗi khi tạo đơn hàng");
@@ -291,10 +380,8 @@ const OrderCreatePage = () => {
                     <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
                   </div>
                 )}
-
-                {/* Search Results Dropdown */}
-                {(searchResults.length > 0 || (searchTerm && !isSearching)) &&
-                  searchTerm.length >= 1 && (
+                {searchTerm.length >= 1 &&
+                  (searchResults.length > 0 || !isSearching) && (
                     <div className="absolute top-full left-0 w-full mt-4 bg-white border border-gray-100 rounded-lg shadow-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-300">
                       {searchResults.length > 0 ? (
                         <div className="max-h-[400px] overflow-y-auto">
@@ -303,83 +390,66 @@ const OrderCreatePage = () => {
                               key={product.id}
                               className="p-4 border-b border-gray-50 last:border-0"
                             >
-                              {product.status === "active" && (
-                                <>
-                                  <div className="flex items-center gap-4 mb-2">
-                                    <img
-                                      src={getImageUrl(
-                                        product.images?.[0]?.url,
-                                      )}
-                                      className="w-12 h-12 rounded-xl object-cover border border-gray-100"
-                                      alt={product.name}
-                                    />
-                                    <span className="font-bold text-gray-900 text-sm">
-                                      {product.name}
-                                    </span>
-                                  </div>
-                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 ml-16">
-                                    {product.variants?.map((variant) => {
-                                      const isOutOfStock =
-                                        variant.inventory?.quantity -
-                                          (variant.inventory?.reserved || 0) <=
-                                        0;
+                              <div className="flex items-center gap-4 mb-2">
+                                <img
+                                  src={getImageUrl(
+                                    product.images?.[0]?.url ||
+                                      product.feature_image,
+                                  )}
+                                  className="w-12 h-12 rounded-xl object-cover border border-gray-100"
+                                  alt={product.name}
+                                />
+                                <span className="font-bold text-gray-900 text-sm">
+                                  {product.name}
+                                </span>
+                              </div>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 ml-16">
+                                {product.variants?.map((variant) => {
+                                  const available =
+                                    (variant.inventory?.quantity || 0) -
+                                    (variant.inventory?.reserved || 0);
+                                  const isOutOfStock = available <= 0;
 
-                                      return (
-                                        <button
-                                          key={variant.id}
-                                          onClick={() =>
-                                            addItemToOrder(product, variant)
-                                          }
-                                          disabled={isOutOfStock}
-                                          className={`flex items-center justify-between p-3 rounded-xl transition-all group ${
-                                            isOutOfStock
-                                              ? "bg-gray-200 cursor-not-allowed opacity-60"
-                                              : " hover:bg-blue-50 "
-                                          }`}
-                                        >
-                                          <div className="text-left">
-                                            <div className="flex items-center gap-2">
-                                              <p
-                                                className={`text-[0.9rem] uppercase opacity-70 ${!isOutOfStock && "group-hover:opacity-100"}`}
-                                              >
-                                                {variant.name || "Default"}
-                                              </p>
-                                            </div>
-
-                                            <p className="text-xs font-bold ">
-                                              {formatPrice(variant.price)}
-                                            </p>
-                                            <div className="flex items-center gap-2 pt-1">
-                                              <span className="text-xs">
-                                                Có thể bán:{" "}
-                                              </span>
-                                              <span
-                                                className={`text-xs ${
-                                                  variant.inventory?.quantity <
-                                                  variant.inventory
-                                                    ?.min_quantity
-                                                    ? "text-yellow-600"
-                                                    : isOutOfStock
-                                                      ? "text-red-600"
-                                                      : "text-green-600"
-                                                } font-medium`}
-                                              >
-                                                {variant.inventory?.quantity -
-                                                  (variant.inventory
-                                                    ?.reserved || 0)}
-                                              </span>
-                                            </div>
-                                          </div>
-
-                                          <Plus
-                                            className={`w-4 h-4 ${isOutOfStock ? "opacity-30" : ""}`}
-                                          />
-                                        </button>
-                                      );
-                                    })}
-                                  </div>
-                                </>
-                              )}
+                                  return (
+                                    <button
+                                      key={variant.id}
+                                      onClick={() =>
+                                        addItemToOrder(product, variant)
+                                      }
+                                      disabled={isOutOfStock}
+                                      className={`flex items-center justify-between p-3 rounded-xl transition-all group ${
+                                        isOutOfStock
+                                          ? "bg-gray-100 cursor-not-allowed opacity-60"
+                                          : " hover:bg-blue-50 "
+                                      }`}
+                                    >
+                                      <div className="text-left">
+                                        <p className="text-[0.9rem] uppercase opacity-70 group-hover:opacity-100">
+                                          {variant.name || "Mặc định"}
+                                        </p>
+                                        <p className="text-xs font-bold">
+                                          {formatPrice(variant.price)}
+                                        </p>
+                                        <div className="flex items-center gap-2 pt-1 text-[10px]">
+                                          <span>Tồn kho:</span>
+                                          <span
+                                            className={
+                                              isOutOfStock
+                                                ? "text-red-500"
+                                                : "text-green-600"
+                                            }
+                                          >
+                                            {available}
+                                          </span>
+                                        </div>
+                                      </div>
+                                      <Plus
+                                        className={`w-4 h-4 ${isOutOfStock ? "opacity-30" : ""}`}
+                                      />
+                                    </button>
+                                  );
+                                })}
+                              </div>
                             </div>
                           ))}
                         </div>
@@ -388,7 +458,7 @@ const OrderCreatePage = () => {
                           <div className="p-12 text-center text-gray-400">
                             <AlertCircle className="w-12 h-12 mx-auto mb-3 opacity-20" />
                             <p className="text-sm font-bold italic">
-                              Không tìm thấy sản phẩm phù hợp
+                              Không tìm thấy sản phẩm nào
                             </p>
                           </div>
                         )
@@ -415,19 +485,19 @@ const OrderCreatePage = () => {
                     <table className="w-full">
                       <thead>
                         <tr className="bg-gray-50/50">
-                          <th className="px-8 py-4 text-[10px] font-black text-gray-400 uppercase text-left">
+                          <th className="px-8 py-4 text-[13px] font-bold text-gray-800 text-left">
                             Sản phẩm
                           </th>
-                          <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase text-center">
+                          <th className="px-6 py-4 text-[13px] font-bold text-gray-800 text-center">
                             Số lượng
                           </th>
-                          <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase text-right">
+                          <th className="px-6 py-4 text-[13px] font-bold text-gray-800 text-right">
                             Giá
                           </th>
-                          <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase text-right">
+                          <th className="px-6 py-4 text-[13px] font-bold text-gray-800 text-right">
                             Tổng
                           </th>
-                          <th className="px-8 py-4 text-[10px] font-black text-gray-400 uppercase text-right w-10"></th>
+                          <th className="px-8 py-4 text-right w-10"></th>
                         </tr>
                       </thead>
                       <tbody>
@@ -446,7 +516,7 @@ const OrderCreatePage = () => {
                                   <p className="font-bold text-gray-900 text-sm">
                                     {item.product_name}
                                   </p>
-                                  <p className="text-[10px] text-gray-400 font-bold uppercase">
+                                  <p className="text-[10px] text-gray-600 fony-medium  uppercase">
                                     {item.variant_name} | {item.sku}
                                   </p>
                                 </div>
@@ -456,7 +526,7 @@ const OrderCreatePage = () => {
                               <div className="flex items-center justify-center gap-3">
                                 <button
                                   onClick={() => updateQuantity(index, -1)}
-                                  className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-100 transition-colors"
+                                  className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-100"
                                 >
                                   <Minus className="w-3 h-3" />
                                 </button>
@@ -465,22 +535,22 @@ const OrderCreatePage = () => {
                                 </span>
                                 <button
                                   onClick={() => updateQuantity(index, 1)}
-                                  className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center shadow-lg active:scale-95 transition-all"
+                                  className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center shadow-lg"
                                 >
                                   <Plus className="w-3 h-3" />
                                 </button>
                               </div>
                             </td>
-                            <td className="px-6 py-5 text-right  text-xs">
+                            <td className="px-6 py-5 text-right text-xs">
                               {formatPrice(item.price)}
                             </td>
-                            <td className="px-6 py-5 text-right font-bold text-gray-900  text-sm">
+                            <td className="px-6 py-5 text-right font-bold text-gray-900 text-sm">
                               {formatPrice(item.price * item.quantity)}
                             </td>
                             <td className="px-8 py-5 text-right">
                               <button
                                 onClick={() => removeItem(index)}
-                                className="p-2 text-gray-300 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all"
+                                className="p-2 text-gray-300 hover:text-rose-500 rounded-xl"
                               >
                                 <Trash2 className="w-4 h-4" />
                               </button>
@@ -562,6 +632,83 @@ const OrderCreatePage = () => {
                     {formatPrice(calculateTax())}
                   </span>
                 </div>
+
+                {/* Promo Code Input Section */}
+                <div className="pt-6 border-t border-gray-100">
+                  <div className="flex flex-col gap-3">
+                    <label className="text-[13px] font-bold text-gray-800 uppercase">
+                      Mã giảm giá
+                    </label>
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <input
+                          type="text"
+                          value={promotionCode}
+                          onChange={(e) =>
+                            setPromotionCode(e.target.value.toUpperCase())
+                          }
+                          placeholder="Nhập mã..."
+                          className="w-full pl-10 pr-4 py-3 bg-gray-50 rounded-xl text-sm outline-none border border-gray-100 focus:border-indigo-300 transition-all font-bold"
+                        />
+                        <Tag className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      </div>
+                      <button
+                        onClick={() => applyPromotion()}
+                        disabled={isApplyingPromo || !promotionCode}
+                        className="px-6 py-3 bg-black text-white rounded-xl text-xs font-bold hover:bg-gray-800 disabled:opacity-50 transition-all"
+                      >
+                        {isApplyingPromo ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          "ÁP DỤNG"
+                        )}
+                      </button>
+                    </div>
+                    <button
+                      onClick={fetchEligiblePromotions}
+                      disabled={isLoadingEligible || selectedItems.length === 0}
+                      className="flex items-center justify-center gap-2 py-3 border-2 border-dashed border-gray-200 rounded-xl text-xs font-bold text-gray-500 hover:border-indigo-300 hover:text-indigo-500 transition-all group"
+                    >
+                      {isLoadingEligible ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <>
+                          <Tag className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+                          DANH SÁCH MÃ GIẢM GIÁ
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                {appliedPromotion && (
+                  <div className="mt-4 p-4 bg-indigo-50 border border-indigo-100 rounded-2xl flex items-center justify-between animate-in fade-in slide-in-from-top-2">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
+                        <Tag className="w-5 h-5 text-indigo-600" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-black text-indigo-900">
+                          {appliedPromotion.promotion.code}
+                        </p>
+                        <p className="text-[10px] text-indigo-600 font-bold uppercase">
+                          Đã giảm{" "}
+                          {formatPrice(appliedPromotion.discount_amount)}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setAppliedPromotion(null);
+                        setDiscountAmount(0);
+                      }}
+                      className="p-2 text-indigo-300 hover:text-indigo-600 transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
+
                 <div className="pt-6 border-t border-white/10 flex justify-between items-center">
                   <span className="text-xs font-bold uppercase  opacity-70">
                     TỔNG CỘNG
@@ -683,6 +830,15 @@ const OrderCreatePage = () => {
                     }))}
                     value={selectedTaxRate}
                     onChange={(val) => setSelectedTaxRate(val)}
+                  />
+                </div>
+
+                <div>
+                  <PromotionModal
+                    isOpen={isPromotionModalOpen}
+                    onClose={() => setIsPromotionModalOpen(false)}
+                    eligiblePromotions={eligiblePromotions}
+                    onSelect={selectPromotion}
                   />
                 </div>
                 <div>

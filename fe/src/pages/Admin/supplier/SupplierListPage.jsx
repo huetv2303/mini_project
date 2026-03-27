@@ -262,7 +262,7 @@ const SupplierListPage = () => {
                             alt={sup.name}
                           />
                           <div>
-                            <div className="font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                            <div className="font-medium text-gray-900 group-hover:text-indigo-600 transition-colors">
                               {sup.name}
                             </div>
                             <div className="text-[13px] text-gray-600  mt-1">

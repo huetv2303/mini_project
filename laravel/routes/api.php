@@ -21,6 +21,8 @@ use App\Http\Controllers\api\v1\ShippingMethodController;
 use App\Http\Controllers\api\v1\TaxRateController;
 use App\Http\Controllers\api\v1\DashboardController;
 use App\Http\Controllers\api\v1\PaymentController;
+use App\Http\Controllers\api\v1\PromotionController;
+use App\Http\Controllers\api\v1\Storefront\CouponController;
 
 Route::group(['prefix' => 'v1'], function () {
     Route::post('/register', [AuthController::class, 'register']);
@@ -61,50 +63,38 @@ Route::group(['prefix' => 'v1'], function () {
             Route::delete('/{id}', [CustomerController::class, 'destroy']);
         });
 
-
         Route::prefix('categories')->group(function () {
             Route::post('/bulk-delete', [CategoryController::class, 'bulkDelete']);
-            // ->middleware('permission:categories.manage');
             Route::get('/', [CategoryController::class, 'index']);
             Route::get('/{slug}', [CategoryController::class, 'show']);
             Route::post('/', [CategoryController::class, 'store']);
-            // ->middleware('permission:categories.manage');
             Route::put('/{slug}', [CategoryController::class, 'update']);
-            // ->middleware('permission:categories.manage');
             Route::delete('/{slug}', [CategoryController::class, 'destroy']);
-            // ->middleware('permission:categories.manage');
         });
 
         Route::prefix('suppliers')->group(function () {
             Route::get('/', [SupplierController::class, 'index']);
             Route::get('/{slug}', [SupplierController::class, 'show']);
             Route::post('/', [SupplierController::class, 'store']);
-            // ->middleware('permission:products.create');
             Route::put('/{slug}', [SupplierController::class, 'update']);
-            // ->middleware('permission:products.edit');
             Route::delete('/{slug}', [SupplierController::class, 'destroy']);
-            // ->middleware('permission:products.delete');
         });
 
         Route::prefix('products')->group(function () {
+            Route::get('/search', [ProductController::class, 'search']);
             Route::post('/bulk-delete', [ProductController::class, 'bulkDelete']);
             Route::get('/', [ProductController::class, 'index']);
             Route::get('/{slug}', [ProductController::class, 'show']);
             Route::post('/', [ProductController::class, 'store']);
-            // ->middleware('permission:products.create');
             Route::put('/{slug}', [ProductController::class, 'update']);
-            // ->middleware('permission:products.edit');
             Route::delete('/{slug}', [ProductController::class, 'destroy']);
-            // ->middleware('permission:products.delete');
         });
 
         Route::prefix('orders')->group(function () {
             Route::post('/bulk-update', [OrderController::class, 'bulkUpdate']);
             Route::get('/', [OrderController::class, 'index']);
-            // ->middleware('permission:orders.view');
-            Route::post('/', [OrderController::class, 'store']); // Ai đã đăng nhập cũng có thể tạo order (khách hàng/nv)
+            Route::post('/', [OrderController::class, 'store']);
             Route::get('/{id}', [OrderController::class, 'show']);
-            // ->middleware('permission:orders.view');
             Route::put('/{id}', [OrderController::class, 'update']);
             Route::patch('/{id}/cancel', [OrderController::class, 'cancel']);
             Route::patch('/{id}/update-payment-method', [OrderController::class, 'updatePaymentMethod']);
@@ -121,18 +111,13 @@ Route::group(['prefix' => 'v1'], function () {
 
         Route::prefix('stock-receipts')->group(function () {
             Route::get('/', [StockReceiptController::class, 'index']);
-            // ->middleware('permission:products.view');
             Route::post('/', [StockReceiptController::class, 'store']);
-            // ->middleware('permission:products.create');
             Route::get('/{id}', [StockReceiptController::class, 'show']);
-            // ->middleware('permission:products.view');
             Route::post('/{id}/confirm', [StockReceiptController::class, 'confirm']);
-            // ->middleware('permission:products.create');
         });
 
         Route::prefix('inventory')->group(function () {
             Route::get('/', [InventoryController::class, 'index']);
-            // ->middleware('permission:products.view');
             Route::get('/report', [InventoryController::class, 'report']);
             Route::get('/{variantId}/history', [InventoryController::class, 'history']);
             Route::post('/adjust', [InventoryController::class, 'adjust']);
@@ -148,11 +133,11 @@ Route::group(['prefix' => 'v1'], function () {
             Route::put('/{id}', [PaymentMethodController::class, 'update']);
             Route::delete('/{id}', [PaymentMethodController::class, 'destroy']);
         });
+
         // Payment Processing
         Route::prefix('payments')->group(function () {
             Route::post('/vnpay/create', [PaymentController::class, 'vnpayCreate']);
             Route::get('/vnpay/verify', [PaymentController::class, 'vnpayVerify']);
-            // Get Bank Config for VietQR
             Route::get('/bank-config', [PaymentController::class, 'bankConfig']);
         });
 
@@ -175,6 +160,11 @@ Route::group(['prefix' => 'v1'], function () {
             Route::delete('/{id}', [TaxRateController::class, 'destroy']);
         });
 
+        // Promotions
+        Route::apiResource('promotions', PromotionController::class);
+        Route::post('promotions/apply', [PromotionController::class, 'apply']);
+        Route::post('promotions/eligible', [PromotionController::class, 'getEligiblePromotions']);
+
         Route::get('/user', function (Request $request) {
             $user = $request->user()->load('role.permissions');
             return new \App\Http\Resources\UserResource($user);
@@ -183,4 +173,9 @@ Route::group(['prefix' => 'v1'], function () {
 
     // Webhooks should not be authenticated
     Route::post('/payments/vnpay/ipn', [PaymentController::class, 'vnpayIpn']);
+
+    // Public Promotions / Coupons endpoints
+    Route::prefix('public')->group(function () {
+        Route::post('coupons/apply', [CouponController::class, 'apply']);
+    });
 });
