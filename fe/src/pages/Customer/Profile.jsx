@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { updateCustomerRequest } from "../../services/CustomerService";
+import { getImageUrl } from "../../helper/helper";
+
 
 const Profile = () => {
   const { user, fetchUser } = useAuth();
@@ -35,12 +37,6 @@ const Profile = () => {
     avatar: "",
   });
 
-  const getImageUrl = (path) => {
-    if (!path) return "/no-image.png";
-    if (path.startsWith("http")) return path;
-    const url = import.meta.env.VITE_URL_IMAGE.replace(/\/$/, "");
-    return `${url}/${path.replace(/^\//, "")}`;
-  };
 
   useEffect(() => {
     if (user) {

@@ -33,8 +33,9 @@ import {
 } from "lucide-react";
 import ReturnOrderModal from "../../../components/Admin/Order/ReturnOrderModal";
 import toast from "react-hot-toast";
-import { formatPrice } from "./OrderListPage";
+import { formatPrice, getImageUrl } from "../../../helper/helper";
 import SelectSearch from "../../../components/common/SelectSearch";
+
 
 const OrderDetailsPage = () => {
   const { id } = useParams();
@@ -115,14 +116,6 @@ const OrderDetailsPage = () => {
     }
   }, [order]);
 
-  const getImageUrl = (path) => {
-    if (!path) return "/no-image.png";
-    if (path.startsWith("http")) return path;
-    const url = (
-      import.meta.env.VITE_URL_IMAGE || "http://localhost:8000/storage"
-    ).replace(/\/$/, "");
-    return `${url}/${path.replace(/^\//, "")}`;
-  };
 
   const handleUpdateOrder = async () => {
     try {

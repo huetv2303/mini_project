@@ -15,6 +15,8 @@ import {
   createPaymentMethodRequest,
 } from "../../../services/PaymentMethodService";
 import AdminLayout from "../../../components/layout/Admin/AdminLayout";
+import { getImageUrl } from "../../../helper/helper";
+
 
 const PaymentMethodPage = () => {
   const [methods, setMethods] = useState([]);
@@ -122,14 +124,6 @@ const PaymentMethodPage = () => {
     }
   };
 
-  const getImageUrl = (path) => {
-    if (!path) return null;
-    if (path.startsWith("http") || path.startsWith("data:")) return path;
-    const url = (
-      import.meta.env.VITE_URL_IMAGE || "http://localhost:8000/storage"
-    ).replace(/\/$/, "");
-    return `${url}/${path.replace(/^\//, "")}`;
-  };
 
   const filteredMethods = methods.filter(
     (m) =>

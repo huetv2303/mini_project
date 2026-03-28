@@ -14,7 +14,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 import toast from "react-hot-toast";
-import { formatPrice } from "./OrderListPage";
+import { formatPrice } from "../../../helper/helper";
 import { ReceiveStatusBadge, RefundStatusBadge } from "../../../components/common/OrderBadges";
 
 const OrderReturnDetailsPage = () => {

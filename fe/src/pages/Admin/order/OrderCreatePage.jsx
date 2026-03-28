@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import {
   Search,
   Plus,
@@ -19,7 +19,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import PromotionService from "../../../services/PromotionService";
 import toast from "react-hot-toast";
-import { formatPrice } from "./OrderListPage";
+import { getImageUrl, formatPrice } from "../../../helper/helper";
 import SelectSearch from "../../../components/common/SelectSearch";
 import AdminLayout from "../../../components/layout/Admin/AdminLayout";
 import api from "../../../api/axios";
@@ -37,6 +37,8 @@ const OrderCreatePage = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+  const searchResultsRef = useRef(null);
+  const [showResults, setShowResults] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);
   const [customer, setCustomer] = useState({
@@ -229,17 +231,30 @@ const OrderCreatePage = () => {
       const res = await api.get(`/products/search?q=${term}`);
       const data = res.data.data || res.data || [];
       // Chỉ lấy những sản phẩm đang hoạt động (active)
-      const activeProducts = Array.isArray(data) 
-        ? data.filter(p => p.status === 'active') 
+      const activeProducts = Array.isArray(data)
+        ? data.filter((p) => p.status === "active")
         : [];
       setSearchResults(activeProducts);
-
     } catch (error) {
       console.error("Search failed", error);
     } finally {
       setIsSearching(false);
     }
   };
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (searchResultsRef.current && !searchResultsRef.current.contains(event.target)) {
+        setShowResults(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const debouncedSearch = useCallback(
     debounce((val) => searchProducts(val), 500),
@@ -248,6 +263,7 @@ const OrderCreatePage = () => {
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
+    setShowResults(true);
     debouncedSearch(e.target.value);
   };
 
@@ -372,15 +388,6 @@ const OrderCreatePage = () => {
     } finally {
       setSubmitting(false);
     }
-  };
-
-  const getImageUrl = (path) => {
-    if (!path) return "/no-image.png";
-    if (path.startsWith("http")) return path;
-    const url = (
-      import.meta.env.VITE_URL_IMAGE || "http://localhost:8000/storage"
-    ).replace(/\/$/, "");
-    return `${url}/${path.replace(/^\//, "")}`;
   };
 
   const ProductVariantSelector = ({ product, onAdd }) => {
@@ -622,11 +629,12 @@ const OrderCreatePage = () => {
           <div className="lg:col-span-8 space-y-8">
             {/* Product Search */}
             <div className="bg-white rounded-lg border border-gray-100 p-4 shadow-sm relative z-20">
-              <div className="relative">
+              <div className="relative" ref={searchResultsRef}>
                 <input
                   type="text"
                   value={searchTerm}
                   onChange={handleSearchChange}
+                  onFocus={() => setShowResults(true)}
                   placeholder="Nhập tên sản phẩm hoặc mã SKU..."
                   className="w-full pl-12 pr-4 py-4 bg-gray-50 rounded-2xl border-none text-sm outline-none "
                 />
@@ -637,12 +645,13 @@ const OrderCreatePage = () => {
                     <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
                   </div>
                 )}
-                {searchTerm.length >= 1 &&
+                {showResults && searchTerm.length >= 1 &&
                   (searchResults.length > 0 || !isSearching) && (
-
-                    <div className="absolute top-full left-0 w-full mt-4 bg-white border border-gray-100 rounded-lg shadow-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div 
+                      className="absolute top-full left-0 w-full mt-4 bg-white border border-gray-100 rounded-lg shadow-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-300"
+                    >
                       {searchResults.length > 0 ? (
-                        <div className="max-h-[400px] overflow-y-auto">
+                        <div className="max-h-[400px] overflow-y-auto grid grid-cols-1 md:grid-cols-2  gap-4">
                           {searchResults.map((product) => (
                             <div
                               key={product.id}

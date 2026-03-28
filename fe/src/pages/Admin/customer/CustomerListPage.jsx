@@ -24,6 +24,8 @@ import {
   deleteCustomerRequest,
 } from "../../../services/CustomerService";
 import toast from "react-hot-toast";
+import { getImageUrl, formatPrice } from "../../../helper/helper";
+
 
 const CustomerListPage = () => {
   const [customers, setCustomers] = useState([]);
@@ -63,12 +65,6 @@ const CustomerListPage = () => {
     } else {
       setSelectedIds([...selectedIds, id]);
     }
-  };
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(price || 0);
   };
 
   const handleBulkStatusUpdate = async (isActive) => {
@@ -143,14 +139,6 @@ const CustomerListPage = () => {
     return matchesSearch && matchesStatus;
   });
 
-  const getImageUrl = (path) => {
-    if (!path) return null;
-    if (path.startsWith("http")) return path;
-    const url = (
-      import.meta.env.VITE_URL_IMAGE || "http://localhost:8000/storage"
-    ).replace(/\/$/, "");
-    return `${url}/${path.replace(/^\//, "")}`;
-  };
 
   return (
     <AdminLayout>

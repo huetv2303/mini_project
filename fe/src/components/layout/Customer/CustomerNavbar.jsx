@@ -14,6 +14,8 @@ import {
   Settings,
 } from "lucide-react";
 import LogoTrendora from "../../../assets/LogoTrendora.png";
+import { getImageUrl } from "../../../helper/helper";
+
 const CustomerNavbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -39,14 +41,6 @@ const CustomerNavbar = () => {
     }
   };
 
-  const getImageUrl = (path) => {
-    if (!path) return "/no-image.png";
-    if (path.startsWith("http")) return path;
-    const url = (
-      import.meta.env.VITE_URL_IMAGE || "http://localhost:8000/storage"
-    ).replace(/\/$/, "");
-    return `${url}/${path.replace(/^\//, "")}`;
-  };
 
   return (
     <nav

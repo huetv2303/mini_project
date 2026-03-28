@@ -14,13 +14,9 @@ import {
 import { fetchMonthlyReport } from "../../../../services/InventoryService";
 import Pagination from "../../../../components/common/Pagination";
 import toast from "react-hot-toast";
+import { formatPrice } from "../../../../helper/helper";
 
-export const formatPrice = (price) => {
-  return new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: "VND",
-  }).format(price || 0);
-};
+
 
 const InventoryReportTab = () => {
   const currentDate = new Date();

@@ -19,7 +19,7 @@ import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import ConfirmModal from "../../../components/common/ConfirmModal";
 import Pagination from "../../../components/common/Pagination";
-
+import { getImageUrl, formatPrice } from "../../../helper/helper";
 const debounce = (func, delay) => {
   let timer;
   return (...args) => {
@@ -28,12 +28,6 @@ const debounce = (func, delay) => {
   };
 };
 
-export const formatPrice = (price) => {
-  return new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: "VND",
-  }).format(price || 0);
-};
 
 const ProductListPage = () => {
   const [products, setProducts] = useState([]);
@@ -142,12 +136,6 @@ const ProductListPage = () => {
     );
   };
 
-  // Helper hiển thị ảnh an toàn
-  const getImageUrl = (path) => {
-    if (!path) return "/no-image.png";
-    if (path.startsWith("http")) return path;
-    return `${import.meta.env.VITE_URL_IMAGE}/${path}`;
-  };
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= pagination.lastPage) {
       getProducts(newPage, searchTerm);

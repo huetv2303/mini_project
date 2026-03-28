@@ -24,7 +24,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
-import { formatPrice } from "../order/OrderListPage";
+import { formatPrice } from "../../../helper/helper";
 
 // ──────────── Management Tab ────────────
 const ManagementTab = () => {

@@ -1,6 +1,6 @@
 import React from "react";
 import Modal from "../../../../components/common/Modal";
-import { formatPrice } from "../OrderListPage";
+import { formatPrice } from "../../../../helper/helper";
 
 const PromotionModal = ({ isOpen, onClose, eligiblePromotions, onSelect }) => {
   return (

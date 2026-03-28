@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import Pagination from "../../../components/common/Pagination";
 import toast from "react-hot-toast";
+import { getImageUrl } from "../../../helper/helper";
 
 import ImportStockModal from "./components/ImportStockModal";
 import AdjustStockModal from "./components/AdjustStockModal";
@@ -117,11 +118,6 @@ const InventoryListPage = () => {
   };
 
   // Helper hiển thị ảnh an toàn
-  const getImageUrl = (path) => {
-    if (!path) return "/no-image.png";
-    if (path.startsWith("http")) return path;
-    return `${import.meta.env.VITE_URL_IMAGE}/${path}`;
-  };
 
   const openImportModal = (product, variant) => {
     setModalConfig({ isOpen: true, type: "import", product, variant });
@@ -553,31 +549,6 @@ const InventoryListPage = () => {
                                     </div>
                                   </td>
 
-                                  {/* <td className="px-4 py-3 text-center">
-                                    <div className="flex flex-col gap-1 items-center">
-                                      <div className="flex gap-2">
-                                        <span
-                                          className="text-[10px] text-red-400"
-                                          title="Không thể bán"
-                                        >
-                                          H:{" "}
-                                          {variant.inventory?.unavailable || 0}
-                                        </span>
-                                        <span
-                                          className="text-[10px] text-blue-400"
-                                          title="Đang về kho"
-                                        >
-                                          V: {variant.inventory?.returning || 0}
-                                        </span>
-                                        <span
-                                          className="text-[10px] text-indigo-400"
-                                          title="Đang đóng gói"
-                                        >
-                                          P: {variant.inventory?.packing || 0}
-                                        </span>
-                                      </div>
-                                    </div>
-                                  </td> */}
                                   <td className="px-4 py-3 text-center">
                                     <div className="flex items-center justify-center gap-1.5 opacity-90">
                                       <button

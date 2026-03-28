@@ -25,6 +25,8 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
+import { formatPrice } from "../../../helper/helper";
+
 import ConfirmModal from "../../../components/common/ConfirmModal";
 import Pagination from "../../../components/common/Pagination";
 import ConfirmBulkActionModal from "../../../components/common/ConfirmBulkActionModal";
@@ -48,12 +50,6 @@ const debounce = (func, delay) => {
   };
 };
 
-export const formatPrice = (price) => {
-  return new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: "VND",
-  }).format(price || 0);
-};
 
 const OrderListPage = () => {
   const [filterStatus, setFilterStatus] = useState("all");

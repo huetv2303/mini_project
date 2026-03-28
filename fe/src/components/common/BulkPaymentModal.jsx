@@ -6,13 +6,9 @@ import {
   AlertTriangle,
   CreditCard,
 } from "lucide-react";
+import { formatPrice } from "../../helper/helper";
 
-const formatPrice = (price) => {
-  return new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: "VND",
-  }).format(price || 0);
-};
+
 
 const BulkPaymentModal = ({
   isOpen,

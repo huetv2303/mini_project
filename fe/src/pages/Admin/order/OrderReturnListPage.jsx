@@ -41,7 +41,6 @@ const OrderReturnListPage = () => {
     try {
       setLoading(true);
       const res = await OrderReturnService.getAll({ page, search });
-      // res is { status, data: [], meta: {}, links: {} }
       const items = res?.data || [];
       const meta = res?.meta || {};
 
@@ -257,7 +256,7 @@ const OrderReturnListPage = () => {
                               #{item.order?.code}
                             </span>
                             <span className="text-[13px] text-gray-600 ">
-                              {item.order?.customer_name || "Khách lẻ"}
+                              {item.order?.customer?.name || "Khách lẻ"}
                             </span>
                           </div>
                         </td>

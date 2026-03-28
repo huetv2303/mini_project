@@ -10,6 +10,8 @@ import {
 import { fetchCategoriesRequest } from "../../../services/CategoryService";
 import { fetchSuppliersRequest } from "../../../services/SupplierService";
 import toast from "react-hot-toast";
+import { getImageUrl } from "../../../helper/helper";
+
 
 // Sub-components
 import ProductFormTabs from "./components/ProductFormTabs";
@@ -30,14 +32,6 @@ const ProductForm = () => {
   const [hasVariants, setHasVariants] = useState(false);
   const [activeTab, setActiveTab] = useState("general");
 
-  const getImageUrl = (path) => {
-    if (!path) return null;
-    if (path.startsWith("http")) return path;
-    const url = (
-      import.meta.env.VITE_URL_IMAGE || "http://localhost:8000/storage"
-    ).replace(/\/$/, "");
-    return `${url}/${path.replace(/^\//, "")}`;
-  };
 
   const [categories, setCategories] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
