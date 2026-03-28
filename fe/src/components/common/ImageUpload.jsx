@@ -129,13 +129,11 @@ const ImageUpload = ({
             `}
           >
             <Plus className="w-6 h-6 text-gray-400 group-hover/btn:text-blue-500 transition-colors" />
-            {!multiple && (
+            {/* {!multiple && (
               <div className="mt-2 text-center px-4">
-                <p className="text-xs font-medium text-gray-500">
-                  <span className="text-blue-600">Tải từ thiết bị</span>
-                </p>
+                <p className="text-xs font-medium text-gray-500"></p>
               </div>
-            )}
+            )} */}
           </button>
         )}
       </div>

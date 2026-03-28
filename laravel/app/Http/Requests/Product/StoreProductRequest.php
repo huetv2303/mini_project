@@ -41,7 +41,7 @@ class StoreProductRequest extends FormRequest
             'attributes.*.attribute_value' => 'required|string',
 
             'variants'                    => 'required|array|min:1',
-            'variants.*.name'             => 'required|string',
+            'variants.*.name'             => 'nullable|string',
             'variants.*.sku'              => 'required|string|unique:product_variants,sku',
             'variants.*.price'            => 'required|numeric|min:0',
             'variants.*.compare_price'    => 'nullable|numeric',

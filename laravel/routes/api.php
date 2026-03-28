@@ -36,6 +36,18 @@ Route::group(['prefix' => 'v1'], function () {
     Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verify'])->name('verification.verify');
     Route::post('/email/resend', [AuthController::class, 'resendVerificationEmail'])->name('verification.send');
 
+    // Public routes for browsing
+    Route::prefix('categories')->group(function () {
+        Route::get('/', [CategoryController::class, 'index']);
+        Route::get('/{slug}', [CategoryController::class, 'show']);
+    });
+
+    Route::prefix('products')->group(function () {
+        Route::get('/', [ProductController::class, 'index']);
+        Route::get('/search', [ProductController::class, 'search']);
+        Route::get('/{slug}', [ProductController::class, 'show']);
+    });
+
     Route::middleware('auth:api')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
 
@@ -66,8 +78,6 @@ Route::group(['prefix' => 'v1'], function () {
 
         Route::prefix('categories')->group(function () {
             Route::post('/bulk-delete', [CategoryController::class, 'bulkDelete']);
-            Route::get('/', [CategoryController::class, 'index']);
-            Route::get('/{slug}', [CategoryController::class, 'show']);
             Route::post('/', [CategoryController::class, 'store']);
             Route::put('/{slug}', [CategoryController::class, 'update']);
             Route::delete('/{slug}', [CategoryController::class, 'destroy']);
@@ -82,10 +92,7 @@ Route::group(['prefix' => 'v1'], function () {
         });
 
         Route::prefix('products')->group(function () {
-            Route::get('/search', [ProductController::class, 'search']);
             Route::post('/bulk-delete', [ProductController::class, 'bulkDelete']);
-            Route::get('/', [ProductController::class, 'index']);
-            Route::get('/{slug}', [ProductController::class, 'show']);
             Route::post('/', [ProductController::class, 'store']);
             Route::put('/{slug}', [ProductController::class, 'update']);
             Route::delete('/{slug}', [ProductController::class, 'destroy']);

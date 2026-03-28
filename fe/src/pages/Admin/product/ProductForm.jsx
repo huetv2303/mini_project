@@ -49,7 +49,7 @@ const ProductForm = () => {
   const [variants, setVariants] = useState([
     {
       id: null,
-      name: "",
+      name: "Mặc định",
       sku: "",
       price: "",
       compare_price: "",
@@ -63,6 +63,7 @@ const ProductForm = () => {
 
   const [featureImage, setFeatureImage] = useState(null);
   const [galleryImages, setGalleryImages] = useState([]);
+  const [productOptions, setProductOptions] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -105,18 +106,20 @@ const ProductForm = () => {
           });
 
           if (p.variants && p.variants.length > 0) {
-            setHasVariants(
-              p.variants.length > 1 ||
-                p.variants[0].attributes?.length > 0 ||
-                p.variants[0].name !== "",
-            );
+            const isReallySimple =
+              p.variants.length <= 1 &&
+              (!p.variants[0]?.attributes ||
+                p.variants[0].attributes.length === 0);
+
+            setHasVariants(!isReallySimple);
+
             setVariants(
               p.variants.map((v) => ({
                 id: v.id,
-                name: v.name || "",
+                name: v.name || (isReallySimple ? "Mặc định" : ""),
                 sku: v.sku,
                 price: v.price,
-                compare_price: v.compare_price || 0,
+                compare_price: v.compare_price || "",
                 cost_price: v.cost_price || "",
                 status: v.status,
                 image:
@@ -128,8 +131,8 @@ const ProductForm = () => {
                       }
                     : null,
                 inventory: {
-                  quantity: v.inventory?.quantity || 0,
-                  min_quantity: v.inventory?.min_quantity || 0,
+                  quantity: v.inventory?.quantity ?? 0,
+                  min_quantity: v.inventory?.min_quantity ?? 0,
                 },
                 attributes: v.attributes.map((va) => ({
                   id: va.id,
@@ -138,6 +141,24 @@ const ProductForm = () => {
                 })),
               })),
             );
+
+            // Reconstruct productOptions from variants
+            const optionsMap = {};
+            p.variants.forEach((v) => {
+              v.attributes.forEach((attr) => {
+                if (!optionsMap[attr.attribute_name]) {
+                  optionsMap[attr.attribute_name] = new Set();
+                }
+                if (attr.attribute_value) {
+                  optionsMap[attr.attribute_name].add(attr.attribute_value);
+                }
+              });
+            });
+            const loadedOptions = Object.keys(optionsMap).map((name) => ({
+              name,
+              values: Array.from(optionsMap[name]),
+            }));
+            setProductOptions(loadedOptions);
           }
 
           if (p.feature_image) {
@@ -208,23 +229,160 @@ const ProductForm = () => {
     setVariants(newVariants);
   };
 
-  const handleAddAttribute = (variantIndex = null) => {
+  const handleOptionsChange = (newOptions) => {
+    setProductOptions(newOptions);
+
+    const validOptions = newOptions.filter(
+      (o) => o.name && o.values.length > 0
+    );
+    if (validOptions.length === 0) {
+      if (hasVariants) {
+        setVariants([
+          {
+            id: null,
+            name: "Mặc định",
+            sku: "",
+            price: "",
+            compare_price: "",
+            cost_price: "",
+            status: "active",
+            image: null,
+            inventory: { quantity: 0, min_quantity: 0 },
+            attributes: [],
+          },
+        ]);
+      }
+      return;
+    }
+
+    const cartesian = (args) =>
+      args.reduce((a, b) => a.flatMap((d) => b.map((e) => [d, e].flat())), [
+        [],
+      ]);
+    const formattedOptions = validOptions.map((o) =>
+      o.values.map((v) => ({ attribute_name: o.name, attribute_value: v }))
+    );
+    const combinations = cartesian(formattedOptions);
+
+    const newVariants = combinations.map((comb) => {
+      // Find existing match
+      const existingMatch = variants.find((v) => {
+        if (v.attributes.length !== comb.length) return false;
+        return comb.every((c) =>
+          v.attributes.some(
+            (va) =>
+              va.attribute_name === c.attribute_name &&
+              va.attribute_value === c.attribute_value
+          )
+        );
+      });
+
+      const generatedName = comb.map((c) => c.attribute_value).join(" - ");
+
+      if (existingMatch) {
+        const mergedAttributes = comb.map((c) => {
+          const exAttr = existingMatch.attributes.find(
+            (va) =>
+              va.attribute_name === c.attribute_name &&
+              va.attribute_value === c.attribute_value
+          );
+          return exAttr && exAttr.id ? { ...c, id: exAttr.id } : c;
+        });
+        return { ...existingMatch, name: generatedName, attributes: mergedAttributes };
+      } else {
+        return {
+          id: null,
+          name: generatedName,
+          sku: "",
+          price: "",
+          compare_price: "",
+          cost_price: "",
+          status: "active",
+          image: null,
+          inventory: { quantity: 0, min_quantity: 0 },
+          attributes: comb,
+        };
+      }
+    });
+
+    setVariants(newVariants);
+  };
+
+  const handleBulkApply = (updates) => {
+    setVariants((prev) =>
+      prev.map((v, i) => {
+        const nv = { ...v, inventory: { ...v.inventory } };
+        if (updates.price !== undefined && updates.price !== "")
+          nv.price = updates.price;
+        if (
+          updates.compare_price !== undefined &&
+          updates.compare_price !== ""
+        )
+          nv.compare_price = updates.compare_price;
+        if (
+          updates.inventory?.quantity !== undefined &&
+          updates.inventory.quantity !== ""
+        ) {
+          nv.inventory.quantity = updates.inventory.quantity;
+        } else if (updates.quantity !== undefined && updates.quantity !== "") {
+          nv.inventory.quantity = updates.quantity;
+        }
+        if (updates.sku_prefix) {
+          nv.sku = `${updates.sku_prefix}-${String(i + 1).padStart(3, "0")}`;
+        }
+        return nv;
+      })
+    );
+  };
+
+  const handleAddAttribute = (variantIndex = null, attribute = { attribute_name: "", attribute_value: "" }) => {
     if (variantIndex === null) {
       setFormData({
         ...formData,
         attributes: [
           ...formData.attributes,
-          { attribute_name: "", attribute_value: "" },
+          attribute,
         ],
       });
     } else {
       const newVariants = [...variants];
-      newVariants[variantIndex].attributes.push({
-        attribute_name: "",
-        attribute_value: "",
-      });
+      newVariants[variantIndex].attributes.push(attribute);
       setVariants(newVariants);
     }
+  };
+
+  const handleBatchAddAttributes = (variantIndex, batchString) => {
+    // Expected format: "Tên: Giá trị 1, Giá trị 2, ..."
+    // Or just "Giá trị 1, Giá trị 2, ..." (will need a name later or it splits values for a given name if provided)
+    // Let's assume the format is "Tên: Giá trị 1, Giá trị 2, Giá trị 3"
+    
+    if (!batchString.includes(':')) {
+       toast.error("Vui lòng nhập theo định dạng 'Tên: Giá trị1, Giá trị2...'");
+       return;
+    }
+
+    const [name, valuesPart] = batchString.split(':');
+    const attrName = name.trim();
+    const values = valuesPart.split(',').map(v => v.trim()).filter(v => v !== "");
+
+    if (!attrName || values.length === 0) {
+      toast.error("Định dạng không hợp lệ");
+      return;
+    }
+
+    if (variantIndex === null) {
+      const newAttributes = values.map(v => ({ attribute_name: attrName, attribute_value: v }));
+      setFormData({
+        ...formData,
+        attributes: [...formData.attributes, ...newAttributes]
+      });
+    } else {
+      const newVariants = [...variants];
+      const newAttributes = values.map(v => ({ attribute_name: attrName, attribute_value: v }));
+      newVariants[variantIndex].attributes.push(...newAttributes);
+      setVariants(newVariants);
+    }
+    toast.success(`Đã thêm ${values.length} thuộc tính`);
   };
 
   const removeAttribute = (attrIndex, variantIndex = null) => {
@@ -413,12 +571,13 @@ const ProductForm = () => {
                     categories={categories}
                     suppliers={suppliers}
                   />
-                  <CommonAttributesSection
+                  {/* <CommonAttributesSection
                     formData={formData}
                     updateAttribute={updateAttribute}
                     removeAttribute={removeAttribute}
                     handleAddAttribute={handleAddAttribute}
-                  />
+                    handleBatchAddAttributes={handleBatchAddAttributes}
+                  /> */}
                   <StatusSection
                     formData={formData}
                     setFormData={setFormData}
@@ -438,10 +597,9 @@ const ProductForm = () => {
                     variants={variants}
                     updateVariant={updateVariant}
                     removeVariant={removeVariant}
-                    handleAddVariant={handleAddVariant}
-                    handleAddAttribute={handleAddAttribute}
-                    updateAttribute={updateAttribute}
-                    removeAttribute={removeAttribute}
+                    productOptions={productOptions}
+                    handleOptionsChange={handleOptionsChange}
+                    handleBulkApply={handleBulkApply}
                   />
                 </>
               )}
@@ -468,12 +626,13 @@ const ProductForm = () => {
                   categories={categories}
                   suppliers={suppliers}
                 />
-                <CommonAttributesSection
+                {/* <CommonAttributesSection
                   formData={formData}
                   updateAttribute={updateAttribute}
                   removeAttribute={removeAttribute}
                   handleAddAttribute={handleAddAttribute}
-                />
+                  handleBatchAddAttributes={handleBatchAddAttributes}
+                /> */}
                 <ProductVariantToggle
                   hasVariants={hasVariants}
                   setHasVariants={setHasVariants}
@@ -485,10 +644,9 @@ const ProductForm = () => {
                   variants={variants}
                   updateVariant={updateVariant}
                   removeVariant={removeVariant}
-                  handleAddVariant={handleAddVariant}
-                  handleAddAttribute={handleAddAttribute}
-                  updateAttribute={updateAttribute}
-                  removeAttribute={removeAttribute}
+                  productOptions={productOptions}
+                  handleOptionsChange={handleOptionsChange}
+                  handleBulkApply={handleBulkApply}
                 />
               </div>
               <div className="space-y-8">

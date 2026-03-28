@@ -9,6 +9,8 @@ import VerifyEmail from "./components/Auth/VerifyEmail";
 // Page Components
 import Home from "./pages/Home";
 import Profile from "./pages/Customer/Profile";
+import ProductList from "./pages/Customer/ProductList";
+import ProductDetail from "./pages/Customer/ProductDetail";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 
 // Auth & Route Guards
@@ -98,6 +100,18 @@ const App = () => {
           <Route
             path="/"
             element={<Home />}
+          />
+          <Route
+            path="/products"
+            element={<ProductList />}
+          />
+          <Route
+            path="/products/:slug"
+            element={<ProductDetail />}
+          />
+          <Route
+            path="/categories"
+            element={<ProductList />}
           />
           <Route
             path="/profile"

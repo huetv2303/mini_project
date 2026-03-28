@@ -53,7 +53,7 @@ const GeneralInfoSection = ({
         </div>
 
         {isEdit && !hasVariants && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50/50 p-6 rounded-3xl border border-dashed border-gray-200">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 bg-gray-50/50 p-6 rounded-3xl border border-dashed border-gray-200">
             <div className="space-y-2">
               <label className="font-bold text-sm text-gray-700">Mã SKU</label>
               <input
@@ -66,7 +66,7 @@ const GeneralInfoSection = ({
             </div>
             <div className="space-y-2">
               <label className="font-bold text-sm text-gray-700">
-                Giá niêm yết (VNĐ) *
+                Giá bán (VNĐ) *
               </label>
               <input
                 type="text"
@@ -74,6 +74,32 @@ const GeneralInfoSection = ({
                 onChange={(e) => onPriceChange(e, 0, "price")}
                 placeholder="Giá bán..."
                 className="w-full px-4 py-3 bg-white outline-none border border-gray-100 rounded-2xl focus:border-black transition-all text-sm font-bold text-emerald-600"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="font-bold text-sm text-gray-700">
+                Giá niêm yết (VNĐ)
+              </label>
+              <input
+                type="text"
+                value={formatPrice(variants[0]?.compare_price)}
+                onChange={(e) => onPriceChange(e, 0, "compare_price")}
+                placeholder="Giá niêm yết..."
+                className="w-full px-4 py-3 bg-white outline-none border border-gray-100 rounded-2xl focus:border-black transition-all text-sm font-medium"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="font-bold text-sm text-gray-700">
+                Số lượng tồn kho *
+              </label>
+              <input
+                type="number"
+                value={variants[0]?.inventory?.quantity ?? 0}
+                onChange={(e) =>
+                  updateVariant(0, "inventory.quantity", e.target.value)
+                }
+                placeholder="0"
+                className="w-full px-4 py-3 bg-white outline-none border border-gray-100 rounded-2xl focus:border-black transition-all text-sm font-bold text-indigo-600"
               />
             </div>
           </div>

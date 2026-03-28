@@ -10,11 +10,13 @@ import {
   X,
   Heart,
   Package,
-  LayoutDashboard,
   Settings,
+  ChevronDown,
+  ChevronRight,
 } from "lucide-react";
 import LogoTrendora from "../../../assets/LogoTrendora.png";
 import { getImageUrl } from "../../../helper/helper";
+import { fetchCategoriesRequest } from "../../../services/CategoryService";
 
 const CustomerNavbar = () => {
   const { user, logout } = useAuth();
@@ -23,12 +25,31 @@ const CustomerNavbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [activeCategory, setActiveCategory] = useState(null);
+  const [expandedMobileCategory, setExpandedMobileCategory] = useState(null);
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
+
+    const loadCategories = async () => {
+      try {
+        const response = await fetchCategoriesRequest();
+        if (response.status === "success") {
+          // The response.data contains the paginated result if from controller
+          // or is the array itself depending on implementation
+          const categoryList = response.data?.data || response.data || [];
+          setCategories(categoryList);
+        }
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+      }
+    };
+
     window.addEventListener("scroll", handleScroll);
+    loadCategories();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -41,7 +62,6 @@ const CustomerNavbar = () => {
     }
   };
 
-
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -50,7 +70,7 @@ const CustomerNavbar = () => {
           : "bg-transparent py-5"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 md:px-8">
+      <div className="max-w-full mx-auto px-4 md:px-8">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
@@ -67,28 +87,57 @@ const CustomerNavbar = () => {
           </Link>
 
           {/* Navigation Links - Desktop */}
-          <div className="hidden lg:flex items-center gap-8">
-            <Link
-              to="/"
-              className={`text-sm font-semibold transition-colors ${location.pathname === "/" ? "text-black" : "text-gray-500 hover:text-black"}`}
-            >
-              TRANG CHỦ
-            </Link>
-            <Link
-              to="/products"
-              className="text-sm font-semibold text-gray-500 hover:text-black transition-colors"
-            >
-              SẢN PHẨM
-            </Link>
-            <Link
-              to="/categories"
-              className="text-sm font-semibold text-gray-500 hover:text-black transition-colors"
-            >
-              DANH MỤC
-            </Link>
+          <div className="hidden lg:flex items-center gap-1">
+            {/* Dynamic Categories */}
+            {categories.slice(0, 5).map((category) => (
+              <div
+                key={category.id}
+                className="relative group py-2"
+                onMouseEnter={() => setActiveCategory(category.id)}
+                onMouseLeave={() => setActiveCategory(null)}
+              >
+                <Link
+                  to={`/products?category=${category.slug}`}
+                  className="px-4 py-2 text-sm font-bold text-gray-500 group-hover:text-black group-hover:bg-gray-50 rounded-xl transition-all flex items-center gap-1"
+                >
+                  {category.name.toUpperCase()}
+                  {category.children && category.children.length > 0 && (
+                    <ChevronDown
+                      size={14}
+                      className="group-hover:rotate-180 transition-transform duration-300"
+                    />
+                  )}
+                </Link>
+
+                {/* Subcategories Dropdown */}
+                {category.children && category.children.length > 0 && (
+                  <div className="absolute top-full left-0 min-w-[220px] bg-white border border-gray-100 shadow-2xl rounded-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 p-3 translate-y-2 group-hover:translate-y-0">
+                    <div className="flex flex-col gap-1">
+                      {category.children.map((child) => (
+                        <Link
+                          key={child.id}
+                          to={`/products?category=${child.slug}`}
+                          className="px-4 py-2.5 text-sm text-gray-600 hover:text-black hover:bg-gray-50 rounded-xl transition-colors"
+                        >
+                          {child.name}
+                        </Link>
+                      ))}
+                      <div className="border-t border-gray-50 mt-1 pt-1">
+                        <Link
+                          to={`/products?category=${category.slug}`}
+                          className="px-4 py-2 text-xs font-bold text-purple-600 hover:bg-purple-50 rounded-lg transition-colors inline-block w-full"
+                        >
+                          XEM TẤT CẢ {category.name.toUpperCase()}
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
             <Link
               to="/promotions"
-              className="text-sm font-semibold text-gray-500 hover:text-black transition-colors"
+              className="px-4 py-2 text-sm font-bold text-gray-500 hover:text-black hover:bg-gray-50 rounded-xl transition-all"
             >
               KHUYẾN MÃI
             </Link>
@@ -266,32 +315,94 @@ const CustomerNavbar = () => {
 
             <div className="flex flex-col gap-4">
               <Link
-                to="/"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="text-2xl font-bold border-b border-gray-50 pb-2"
-              >
-                Trang chủ
-              </Link>
-              <Link
                 to="/products"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="text-2xl font-bold border-b border-gray-50 pb-2"
+                className="text-2xl font-bold border-b border-gray-50 pb-2 flex items-center justify-between"
               >
                 Sản phẩm
+                <ChevronRight size={20} className="text-gray-300" />
               </Link>
-              <Link
-                to="/categories"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="text-2xl font-bold border-b border-gray-50 pb-2"
-              >
-                Danh mục
-              </Link>
+
+              {/* Mobile Categories */}
+              <div className="flex flex-col">
+                <div
+                  className="text-2xl font-bold border-b border-gray-50 pb-2 flex items-center justify-between cursor-pointer"
+                  onClick={() =>
+                    setExpandedMobileCategory(
+                      expandedMobileCategory === "all" ? null : "all",
+                    )
+                  }
+                >
+                  Danh mục
+                  <ChevronDown
+                    size={20}
+                    className={`transition-transform ${expandedMobileCategory === "all" ? "rotate-180" : ""} text-gray-300`}
+                  />
+                </div>
+
+                {expandedMobileCategory === "all" && (
+                  <div className="pl-4 py-4 flex flex-col gap-4 animate-in fade-in slide-in-from-left-2 transition-all">
+                    {categories.map((category) => (
+                      <div key={category.id} className="flex flex-col gap-2">
+                        <div
+                          className="font-bold text-gray-900 flex items-center justify-between"
+                          onClick={(e) => {
+                            if (
+                              category.children &&
+                              category.children.length > 0
+                            ) {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setExpandedMobileCategory(
+                                expandedMobileCategory === category.id
+                                  ? "all"
+                                  : category.id,
+                              );
+                            }
+                          }}
+                        >
+                          <Link
+                            to={`/products?category=${category.slug}`}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                          >
+                            {category.name}
+                          </Link>
+                          {category.children &&
+                            category.children.length > 0 && (
+                              <ChevronDown
+                                size={18}
+                                className={`transition-transform ${expandedMobileCategory === category.id ? "rotate-180" : ""} text-gray-400`}
+                              />
+                            )}
+                        </div>
+
+                        {expandedMobileCategory === category.id && (
+                          <div className="pl-4 py-2 flex flex-col gap-3 border-l-2 border-gray-100">
+                            {category.children.map((child) => (
+                              <Link
+                                key={child.id}
+                                to={`/products?category=${child.slug}`}
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className="text-gray-500 font-medium"
+                              >
+                                {child.name}
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               <Link
                 to="/promotions"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="text-2xl font-bold border-b border-gray-50 pb-2"
+                className="text-2xl font-bold border-b border-gray-50 pb-2 flex items-center justify-between"
               >
                 Khuyến mãi
+                <ChevronRight size={20} className="text-gray-300" />
               </Link>
             </div>
 

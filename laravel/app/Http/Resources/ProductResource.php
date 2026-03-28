@@ -18,6 +18,11 @@ class ProductResource extends JsonResource
             'feature_image'     => $this->feature_image
                 ? asset('storage/' . $this->feature_image)
                 : null,
+            'image'             => $this->feature_image
+                ? asset('storage/' . $this->feature_image)
+                : null,
+            'price'             => $this->variants->min('price'),
+            'old_price'         => $this->variants->min('compare_price'),
             'category_id'       => $this->category_id,
             'status'            => $this->status,
             'sold_count'        => $this->sold_count,
