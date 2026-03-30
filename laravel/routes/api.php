@@ -23,6 +23,7 @@ use App\Http\Controllers\api\v1\DashboardController;
 use App\Http\Controllers\api\v1\PaymentController;
 use App\Http\Controllers\api\v1\PromotionController;
 use App\Http\Controllers\api\v1\Storefront\CouponController;
+use App\Http\Resources\UserResource;
 
 Route::group(['prefix' => 'v1'], function () {
     Route::post('/register', [AuthController::class, 'register']);
@@ -175,7 +176,7 @@ Route::group(['prefix' => 'v1'], function () {
 
         Route::get('/user', function (Request $request) {
             $user = $request->user()->load(['role.permissions', 'customerProfile']);
-            return new \App\Http\Resources\UserResource($user);
+            return new UserResource($user);
         });
     });
 

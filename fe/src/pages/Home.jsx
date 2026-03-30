@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useAuth } from "../context/AuthContext";
 import CustomerLayout from "../components/layout/Customer/CustomerLayout";
 import {
   ArrowRight,
@@ -16,20 +17,19 @@ import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import axios from "axios";
 import { fetchCategoriesRequest } from "../services/CategoryService";
 import { fetchProductsRequest } from "../services/ProductService";
 import { getImageUrl, formatPrice } from "../helper/helper";
 
 const Home = () => {
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
   const [categories, setCategories] = useState([]);
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const swiperRef = useRef(null);
 
-  // Note: These would normally fetch from your real API
-  // Using placeholders for now to show the design
   useEffect(() => {
     const loadHomeData = async () => {
       try {
@@ -58,6 +58,14 @@ const Home = () => {
 
     loadHomeData();
   }, []);
+
+  // Automatically redirect Admin to dashboard if they land on Home
+  if (!authLoading && isAuthenticated) {
+    const isAdmin = user?.role?.code === "admin" || user?.role_id === 1;
+    if (isAdmin) {
+      return <Navigate to="/admin/dashboard" replace />;
+    }
+  }
 
   return (
     <CustomerLayout>

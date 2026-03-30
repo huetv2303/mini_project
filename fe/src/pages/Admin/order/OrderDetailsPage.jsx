@@ -35,6 +35,7 @@ import ReturnOrderModal from "../../../components/Admin/Order/ReturnOrderModal";
 import toast from "react-hot-toast";
 import { formatPrice, getImageUrl } from "../../../helper/helper";
 import SelectSearch from "../../../components/common/SelectSearch";
+import PaymentIntegration from "../../../components/common/PaymentIntegration";
 
 
 const OrderDetailsPage = () => {
@@ -584,43 +585,14 @@ const OrderDetailsPage = () => {
                   />
                 </div>
 
-                {order.payment_method?.code === "vnpay" && (
-                  <button
-                    onClick={handleVnpayPayment}
-                    className="w-full py-3 bg-[#005BA9] hover:bg-[#004e92] text-white font-bold rounded-lg transition-all"
-                  >
-                    Thanh toán qua VNPay
-                  </button>
-                )}
-
-                {order.payment_method?.code === "bank_transfer" &&
-                  bankConfig && (
-                    <div className="flex flex-col items-center">
-                      <p className="text-sm font-medium mb-4 text-center">
-                        Quét mã QR để thanh toán (VietQR)
-                      </p>
-                      <img
-                        src={`https://img.vietqr.io/image/${bankConfig.bank_id}-${bankConfig.account_no}-compact2.png?amount=${Math.floor(order.final_amount)}&addInfo=${encodeURIComponent("Thanh toan don hang " + order.code)}&accountName=${encodeURIComponent(bankConfig.account_name)}`}
-                        alt="VietQR"
-                        className="w-48 h-48 border rounded-lg shadow-sm"
-                      />
-                      <div className="mt-4 text-center text-xs text-gray-500 space-y-1">
-                        <p>
-                          Ngân hàng: <strong>{bankConfig.bank_id}</strong>
-                        </p>
-                        <p>
-                          Số TK: <strong>{bankConfig.account_no}</strong>
-                        </p>
-                        <p>
-                          Chủ TK: <strong>{bankConfig.account_name}</strong>
-                        </p>
-                        <p>
-                          Nội dung:{" "}
-                          <strong>Thanh toan don hang {order.code}</strong>
-                        </p>
-                      </div>
-                    </div>
-                  )}
+                <PaymentIntegration
+                  selectedMethod={order.payment_method}
+                  bankConfig={bankConfig}
+                  validOrders={[order]}
+                  totalAmount={order.final_amount}
+                  isVnpayLoading={updating}
+                  onVnpayPayment={handleVnpayPayment}
+                />
               </div>
             )}
 

@@ -27,9 +27,10 @@ const SelectSearch = ({
   );
 
   // Lọc danh sách theo nội dung tìm kiếm
-  const filteredOptions = options.filter((opt) =>
-    opt.label.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+  const filteredOptions = options.filter((opt) => {
+    const label = opt?.label || "";
+    return label.toLowerCase().includes(searchTerm.toLowerCase());
+  });
 
   // Xử lý khi chọn 1 item
   const handleSelect = (option) => {

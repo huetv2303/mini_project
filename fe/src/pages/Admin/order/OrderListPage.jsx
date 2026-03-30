@@ -50,7 +50,6 @@ const debounce = (func, delay) => {
   };
 };
 
-
 const OrderListPage = () => {
   const [filterStatus, setFilterStatus] = useState("all");
   const [searchType, setSearchType] = useState("all");
@@ -525,7 +524,7 @@ const OrderListPage = () => {
                   <th className="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Trạng thái thanh toán
                   </th>
-                  <th className="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">
+                  <th className="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider ">
                     Trạng thái xử lý
                   </th>
                   <th className="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right">

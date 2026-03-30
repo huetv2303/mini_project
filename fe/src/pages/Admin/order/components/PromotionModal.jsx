@@ -2,7 +2,7 @@ import React from "react";
 import Modal from "../../../../components/common/Modal";
 import { formatPrice } from "../../../../helper/helper";
 
-const PromotionModal = ({ isOpen, onClose, eligiblePromotions, onSelect }) => {
+const PromotionModal = ({ isOpen, onClose, promotions = [], onSelect }) => {
   return (
     <Modal
       isOpen={isOpen}
@@ -11,8 +11,8 @@ const PromotionModal = ({ isOpen, onClose, eligiblePromotions, onSelect }) => {
       size="xl"
     >
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-2">
-        {eligiblePromotions.length > 0 ? (
-          eligiblePromotions.map((item) => (
+        {promotions && promotions.length > 0 ? (
+          promotions.map((item) => (
             <div
               key={item.promotion.id}
               className={`relative flex flex-col p-5 bg-white border-2 border-dashed rounded-lg transition-all group overflow-hidden ${

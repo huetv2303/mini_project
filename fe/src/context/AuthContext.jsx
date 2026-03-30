@@ -68,8 +68,15 @@ export const AuthProvider = ({ children }) => {
   };
 
   const hasPermission = (permissionCode) => {
-    if (!user || !user.role || !user.role.permissions) return false;
-    return user.role.permissions.some((p) => p.code === permissionCode);
+    if (!user) return false;
+
+    // Handle potential data wrapping from Laravel resources
+    const roleData = user.role?.data || user.role;
+    const permissions = roleData?.permissions?.data || roleData?.permissions;
+
+    if (!permissions || !Array.isArray(permissions)) return false;
+
+    return permissions.some((p) => p.code === permissionCode);
   };
 
   return (

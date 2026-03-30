@@ -1,14 +1,19 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  getBankConfigRequest,
+  createVNPayPaymentRequest,
+} from "../../services/PaymentService";
 import {
   X,
   CheckCircle,
   XCircle,
   AlertTriangle,
   CreditCard,
+  ExternalLink,
 } from "lucide-react";
 import { formatPrice } from "../../helper/helper";
-
-
+import toast from "react-hot-toast";
+import PaymentIntegration from "./PaymentIntegration";
 
 const BulkPaymentModal = ({
   isOpen,
@@ -18,6 +23,20 @@ const BulkPaymentModal = ({
   paymentMethods = [],
 }) => {
   const [paymentMethodId, setPaymentMethodId] = useState("");
+  const [bankConfig, setBankConfig] = useState(null);
+  const [isVnpayLoading, setIsVnpayLoading] = useState(false);
+
+  const selectedMethod = useMemo(() => {
+    return paymentMethods.find((m) => String(m.id) === String(paymentMethodId));
+  }, [paymentMethodId, paymentMethods]);
+
+  useEffect(() => {
+    if (selectedMethod?.code === "bank_transfer") {
+      getBankConfigRequest()
+        .then((res) => setBankConfig(res?.data))
+        .catch(console.error);
+    }
+  }, [selectedMethod]);
   const { validOrders, invalidOrders, totalAmount } = useMemo(() => {
     const valid = [];
     const invalid = [];
@@ -51,6 +70,37 @@ const BulkPaymentModal = ({
 
   if (!isOpen) return null;
 
+  const handleVnpayPayment = async () => {
+    if (validOrders.length !== 1) return;
+
+    try {
+      setIsVnpayLoading(true);
+      const res = await createVNPayPaymentRequest(validOrders[0].id);
+      if (res?.data?.payment_url) {
+        window.location.href = res.data.payment_url;
+      }
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Lỗi tạo link thanh toán VNPay",
+      );
+    } finally {
+      setIsVnpayLoading(false);
+    }
+  };
+
+  const renderPaymentIntegration = () => {
+    return (
+      <PaymentIntegration
+        selectedMethod={selectedMethod}
+        bankConfig={bankConfig}
+        validOrders={validOrders}
+        totalAmount={totalAmount}
+        isVnpayLoading={isVnpayLoading}
+        onVnpayPayment={handleVnpayPayment}
+      />
+    );
+  };
+
   const handleSubmit = () => {
     if (!paymentMethodId) return;
     onConfirm(
@@ -68,7 +118,7 @@ const BulkPaymentModal = ({
       />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-2xl flex flex-col animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative bg-white rounded-xl max-h-[800px] overflow-y-auto shadow-2xl w-full max-w-2xl flex flex-col animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-100">
           <h2 className="text-xl font-bold text-gray-800">
@@ -175,6 +225,8 @@ const BulkPaymentModal = ({
               {formatPrice(totalAmount)}
             </span>
           </div>
+
+          {renderPaymentIntegration()}
 
           <p className="text-[11px] text-gray-500 italic leading-relaxed">
             Lưu ý: Hệ thống sẽ thanh toán lần lượt các đơn và tạo ra nhiều phiếu
