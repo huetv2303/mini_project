@@ -2,8 +2,6 @@ import React, { useState, useMemo } from "react";
 import { X, CheckCircle, XCircle, AlertCircle, RotateCcw } from "lucide-react";
 import { formatPrice } from "../../helper/helper";
 
-
-
 const BulkRefundModal = ({
   isOpen,
   onClose,
@@ -119,7 +117,10 @@ const BulkRefundModal = ({
                   onChange={(e) => setAllowUnreceived(e.target.checked)}
                   className="w-4 h-4 cursor-pointer rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                 />
-                <label htmlFor="allowUnreceivedCb" className="ml-2 italic text-[0.9rem] cursor-pointer select-none">
+                <label
+                  htmlFor="allowUnreceivedCb"
+                  className="ml-2 italic text-[0.9rem] cursor-pointer select-none"
+                >
                   Hoàn tiền cho những đơn chưa hoàn hàng về kho.
                 </label>
               </div>

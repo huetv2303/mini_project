@@ -23,6 +23,8 @@ use App\Http\Controllers\api\v1\DashboardController;
 use App\Http\Controllers\api\v1\PaymentController;
 use App\Http\Controllers\api\v1\PromotionController;
 use App\Http\Controllers\api\v1\Storefront\CouponController;
+use App\Http\Controllers\api\v1\Storefront\CartController;
+use App\Http\Controllers\api\v1\Storefront\WishlistController;
 use App\Http\Resources\UserResource;
 
 Route::group(['prefix' => 'v1'], function () {
@@ -106,6 +108,7 @@ Route::group(['prefix' => 'v1'], function () {
             Route::get('/{id}', [OrderController::class, 'show']);
             Route::put('/{id}', [OrderController::class, 'update']);
             Route::patch('/{id}/cancel', [OrderController::class, 'cancel']);
+            Route::patch('/{id}/refund', [OrderController::class, 'refund']);
             Route::patch('/{id}/update-payment-method', [OrderController::class, 'updatePaymentMethod']);
         });
 
@@ -173,6 +176,23 @@ Route::group(['prefix' => 'v1'], function () {
         Route::apiResource('promotions', PromotionController::class);
         Route::post('promotions/apply', [PromotionController::class, 'apply']);
         Route::post('promotions/eligible', [PromotionController::class, 'getEligiblePromotions']);
+
+        // Storefront Cart (Redis)
+        Route::prefix('cart')->group(function () {
+            Route::get('/', [CartController::class, 'index']);
+            Route::post('/', [CartController::class, 'store']);
+            Route::put('/{variantId}', [CartController::class, 'update']);
+            Route::delete('/{variantId}', [CartController::class, 'destroy']);
+            Route::post('/clear', [CartController::class, 'clear']);
+            Route::post('/sync', [CartController::class, 'sync']);
+        });
+
+        // Storefront Wishlist (Redis)
+        Route::prefix('wishlist')->group(function () {
+            Route::get('/', [WishlistController::class, 'index']);
+            Route::post('/toggle', [WishlistController::class, 'toggle']);
+            Route::post('/clear', [WishlistController::class, 'clear']);
+        });
 
         Route::get('/user', function (Request $request) {
             $user = $request->user()->load(['role.permissions', 'customerProfile']);

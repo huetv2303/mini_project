@@ -1,9 +1,5 @@
 import React from "react";
-import {
-  AlertTriangle,
-  Loader2,
-  ExternalLink,
-} from "lucide-react";
+import { AlertTriangle, Loader2, ExternalLink } from "lucide-react";
 import { formatPrice } from "../../helper/helper";
 
 const PaymentIntegration = ({
@@ -47,9 +43,7 @@ const PaymentIntegration = ({
           </div>
           <div className="flex gap-4">
             <span className="text-gray-400 w-24">Chủ tài khoản:</span>
-            <strong className="text-gray-900">
-              {bankConfig.account_name}
-            </strong>
+            <strong className="text-gray-900">{bankConfig.account_name}</strong>
           </div>
           <div className="flex gap-4">
             <span className="text-gray-400 w-24">Nội dung:</span>
@@ -75,8 +69,8 @@ const PaymentIntegration = ({
         {validOrders.length === 1 ? (
           <div className="space-y-4 w-full">
             <p className="text-sm text-center text-gray-600">
-              Hệ thống sẽ chuyển tiếp bạn đến cổng thanh toán VNPay để hoàn
-              tất giao dịch cho đơn hàng{" "}
+              Hệ thống sẽ chuyển tiếp bạn đến cổng thanh toán VNPay để hoàn tất
+              giao dịch cho đơn hàng{" "}
               <span className="font-bold text-gray-900">
                 #{validOrders[0].code}
               </span>
@@ -103,8 +97,8 @@ const PaymentIntegration = ({
             <p className="text-xs leading-relaxed font-medium">
               VNPay hiện chỉ hỗ trợ thanh toán cho từng đơn hàng riêng lẻ. Vui
               lòng chọn từng đơn hàng để thanh toán qua VNPay hoặc sử dụng{" "}
-              <span className="font-bold underline">Chuyển khoản</span> để
-              thanh toán gộp cho {validOrders.length} đơn hàng.
+              <span className="font-bold underline">Chuyển khoản</span> để thanh
+              toán gộp cho {validOrders.length} đơn hàng.
             </p>
           </div>
         )}

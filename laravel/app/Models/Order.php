@@ -24,6 +24,8 @@ class Order extends Model
         'customer_phone',
         'customer_address',
         'shipping_method_id',
+        'fulfillment_type',
+        'shipping_address',
         'expected_delivery_date',
         'tax_rate_id',
         'tax_rate_snapshot',

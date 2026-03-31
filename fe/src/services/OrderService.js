@@ -37,9 +37,6 @@ export const updateOrderRequest = async (id, orderData) => {
   }
 };
 
-/**
- * Hủy đơn hàng
- */
 export const cancelOrderRequest = async (id) => {
   try {
     const response = await api.patch(`/orders/${id}/cancel`);
@@ -72,6 +69,15 @@ export const updatePaymentMethodRequest = async (id, paymentMethodId) => {
     const response = await api.patch(`/orders/${id}/update-payment-method`, {
       payment_method_id: paymentMethodId,
     });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const refundOrderRequest = async (id) => {
+  try {
+    const response = await api.patch(`/orders/${id}/refund`);
     return response.data;
   } catch (error) {
     throw error;

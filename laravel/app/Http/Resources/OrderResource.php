@@ -16,10 +16,12 @@ class OrderResource extends JsonResource
             'total_amount'     => $this->total_amount,
             'discount_amount'  => $this->discount_amount,
             'shipping_fee'     => $this->shipping_fee,
+            'fulfillment_type' => $this->fulfillment_type,
+            'shipping_address' => $this->shipping_address,
             'expected_delivery_date' => $this->expected_delivery_date?->format('Y-m-d'),
             'final_amount'     => $this->final_amount,
             'tax_amount'       => $this->tax_amount,
-            'tax_rate_snapshot'=> $this->tax_rate_snapshot,
+            'tax_rate_snapshot' => $this->tax_rate_snapshot,
             'tax_rate'         => $this->whenLoaded('taxRate', fn() => [
                 'id'   => $this->taxRate?->id,
                 'name' => $this->taxRate?->name,

@@ -6,6 +6,7 @@ import {
   cancelOrderRequest,
   fetchPaymentMethodsRequest,
   updatePaymentMethodRequest,
+  refundOrderRequest,
 } from "../../../services/OrderService";
 import {
   createVNPayPaymentRequest,
@@ -36,7 +37,6 @@ import toast from "react-hot-toast";
 import { formatPrice, getImageUrl } from "../../../helper/helper";
 import SelectSearch from "../../../components/common/SelectSearch";
 import PaymentIntegration from "../../../components/common/PaymentIntegration";
-
 
 const OrderDetailsPage = () => {
   const { id } = useParams();
@@ -78,6 +78,7 @@ const OrderDetailsPage = () => {
       setStatus(data.status);
       setPaymentStatus(data.payment_status);
       setNote(data.note || "");
+      console.log(data);
       if (
         data.payment_method?.code === "bank_transfer" &&
         data.payment_status === "unpaid"
@@ -116,7 +117,6 @@ const OrderDetailsPage = () => {
       console.log("alo", selectedPaymentMethod);
     }
   }, [order]);
-
 
   const handleUpdateOrder = async () => {
     try {
@@ -182,6 +182,27 @@ const OrderDetailsPage = () => {
         error.response?.data?.message ||
           "Cập nhật phương thức thanh toán thất bại",
       );
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handleRefundOrder = async () => {
+    if (
+      !window.confirm(
+        "Bạn có chắc chắn muốn hoàn tiền cho đơn hàng này? Thao tác này sẽ cập nhật trạng thái thanh toán thành 'Đã hoàn tiền'.",
+      )
+    )
+      return;
+
+    try {
+      setUpdating(true);
+      await refundOrderRequest(id);
+      toast.success("Đã hoàn tiền đơn hàng");
+      getOrderDetails();
+    } catch (error) {
+      console.error("Refund failed:", error);
+      toast.error(error.response?.data?.message || "Hoàn tiền thất bại");
     } finally {
       setUpdating(false);
     }
@@ -258,6 +279,19 @@ const OrderDetailsPage = () => {
                   <p className="font-medium items-center">Hủy đơn</p>
                 </button>
               )}
+              {order.status === "cancelled" &&
+                ["paid", "partially_paid", "partially_refunded"].includes(
+                  order.payment_status,
+                ) && (
+                  <button
+                    onClick={handleRefundOrder}
+                    disabled={updating}
+                    className="w-full p-2 rounded-lg text-[0.9rem] bg-blue-500 text-white items-center flex gap-1 hover:bg-blue-600 transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    <RotateCcw className="w-4 h-4 text-white" />
+                    <p className="font-medium items-center">Hoàn tiền</p>
+                  </button>
+                )}
               {order.status === "delivered" && (
                 <button
                   onClick={() => setIsReturnModalOpen(true)}
@@ -471,9 +505,7 @@ const OrderDetailsPage = () => {
                           <Truck className="w-3 h-3" />
                           Vận chuyển
                         </div>
-                        <span>
-                          {order.shipping_method?.name || "Chưa xác định"}
-                        </span>
+                        <span>{order.fulfillment_type || "Chưa xác định"}</span>
                       </div>
                     </div>
                   </div>
@@ -538,9 +570,20 @@ const OrderDetailsPage = () => {
               </h3>
               <div className="space-y-6">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-black text-white rounded-2xl flex items-center justify-center shadow-lg">
-                    <User className="w-6 h-6" />
+                  <div>
+                    {order.customer?.avatar ? (
+                      <img
+                        src={getImageUrl(order.customer.avatar)}
+                        alt=""
+                        className="rounded-full"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 bg-black text-white rounded-2xl flex items-center justify-center shadow-lg">
+                        <User className="w-6 h-6" />
+                      </div>
+                    )}
                   </div>
+
                   <div>
                     <p className="text-sm font-bold text-gray-900">
                       {order.customer?.name}

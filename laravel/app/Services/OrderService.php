@@ -79,9 +79,15 @@ class OrderService
             }
 
             // Tính phí vận chuyển và ngày dự kiến
-            $shippingMethod = ShippingMethod::findOrFail($data['shipping_method_id']);
-            $shippingFee = $shippingMethod->cost;
-            $expectedDeliveryDate = now()->addDays($shippingMethod->estimated_days)->format('Y-m-d');
+            $shippingMethodId = $data['shipping_method_id'] ?? null;
+            if ($shippingMethodId) {
+                $shippingMethod = ShippingMethod::findOrFail($shippingMethodId);
+                $shippingFee = $shippingMethod->cost;
+                $expectedDeliveryDate = now()->addDays($shippingMethod->estimated_days)->format('Y-m-d');
+            } else {
+                $shippingFee = floatval($data['shipping_fee'] ?? 0);
+                $expectedDeliveryDate = null;
+            }
 
             $discountAmount = $data['discount_amount'] ?? 0;
 
@@ -116,23 +122,29 @@ class OrderService
                 }
             }
 
+            $isPickup = ($data['fulfillment_type'] ?? null) === 'pickup';
+            $initialStatus = $isPickup ? 'delivered' : 'pending';
+            $initialPaymentStatus = $isPickup ? 'paid' : 'unpaid';
+
             $order = $this->orderRepo->createOrder([
                 'code'                   => $code,
                 'payment_method_id'      => $data['payment_method_id'],
-                'shipping_method_id'     => $data['shipping_method_id'],
+                'shipping_method_id'     => $shippingMethodId,
+                'fulfillment_type'       => $data['fulfillment_type'] ?? null,
                 'shipping_fee'           => $shippingFee,
+                'shipping_address'       => $data['shipping_address'] ?? null,
                 'expected_delivery_date' => $expectedDeliveryDate,
                 'created_by'             => $staffId,
-                'status'                 => 'pending',
+                'status'                 => $initialStatus,
                 'total_amount'           => $totalAmount,
                 'discount_amount'        => $discountAmount,
                 'final_amount'           => $finalAmount,
-                'payment_status'         => 'unpaid',
+                'payment_status'         => $initialPaymentStatus,
                 'note'                   => $data['note'] ?? null,
                 'customer_id'            => $customerId,
-                'customer_name'          => $customerName,
-                'customer_phone'         => $customerPhone,
-                'customer_address'       => $customerAddress,
+                'customer_name'          => $data['recipient_name'] ?? $customerName ?? 'Khách lẻ',
+                'customer_phone'         => $data['recipient_phone'] ?? $customerPhone ?? null,
+                'customer_address'       => $data['shipping_address'] ?? $customerAddress ?? null,
                 'tax_rate_id'            => $taxRateId,
                 'tax_rate_snapshot'      => $taxRateSnapshot,
                 'tax_amount'             => $taxAmount,
@@ -145,12 +157,29 @@ class OrderService
                 $order->items()->create($itemData);
             }
 
-            // Đặt chỗ tồn kho (Reserve) thay vì trừ ngay
             foreach ($items as $item) {
-                $this->inventoryService->reserveStock(
-                    $item['product_variant_id'],
-                    $item['quantity']
-                );
+                if ($isPickup) {
+                    $this->inventoryService->decreaseStock(
+                        $item['product_variant_id'],
+                        $item['quantity'],
+                        'order',
+                        $order->id,
+                        $staffId,
+                        "Bán hàng tại quầy: " . $order->code,
+                        'order'
+                    );
+
+                    $variant = ProductVariant::find($item['product_variant_id']);
+                    if ($variant && $variant->product_id) {
+                        Product::where('id', $variant->product_id)
+                            ->increment('sold_count', $item['quantity']);
+                    }
+                } else {
+                    $this->inventoryService->reserveStock(
+                        $item['product_variant_id'],
+                        $item['quantity']
+                    );
+                }
             }
 
             if (!empty($data['promotion_id'])) {
@@ -160,7 +189,6 @@ class OrderService
                 }
             }
 
-            // Cập nhật thống kê khách hàng
             if ($customerId) {
                 CustomerProfile::where('user_id', $customerId)->increment('total_orders');
                 CustomerProfile::where('user_id', $customerId)->increment('total_spent', $finalAmount);
@@ -187,7 +215,6 @@ class OrderService
 
             $updated = $this->orderRepo->updateOrder($data, $id);
 
-            // Tăng sold_count VÀ Trừ tồn kho thực tế khi đơn chuyển sang 'delivered'
             if ($oldStatus !== 'delivered' && $newStatus === 'delivered') {
                 foreach ($order->items as $item) {
                     if ($item->product_id) {
@@ -195,7 +222,6 @@ class OrderService
                             ->increment('sold_count', $item->quantity);
                     }
 
-                    // Trừ tồn kho thực tế và trừ đặt chỗ
                     if ($item->product_variant_id) {
                         $this->inventoryService->decreaseStock(
                             $item->product_variant_id,
@@ -215,27 +241,21 @@ class OrderService
                 }
             }
 
-            //  chuyển sang trạng thái processing
             if ($oldStatus !== 'processing' && $newStatus === 'processing') {
                 foreach ($order->items as $item) {
                     if ($item->product_variant_id) {
-                        // tăng số lượng Đang đóng gói
                         $this->inventoryService->updatePackingStock($item->product_variant_id, $item->quantity, true);
 
-                        //  giảm số lượng Đang giao dịch
                         $this->inventoryService->releaseBooking($item->product_variant_id, $item->quantity);
                     }
                 }
             }
 
-            // Nếu đơn hàng rời khỏi trạng thái 'processing' (Trừ khi sang 'delivered' đã xử lý ở trên)
             if ($oldStatus === 'processing' && !in_array($newStatus, ['processing', 'delivered'])) {
                 foreach ($order->items as $item) {
                     if ($item->product_variant_id) {
-                        // 1. Giảm số lượng Đang đóng gói
                         $this->inventoryService->updatePackingStock($item->product_variant_id, $item->quantity, false);
 
-                        // 2. Nếu quay lại 'pending' thì phải TĂNG lại Đang giao dịch (reserved)
                         if ($newStatus === 'pending') {
                             $this->inventoryService->reserveStock($item->product_variant_id, $item->quantity);
                         }
@@ -243,9 +263,7 @@ class OrderService
                 }
             }
 
-            // Xử lý khi status chuyển sang 'cancelled'
             if ($oldStatus !== 'cancelled' && $newStatus === 'cancelled') {
-                // Nếu đơn đã delivered (đã trừ kho) thì phải hoàn lại tồn kho
                 if ($oldStatus === 'delivered') {
                     foreach ($order->items as $item) {
                         if ($item->product_variant_id) {
@@ -261,19 +279,15 @@ class OrderService
                         }
                     }
                 } else {
-                    // Nếu đơn chưa giao (chỉ mới reserve) thì chỉ cần giải phóng booking
                     foreach ($order->items as $item) {
                         if ($item->product_variant_id) {
                             $this->inventoryService->releaseBooking($item->product_variant_id, $item->quantity);
-
-                            // Nếu đang đóng gói thì cũng phải giảm packing
                             if ($oldStatus === 'processing') {
                                 $this->inventoryService->updatePackingStock($item->product_variant_id, $item->quantity, false);
                             }
                         }
                     }
                 }
-                // Nếu đơn đã delivered thì giảm sold_count lại
                 if ($oldStatus === 'delivered') {
                     foreach ($order->items as $item) {
                         if ($item->product_id) {
@@ -283,9 +297,6 @@ class OrderService
                     }
                 }
 
-
-
-                // Hoàn thống kê khách hàng khi hủy đơn
                 if ($order->customer_id) {
                     CustomerProfile::where('user_id', $order->customer_id)
                         ->decrement('total_orders');
@@ -307,18 +318,18 @@ class OrderService
             $terminalStates = ['delivered', 'cancelled', 'returned', 'partially_returned'];
 
             foreach ($ids as $id) {
-                $order = $this->orderRepo->findById($id);
-
-                if ($action !== 'pay' && $action !== 'refund') {
-                    if (in_array($order->status, $terminalStates)) {
-                        continue;
-                    }
-                    if ($action === 'cancel' && $order->status === 'shipped') {
-                        continue;
-                    }
-                }
-
                 try {
+                    $order = $this->orderRepo->findById($id);
+
+                    if ($action !== 'pay' && $action !== 'refund') {
+                        if (in_array($order->status, $terminalStates)) {
+                            continue;
+                        }
+                        if ($action === 'cancel' && $order->status === 'shipped') {
+                            continue;
+                        }
+                    }
+
                     if ($action === 'update_status') {
                         if ($order->status === 'shipped' && $status !== 'delivered') {
                             continue;
@@ -349,25 +360,34 @@ class OrderService
                         $order->update($updateData);
                         $updatedCount++;
                     } elseif ($action === 'refund') {
-                        $orderStatus = strtolower($order->status);
-                        $orderPaymentStatus = strtolower($order->payment_status);
-
-                        // Allow refund for Cancelled or Fully Returned orders
-                        if ($orderStatus !== 'cancelled' && $orderStatus !== 'returned') {
-                            continue;
-                        }
-
-                        // Must have been paid at some point
-                        if (in_array($orderPaymentStatus, ['paid', 'partially_paid', 'partially_refunded'])) {
-                            $order->update(['payment_status' => 'refunded']);
-                            $updatedCount++;
-                        }
+                        $this->refundOrder($id);
+                        $updatedCount++;
                     }
                 } catch (\Exception $e) {
                     continue;
                 }
             }
             return ['updated_count' => $updatedCount];
+        });
+    }
+
+    public function refundOrder($id)
+    {
+        return DB::transaction(function () use ($id) {
+            $order = $this->orderRepo->findById($id);
+            $orderStatus = strtolower($order->status);
+            $orderPaymentStatus = strtolower($order->payment_status);
+
+            if ($orderStatus !== 'cancelled' && $orderStatus !== 'returned') {
+                throw new \Exception('Chỉ có thể hoàn tiền cho đơn hàng đã hủy hoặc đã trả hàng.');
+            }
+
+            if (!in_array($orderPaymentStatus, ['paid', 'partially_paid', 'partially_refunded'])) {
+                throw new \Exception('Đơn hàng chưa được thanh toán hoặc đã được hoàn tiền.');
+            }
+
+            $order->update(['payment_status' => 'refunded']);
+            return $order;
         });
     }
 
@@ -386,7 +406,6 @@ class OrderService
                 throw new \Exception('Không thể hủy đơn hàng đang trong quá trình vận chuyển.');
             }
 
-            // Xử lý hoàn tồn kho hoặc giải phóng booking
             if ($previousStatus === 'delivered') {
                 foreach ($order->items as $item) {
                     if ($item->product_variant_id) {
@@ -406,7 +425,6 @@ class OrderService
                     if ($item->product_variant_id) {
                         $this->inventoryService->releaseBooking($item->product_variant_id, $item->quantity);
 
-                        // Nếu đang đóng gói (processing) thì giảm packing
                         if ($previousStatus === 'processing') {
                             $this->inventoryService->updatePackingStock($item->product_variant_id, $item->quantity, false);
                         }
@@ -414,7 +432,6 @@ class OrderService
                 }
             }
 
-            // Nếu đơn đã 'delivered' thì giảm sold_count lại
             if ($previousStatus === 'delivered') {
                 foreach ($order->items as $item) {
                     if ($item->product_id) {
@@ -426,11 +443,10 @@ class OrderService
 
             $order->update(['status' => 'cancelled']);
 
-            // Hoàn thống kê khách hàng
             if ($order->customer_id) {
-                \App\Models\CustomerProfile::where('user_id', $order->customer_id)
+                CustomerProfile::where('user_id', $order->customer_id)
                     ->decrement('total_orders');
-                \App\Models\CustomerProfile::where('user_id', $order->customer_id)
+                CustomerProfile::where('user_id', $order->customer_id)
                     ->decrement('total_spent', max(0, $order->final_amount));
             }
 

@@ -143,4 +143,21 @@ class OrderController extends Controller
             ], 422);
         }
     }
+
+    public function refund($id)
+    {
+        try {
+            $order = $this->orderService->refundOrder($id);
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Hoàn tiền thành công.',
+                'data'    => new OrderResource($order),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => $e->getMessage(),
+            ], 422);
+        }
+    }
 }

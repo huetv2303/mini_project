@@ -23,6 +23,7 @@ import {
   AlertCircle,
   Truck,
   Percent,
+  X,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { formatPrice, getImageUrl } from "../../../helper/helper";
@@ -30,6 +31,9 @@ import AdminLayout from "../../../components/layout/Admin/AdminLayout";
 import api from "../../../api/axios";
 import PromotionModal from "./components/PromotionModal";
 import SelectSearch from "../../../components/common/SelectSearch";
+import { usePromotion } from "../../../hooks/usePromotion";
+import PaymentIntegration from "../../../components/common/PaymentIntegration";
+import { getBankConfigRequest } from "../../../services/PaymentService";
 
 const debounce = (func, delay) => {
   let timer;
@@ -143,10 +147,12 @@ const OrderCreatePage = () => {
     id,
     label: `Khách ${id.split("-")[1] || id}`,
     selectedItems: [],
-    customer: { name: "", phone: "", address: "" },
+    customer: { name: "", phone: "" },
     selectedCustomer: null,
     selectedPaymentMethod: null,
-    selectedShippingMethod: null,
+    fulfillmentType: null, // 'pickup' | 'delivery'
+    shippingFee: 0,
+    shippingInfo: { name: "", phone: "", address: "" },
     selectedTaxRate: null,
     note: "",
     promotionCode: "",
@@ -159,7 +165,27 @@ const OrderCreatePage = () => {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          // Migrate old sessions: ensure new fields exist
+          return parsed.map((s) => ({
+            fulfillmentType: null,
+            shippingFee: 0,
+            shippingInfo: { name: "", phone: "", address: "" },
+            customer: { name: "", phone: "" },
+            ...s,
+            shippingInfo: {
+              name: "",
+              phone: "",
+              address: "",
+              ...(s.shippingInfo || {}),
+            },
+            customer: {
+              name: "",
+              phone: "",
+              ...(s.customer || {}),
+            },
+          }));
+        }
       } catch (e) {
         console.error("Failed to parse sessions", e);
       }
@@ -226,7 +252,6 @@ const OrderCreatePage = () => {
   const [showResults, setShowResults] = useState(false);
 
   const [paymentMethods, setPaymentMethods] = useState([]);
-  const [shippingMethods, setShippingMethods] = useState([]);
   const [taxRates, setTaxRates] = useState([]);
   const [submitting, setSubmitting] = useState(false);
 
@@ -235,8 +260,16 @@ const OrderCreatePage = () => {
   const [isSearchingCustomer, setIsSearchingCustomer] = useState(false);
 
   const [isPromotionModalOpen, setIsPromotionModalOpen] = useState(false);
-  const [eligiblePromotions, setEligiblePromotions] = useState([]);
-  const [isLoadingEligible, setIsLoadingEligible] = useState(false);
+  const [bankConfig, setBankConfig] = useState(null);
+
+  const {
+    applyPromotion: runApplyPromotion,
+    fetchEligiblePromotions: runFetchEligiblePromotions,
+    clearPromotion: runClearPromotion,
+    eligiblePromotions,
+    isLoadingEligible,
+    isApplying: isApplyingPromotion,
+  } = usePromotion();
 
   const [editingTabId, setEditingTabId] = useState(null);
   const [editingLabel, setEditingLabel] = useState("");
@@ -266,14 +299,14 @@ const OrderCreatePage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [pm, sm, tr] = await Promise.all([
+        const [pm, tr, bc] = await Promise.all([
           api.get("/payment-methods"),
-          api.get("/shipping-methods"),
           api.get("/tax-rates"),
+          getBankConfigRequest(),
         ]);
         setPaymentMethods(pm.data.data || pm.data);
-        setShippingMethods(sm.data.data || sm.data);
         setTaxRates(tr.data.data || tr.data);
+        setBankConfig(bc.data);
       } catch (error) {
         toast.error("Lỗi tải dữ liệu cấu hình");
       }
@@ -383,55 +416,59 @@ const OrderCreatePage = () => {
   const calculateTotal = () => {
     const sub = calculateSubtotal();
     const ship =
-      shippingMethods.find((s) => s.id == activeSession.selectedShippingMethod)
-        ?.cost || 0;
-    return sub + Number(ship) + calculateTax() - activeSession.discountAmount;
+      activeSession.fulfillmentType === "delivery"
+        ? Number(activeSession.shippingFee) || 0
+        : 0;
+    return sub + ship + calculateTax() - activeSession.discountAmount;
   };
 
   const applyPromotion = async (code = activeSession.promotionCode) => {
-    if (!code) return;
     try {
-      const res = await api.post("/promotions/apply", {
+      const data = await runApplyPromotion(
         code,
-        cart_items: activeSession.selectedItems.map((item) => ({
+        activeSession.selectedItems.map((item) => ({
           product_id: item.product_id,
           category_id: item.category_id,
           subtotal: item.price * item.quantity,
         })),
-        customer_id: activeSession.selectedCustomer?.id,
-      });
-      const data = res.data.data || res.data;
+        activeSession.selectedCustomer?.id,
+        "pos",
+      );
+
       patchSession({
         appliedPromotion: data,
         discountAmount: data.discount_amount,
         promotionCode: code,
       });
-      toast.success("Áp dụng mã thành công!");
     } catch (e) {
-      toast.error(e.response?.data?.message || "Mã không hợp lệ");
       patchSession({ appliedPromotion: null, discountAmount: 0 });
     }
   };
 
   const fetchEligiblePromotions = async () => {
     if (activeSession.selectedItems.length === 0) return;
-    setIsLoadingEligible(true);
-    try {
-      const res = await api.post("/promotions/eligible", {
-        cart_items: activeSession.selectedItems.map((item) => ({
-          product_id: item.product_id,
-          category_id: item.category_id,
-          subtotal: item.price * item.quantity,
-        })),
-        customer_id: activeSession.selectedCustomer?.id,
-      });
-      setEligiblePromotions(res.data.data || res.data);
+    const data = await runFetchEligiblePromotions(
+      activeSession.selectedItems.map((item) => ({
+        product_id: item.product_id,
+        category_id: item.category_id,
+        subtotal: item.price * item.quantity,
+      })),
+      activeSession.selectedCustomer?.id,
+      "pos",
+    );
+
+    if (data) {
       setIsPromotionModalOpen(true);
-    } catch (e) {
-      toast.error("Lỗi tải khuyến mãi");
-    } finally {
-      setIsLoadingEligible(false);
     }
+  };
+
+  const handleClearPromotion = () => {
+    runClearPromotion();
+    patchSession({
+      appliedPromotion: null,
+      discountAmount: 0,
+      promotionCode: "",
+    });
   };
 
   const handlePlaceOrder = async () => {
@@ -440,9 +477,23 @@ const OrderCreatePage = () => {
       toast.error("Vui lòng chọn phương thức thanh toán");
       return;
     }
-    if (!activeSession.selectedShippingMethod) {
-      toast.error("Vui lòng chọn phương thức vận chuyển");
+    if (!activeSession.fulfillmentType) {
+      toast.error("Vui lòng chọn hình thức nhận hàng");
       return;
+    }
+    if (activeSession.fulfillmentType === "delivery") {
+      if (!activeSession.shippingInfo.name.trim()) {
+        toast.error("Vui lòng nhập tên người nhận");
+        return;
+      }
+      if (!activeSession.shippingInfo.phone.trim()) {
+        toast.error("Vui lòng nhập số điện thoại người nhận");
+        return;
+      }
+      if (!activeSession.shippingInfo.address.trim()) {
+        toast.error("Vui lòng nhập địa chỉ giao hàng");
+        return;
+      }
     }
 
     setSubmitting(true);
@@ -454,14 +505,39 @@ const OrderCreatePage = () => {
           quantity: item.quantity,
         })),
         payment_method_id: activeSession.selectedPaymentMethod,
-        shipping_method_id: activeSession.selectedShippingMethod,
+        fulfillment_type: activeSession.fulfillmentType,
+        shipping_fee:
+          activeSession.fulfillmentType === "delivery"
+            ? Number(activeSession.shippingFee) || 0
+            : 0,
+        recipient_name:
+          activeSession.fulfillmentType === "delivery"
+            ? activeSession.shippingInfo.name
+            : activeSession.customer.name ||
+              activeSession.selectedCustomer?.name ||
+              "",
+        recipient_phone:
+          activeSession.fulfillmentType === "delivery"
+            ? activeSession.shippingInfo.phone
+            : activeSession.customer.phone ||
+              activeSession.selectedCustomer?.customer_profile?.phone ||
+              "",
+        shipping_address:
+          activeSession.fulfillmentType === "delivery"
+            ? activeSession.shippingInfo.address
+            : null,
         tax_rate_id: activeSession.selectedTaxRate,
         discount_amount: activeSession.discountAmount,
         promotion_id: activeSession.appliedPromotion?.promotion?.id,
         note: activeSession.note,
-        customer_name: activeSession.customer.name,
-        customer_phone: activeSession.customer.phone,
-        customer_address: activeSession.customer.address,
+        customer_name:
+          activeSession.customer.name ||
+          activeSession.selectedCustomer?.name ||
+          "",
+        customer_phone:
+          activeSession.customer.phone ||
+          activeSession.selectedCustomer?.customer_profile?.phone ||
+          "",
       };
       const res = await api.post("/orders", data);
       toast.success("Tạo đơn hàng thành công!");
@@ -614,7 +690,7 @@ const OrderCreatePage = () => {
             </div>
 
             {/* CART TABLE */}
-            <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
+            <div className="bg-white rounded-lg border shadow-sm overflow-hidden  h-[500px] overflow-y-auto">
               <div className="p-6 border-b font-bold text-sm uppercase flex items-center gap-2">
                 <ShoppingCart className="w-4 h-4" /> Giỏ hàng (
                 {activeSession.selectedItems.length})
@@ -693,6 +769,126 @@ const OrderCreatePage = () => {
                 </div>
               )}
             </div>
+
+            {/* FULFILLMENT SECTION */}
+            {activeSession.selectedItems.length > 0 && (
+              <div className="bg-white rounded-lg border shadow-sm p-6 space-y-4">
+                <h3 className="font-bold text-sm uppercase flex items-center gap-2">
+                  <Truck className="w-4 h-4" /> Hình thức nhận hàng
+                </h3>
+
+                {/* Toggle cards */}
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => patchSession({ fulfillmentType: "pickup" })}
+                    className={`flex flex-col items-center gap-2 py-5 rounded-xl border-2 font-bold text-sm transition-all ${
+                      activeSession.fulfillmentType === "pickup"
+                        ? "border-blue-500 bg-blue-50 text-blue-700 shadow-sm"
+                        : "border-gray-200 text-gray-400 hover:border-gray-300"
+                    }`}
+                  >
+                    <span className="text-2xl">🏢</span>
+                    Nhận tại cửa hàng
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      patchSession({ fulfillmentType: "delivery" })
+                    }
+                    className={`flex flex-col items-center gap-2 py-5 rounded-xl border-2 font-bold text-sm transition-all ${
+                      activeSession.fulfillmentType === "delivery"
+                        ? "border-blue-500 bg-blue-50 text-blue-700 shadow-sm"
+                        : "border-gray-200 text-gray-400 hover:border-gray-300"
+                    }`}
+                  >
+                    <span className="text-2xl">🚚</span>
+                    Giao hàng
+                  </button>
+                </div>
+
+                {/* Delivery form */}
+                {activeSession.fulfillmentType === "delivery" && (
+                  <div className="space-y-3 pt-2 border-t">
+                    <p className="text-xs font-bold uppercase text-gray-500">
+                      Thông tin giao hàng
+                    </p>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={activeSession.shippingInfo.name}
+                        onChange={(e) =>
+                          patchSession({
+                            shippingInfo: {
+                              ...activeSession.shippingInfo,
+                              name: e.target.value,
+                            },
+                          })
+                        }
+                        placeholder="Tên người nhận *"
+                        className="w-full pl-10 p-3 bg-gray-50 rounded-xl text-xs outline-none"
+                      />
+                      <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                    </div>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={activeSession.shippingInfo.phone}
+                        onChange={(e) =>
+                          patchSession({
+                            shippingInfo: {
+                              ...activeSession.shippingInfo,
+                              phone: e.target.value,
+                            },
+                          })
+                        }
+                        placeholder="Số điện thoại *"
+                        className="w-full pl-10 p-3 bg-gray-50 rounded-xl text-xs outline-none"
+                      />
+                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                    </div>
+                    <div className="relative">
+                      <textarea
+                        value={activeSession.shippingInfo.address}
+                        onChange={(e) =>
+                          patchSession({
+                            shippingInfo: {
+                              ...activeSession.shippingInfo,
+                              address: e.target.value,
+                            },
+                          })
+                        }
+                        placeholder="Địa chỉ giao hàng *"
+                        rows="2"
+                        className="w-full pl-10 p-3 bg-gray-50 rounded-xl text-xs outline-none resize-none"
+                      />
+                      <MapPin className="absolute left-3 top-4 w-4 h-4 text-gray-300" />
+                    </div>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        min="0"
+                        value={activeSession.shippingFee || ""}
+                        onChange={(e) =>
+                          patchSession({ shippingFee: Number(e.target.value) })
+                        }
+                        placeholder="Phí vận chuyển (đồng)"
+                        className="w-full pl-10 p-3 bg-gray-50 rounded-xl text-xs outline-none"
+                      />
+                      <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                    </div>
+                  </div>
+                )}
+
+                {/* Pickup note */}
+                {activeSession.fulfillmentType === "pickup" && (
+                  <div className="p-3 bg-green-50 rounded-xl text-xs text-green-700 font-medium">
+                    ✅ Khách nhận hàng trực tiếp tại cửa hàng. Không cần địa chỉ
+                    giao hàng.
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="lg:col-span-4 space-y-6">
@@ -804,59 +1000,24 @@ const OrderCreatePage = () => {
                     />
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
                   </div>
-                  <div className="relative">
-                    <textarea
-                      value={activeSession.customer.address}
-                      onChange={(e) =>
-                        patchSession({
-                          customer: {
-                            ...activeSession.customer,
-                            address: e.target.value,
-                          },
-                        })
-                      }
-                      placeholder="Địa chỉ giao hàng..."
-                      rows="2"
-                      className="w-full pl-10 p-3 bg-gray-50 rounded-xl text-xs outline-none"
-                    />
-                    <MapPin className="absolute left-3 top-4 w-4 h-4 text-gray-300" />
-                  </div>
                 </div>
               </div>
 
               <hr className="border-gray-50" />
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-[0.8rem] font-medium text-gray-700 uppercase flex items-center gap-1">
-                    <Truck className="w-4 h-4" /> Vận chuyển
-                  </label>
-                  <SelectSearch
-                    placeholder="Chọn vận chuyển"
-                    options={shippingMethods.map((sm) => ({
-                      label: `${sm.name} (+${formatPrice(sm.cost)})`,
-                      value: sm.id,
-                    }))}
-                    value={activeSession.selectedShippingMethod || ""}
-                    onChange={(val) =>
-                      patchSession({ selectedShippingMethod: val })
-                    }
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[0.8rem] font-medium text-gray-700 uppercase flex items-center gap-1">
-                    <Percent className="w-4 h-4" /> Thuế
-                  </label>
-                  <SelectSearch
-                    placeholder="Chọn thuế"
-                    options={taxRates.map((t) => ({
-                      label: `${t.name}`,
-                      value: t.id,
-                    }))}
-                    value={activeSession.selectedTaxRate || ""}
-                    onChange={(val) => patchSession({ selectedTaxRate: val })}
-                  />
-                </div>
+              <div className="space-y-2">
+                <label className="text-[0.8rem] font-medium text-gray-700 uppercase flex items-center gap-1">
+                  <Percent className="w-4 h-4" /> Thuế
+                </label>
+                <SelectSearch
+                  placeholder="Chọn thuế"
+                  options={taxRates.map((t) => ({
+                    label: `${t.name}`,
+                    value: t.id,
+                  }))}
+                  value={activeSession.selectedTaxRate || ""}
+                  onChange={(val) => patchSession({ selectedTaxRate: val })}
+                />
               </div>
 
               <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
@@ -871,11 +1032,9 @@ const OrderCreatePage = () => {
                 <div className="flex justify-between text-xs font-medium opacity-60">
                   <span>Phí ship</span>
                   <span>
-                    {formatPrice(
-                      shippingMethods.find(
-                        (s) => s.id == activeSession.selectedShippingMethod,
-                      )?.cost || 0,
-                    )}
+                    {activeSession.fulfillmentType === "delivery"
+                      ? formatPrice(Number(activeSession.shippingFee) || 0)
+                      : "Miễn phí"}
                   </span>
                 </div>
                 <div className="flex justify-between text-xs font-bold text-red-500">
@@ -888,28 +1047,47 @@ const OrderCreatePage = () => {
                     {formatPrice(calculateTotal())}
                   </span>
                 </div>
+                <div className="flex gap-2 h-11">
+                  <div className="relative flex-1 group">
+                    <input
+                      type="text"
+                      value={activeSession.promotionCode}
+                      onChange={(e) =>
+                        patchSession({
+                          promotionCode: e.target.value.toUpperCase(),
+                        })
+                      }
+                      placeholder="Mã giảm giá..."
+                      className="w-full h-full pl-4 pr-10 bg-white border border-gray-200 rounded-xl text-xs font-bold uppercase outline-none focus:border-black transition-all"
+                    />
+                    {(activeSession.promotionCode ||
+                      activeSession.appliedPromotion) && (
+                      <button
+                        onClick={handleClearPromotion}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                        title="Gỡ bỏ"
+                      >
+                        <X size={14} />
+                      </button>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => applyPromotion()}
+                    disabled={
+                      isApplyingPromotion || !activeSession.promotionCode
+                    }
+                    className="px-6 h-full bg-black text-white rounded-xl text-[13px]  uppercase font-bold  hover:bg-gray-800 disabled:bg-gray-100 disabled:text-gray-400 transition-all flex items-center justify-center min-w-[100px] shadow-sm shadow-black/5"
+                  >
+                    {isApplyingPromotion ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      "Áp dụng"
+                    )}
+                  </button>
+                </div>
               </div>
 
               <div className="space-y-3">
-                <div className="flex gap-2 relative">
-                  <input
-                    type="text"
-                    value={activeSession.promotionCode}
-                    onChange={(e) =>
-                      patchSession({
-                        promotionCode: e.target.value.toUpperCase(),
-                      })
-                    }
-                    placeholder="Mã giảm giá..."
-                    className="flex-1 p-3 bg-gray-50 rounded-xl text-xs font-bold uppercase mr-10 outline-none  "
-                  />
-                  <button
-                    onClick={() => applyPromotion()}
-                    className="p-3 right-0  bg-black text-white rounded-xl text-xs font-bold hover:bg-gray-800 transition-colors absolute"
-                  >
-                    OK
-                  </button>
-                </div>
                 <button
                   onClick={fetchEligiblePromotions}
                   className="w-full py-3 border-2 border-dashed border-gray-200 rounded-xl text-[10px] text-gray-400 font-bold uppercase hover:border-blue-200 hover:text-blue-500 transition-all flex items-center justify-center gap-2"
@@ -940,6 +1118,40 @@ const OrderCreatePage = () => {
                   }
                 />
               </div>
+
+              {activeSession.selectedPaymentMethod &&
+                (() => {
+                  const selectedMethod = paymentMethods.find(
+                    (pm) => pm.id === activeSession.selectedPaymentMethod,
+                  );
+                  if (
+                    ["bank_transfer", "vnpay"].includes(selectedMethod?.code)
+                  ) {
+                    return (
+                      <div className="bg-white rounded-lg border border-gray-100 p-6 shadow-sm animate-in fade-in slide-in-from-right-2 duration-300">
+                        <h4 className="text-[0.8rem] font-bold text-gray-700 uppercase flex items-center gap-2 mb-4">
+                          <CreditCard className="w-4 h-4" />
+                          Thanh toán dự kiến
+                        </h4>
+                        <PaymentIntegration
+                          selectedMethod={selectedMethod}
+                          bankConfig={bankConfig}
+                          validOrders={[
+                            { code: activeSession.label || "Order" },
+                          ]}
+                          totalAmount={calculateTotal()}
+                          isVnpayLoading={false}
+                          onVnpayPayment={() =>
+                            toast.error(
+                              "Vui lòng 'Xác nhận tạo đơn' trước khi tiến hành thanh toán VNPay",
+                            )
+                          }
+                        />
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
 
               <div className="space-y-2">
                 <h4 className="text-[0.8rem] font-medium text-gray-700 uppercase">

@@ -93,6 +93,16 @@ services:
     env_file:
       - ./laravel/.env
 
+  # Redis for Caching and Sessions
+  redis:
+    image: redis:alpine
+    container_name: laravel-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - laravel-network
+
 networks:
   laravel-network:
     driver: bridge

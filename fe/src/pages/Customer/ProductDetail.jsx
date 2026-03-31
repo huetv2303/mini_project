@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import CustomerLayout from "../../components/layout/Customer/CustomerLayout";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import {
   fetchProductRequest,
   fetchProductsRequest,
 } from "../../services/ProductService";
+import { useCart } from "../../context/CartContext";
+import { useWishlist } from "../../context/WishlistContext";
 import { getImageUrl, formatPrice } from "../../helper/helper";
 import {
   ShoppingBag,
@@ -18,10 +20,30 @@ import {
   CheckCircle2,
   Info,
   ChevronUp,
+  Tag,
+  Loader2,
 } from "lucide-react";
+import { usePromotion } from "../../hooks/usePromotion";
+import PromotionModal from "../Admin/order/components/PromotionModal";
 
 const ProductDetail = () => {
   const { slug } = useParams();
+  const navigate = useNavigate();
+  const { addToCart, setIsCartOpen } = useCart();
+  const { toggleWishlist, isInWishlist } = useWishlist();
+  const {
+    applyPromotion,
+    fetchEligiblePromotions,
+    clearPromotion,
+    promotionCode,
+    setPromotionCode,
+    appliedPromotion,
+    discountAmount,
+    eligiblePromotions,
+    isApplying,
+    isLoadingEligible,
+  } = useCart();
+
   const [product, setProduct] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -36,6 +58,7 @@ const ProductDetail = () => {
 
   const [availableColors, setAvailableColors] = useState([]);
   const [availableSizes, setAvailableSizes] = useState([]);
+  const [isPromotionModalOpen, setIsPromotionModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -235,12 +258,85 @@ const ProductDetail = () => {
     }
   };
 
+  const calculateSubtotal = () => {
+    if (!product) return null;
+
+    const unitPrice = Number(activeVariant?.price || 0);
+    const comparePrice = Number(activeVariant?.compare_price || 0);
+    const subtotal = unitPrice * quantity;
+    const finalTotal = Math.max(0, subtotal - (discountAmount || 0));
+
+    return (
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-4 flex-wrap">
+          <span className="text-2xl  text-red-500 tracking-tighter">
+            {formatPrice(finalTotal)}
+          </span>
+          {(comparePrice > unitPrice || discountAmount > 0) && (
+            <span className="text-[1rem] text-gray-400 line-through decoration-gray-300">
+              {formatPrice(
+                (comparePrice > unitPrice ? comparePrice : unitPrice) *
+                  quantity,
+              )}
+            </span>
+          )}
+          {discountAmount > 0 && (
+            <span className="px-3 py-1 bg-green-500 text-white text-[13px] rounded-lg  shadow-green-200">
+              Tiết kiệm {formatPrice(discountAmount)}
+            </span>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const handleAddToCart = () => {
+    if (!activeVariant) return;
+    addToCart(product, activeVariant, quantity);
+    setIsCartOpen(true);
+  };
+
+  const handleBuyNow = () => {
+    if (!activeVariant) return;
+    // addToCart(product, activeVariant, quantity);
+    navigate("/checkout"); // Assuming checkout exists or will be created
+  };
+
+  const handleToggleWishlist = (e) => {
+    e.preventDefault();
+    toggleWishlist(product);
+  };
+
   return (
     <CustomerLayout>
       <div className="pt-24 pb-24 bg-white min-h-screen">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
+          {/* Promotion Modal - To be implemented or used if shared */}
+
+          <PromotionModal
+            isOpen={isPromotionModalOpen}
+            onClose={() => setIsPromotionModalOpen(false)}
+            onSelect={(promo) => {
+              setPromotionCode(promo.code);
+              applyPromotion(
+                promo.code,
+                [
+                  {
+                    product_id: product.id,
+                    category_id: product.category_id,
+                    subtotal: Number(activeVariant?.price) * quantity,
+                  },
+                ],
+                null,
+                "storefront",
+              );
+              setIsPromotionModalOpen(false);
+            }}
+            promotions={eligiblePromotions}
+          />
+
           {/* Breadcrumbs */}
-          <div className="mt-[50px] flex items-center gap-2 text-[1rem] font-medium text-gray-400 uppercase  mb-12">
+          <div className="pt-4 md:pt-8 flex items-center gap-2 text-[0.8rem] md:text-[1rem] font-medium text-gray-400 uppercase mb-8 md:mb-12">
             <Link to="/" className="hover:text-black transition-colors">
               Trang chủ
             </Link>
@@ -251,7 +347,7 @@ const ProductDetail = () => {
             <ChevronRight size={12} />
             <span className="text-black">{product.name}</span>
           </div>
-          <div className="flex flex-col lg:flex-row gap-16 max-h-[700px]">
+          <div className="flex flex-col lg:flex-row gap-8 lg:gap-16">
             {/* Left: Image Gallery */}
             <div className="flex flex-row gap-6 lg:w-3/5">
               {/* Vertical Thumbnails */}
@@ -286,7 +382,7 @@ const ProductDetail = () => {
             </div>
 
             {/* Right: Product Details */}
-            <div className="lg:w-2/5 space-y-8">
+            <div className="lg:w-2/5 space-y-8 lg:sticky lg:top-32 h-fit">
               <div className="space-y-4">
                 <h1 className="text-3xl font-bold text-gray-900 tracking-tight leading-snug">
                   {product.name}
@@ -321,11 +417,7 @@ const ProductDetail = () => {
                         </div>
                       </div>
 
-                      <div className="pt-2">
-                        <span className="text-3xl text-red-500">
-                          {formatPrice(activeVariant?.price || product.price)}
-                        </span>
-                      </div>
+                      <div className="pt-2">{calculateSubtotal()}</div>
                     </>
                   );
                 })()}
@@ -333,33 +425,83 @@ const ProductDetail = () => {
 
               <div className="h-px bg-dashed border-t border-dashed border-gray-200 w-full my-8"></div>
 
-              {/* Installment Banner */}
-              <div className="space-y-4">
-                <p className="text-sm font-medium">
-                  Trả sau đến 12 tháng với{" "}
-                  <span className="text-[#3edcdc] font-black italic">f</span>
-                  <span className="text-blue-600 font-bold">undiin</span>{" "}
-                  <Info size={14} className="inline ml-1 text-gray-400" />
-                </p>
-                <div className="bg-gradient-to-r from-[#00d8cc] to-[#7b5ef0] rounded-xl p-4 flex items-center justify-between group cursor-pointer shadow-lg shadow-blue-500/10 hover:brightness-110 transition-all">
-                  <div className="flex items-center gap-4">
-                    <div className="bg-white/20 p-2 rounded-lg">
-                      <CheckCircle2 className="text-white" size={24} />
-                    </div>
-                    <div>
-                      <p className="text-white text-sm font-bold">
-                        Giảm đến{" "}
-                        <span className="underline underline-offset-4">
-                          50K
-                        </span>{" "}
-                        khi thanh toán qua Fundiin.
-                      </p>
-                      <button className="text-white/80 text-[10px] uppercase font-bold tracking-widest mt-0.5 hover:text-white transition-colors italic">
-                        xem thêm
-                      </button>
-                    </div>
-                  </div>
+              <div className="space-y-3">
+                <div className="flex gap-2 relative">
+                  <input
+                    type="text"
+                    value={promotionCode}
+                    onChange={(e) =>
+                      setPromotionCode(e.target.value.toUpperCase())
+                    }
+                    placeholder="Mã giảm giá..."
+                    className="flex-1 p-3 bg-gray-50 rounded-xl text-xs font-bold uppercase mr-10 outline-none w-full"
+                  />
+                  <button
+                    onClick={() =>
+                      applyPromotion(promotionCode, [
+                        {
+                          product_id: product.id,
+                          category_id: product.category_id,
+                          subtotal: activeVariant?.price * quantity,
+                        },
+                      ])
+                    }
+                    disabled={isApplying}
+                    className="p-3 right-0 h-full bg-black text-white rounded-xl text-xs font-bold hover:bg-gray-800 transition-colors absolute flex items-center justify-center min-w-[50px]"
+                  >
+                    {isApplying ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      "OK"
+                    )}
+                  </button>
                 </div>
+                <button
+                  onClick={async () => {
+                    const data = await fetchEligiblePromotions(
+                      [
+                        {
+                          product_id: product.id,
+                          category_id: product.category_id,
+                          subtotal: Number(activeVariant?.price) * quantity,
+                        },
+                      ],
+                      null,
+                      "storefront",
+                    );
+                    if (data) setIsPromotionModalOpen(true);
+                  }}
+                  className="w-full py-5 border-2 border-dashed border-gray-200 rounded-xl text-[10px] text-gray-400 font-bold uppercase hover:border-blue-200 hover:text-blue-500 transition-all flex items-center justify-center gap-2"
+                >
+                  {isLoadingEligible ? (
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                  ) : (
+                    <Tag className="w-3 h-3" />
+                  )}{" "}
+                  DANH SÁCH MÃ GIẢM GIÁ
+                </button>
+
+                {appliedPromotion && (
+                  <div className="p-4 bg-green-50 border border-green-100 rounded-xl flex justify-between items-center animate-in slide-in-from-top-2">
+                    <div>
+                      <p className="text-[13px] text-green-600 font-black uppercase  mb-1 ">
+                        Mã được áp dụng:
+                      </p>
+                      <h4 className="text-sm font-bold text-green-700 uppercase">
+                        {appliedPromotion.promotion?.name}
+                      </h4>
+                      <p className="text-xs font-medium text-green-600">
+                        Giảm: -{formatPrice(discountAmount)}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => clearPromotion()}
+                      className="p-2 text-green-400 hover:text-green-600 hover:bg-green-100/50 rounded-lg transition-all"
+                    >
+                      <Plus className="rotate-45" size={18} />
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* Selection Options */}
@@ -369,7 +511,7 @@ const ProductDetail = () => {
                   <h4 className="text-sm font-medium text-gray-900">
                     Màu sắc:
                   </h4>
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center flex-wrap gap-4">
                     {availableColors.map((color, i) => {
                       const isAvailable = isColorAvailable(color, selectedSize);
                       return (
@@ -462,80 +604,105 @@ const ProductDetail = () => {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex flex-col sm:flex-row items-center gap-4 pt-4">
-                  <button className="w-16 h-16 flex items-center justify-center bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors text-gray-600">
-                    <Heart size={24} />
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-4">
+                  <button
+                    onClick={handleToggleWishlist}
+                    className={`hidden sm:flex w-16 h-16 items-center justify-center rounded-lg transition-colors ${
+                      isInWishlist(product.id)
+                        ? "bg-red-50 text-red-500 border border-red-100"
+                        : "bg-gray-100 hover:bg-gray-200 text-gray-600"
+                    }`}
+                  >
+                    <Heart
+                      size={24}
+                      fill={isInWishlist(product.id) ? "currentColor" : "none"}
+                    />
                   </button>
-                  <button className="flex-1 h-16 border-2 border-black text-black text-xs font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all rounded-lg">
+                  <button
+                    onClick={handleAddToCart}
+                    className="flex-1 p-5 h-10 md:h-16 border-2 border-black text-black text-xs font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all rounded-lg"
+                  >
                     Thêm vào giỏ hàng
                   </button>
-                  <button className="flex-1 h-16 bg-[#222] text-white text-xs font-black uppercase tracking-widest hover:bg-black transition-all rounded-lg shadow-xl shadow-black/10">
+                  <button
+                    onClick={handleBuyNow}
+                    className="flex-1 p-5 h-10 md:h-16 bg-[#222] text-white text-xs font-black uppercase tracking-widest hover:bg-black transition-all rounded-lg shadow-xl shadow-black/10"
+                  >
                     Mua ngay
                   </button>
-                </div>
-              </div>
-
-              {/* Accordion Sections */}
-              <div className="pt-12 space-y-px border-t border-gray-100">
-                <div className="border-b border-gray-100">
+                  {/* Mobile Heart Button */}
                   <button
-                    onClick={() => toggleSection("details")}
-                    className="w-full py-6 flex items-center justify-between text-left group"
+                    onClick={handleToggleWishlist}
+                    className={`sm:hidden h-14 flex items-center justify-center rounded-lg border transition-all ${
+                      isInWishlist(product.id)
+                        ? "bg-red-50 text-red-500 border-red-100"
+                        : "bg-gray-50 text-gray-600 border-gray-100"
+                    }`}
                   >
-                    <span className="text-sm font-bold text-gray-900 group-hover:text-black transition-colors">
-                      Thông tin chi tiết
+                    <Heart
+                      size={20}
+                      className="mr-2"
+                      fill={isInWishlist(product.id) ? "currentColor" : "none"}
+                    />
+                    <span className="text-xs font-bold">
+                      {isInWishlist(product.id) ? "Đã thích" : "Yêu thích"}
                     </span>
-                    {openSections.details ? (
-                      <Plus
-                        size={18}
-                        className="rotate-45 transition-transform"
-                      />
-                    ) : (
-                      <Plus size={18} />
-                    )}
                   </button>
-                  {openSections.details && (
-                    <div className="pb-6 animate-in slide-in-from-top-2 duration-300">
-                      <p className="text-sm text-gray-500 leading-relaxed font-medium">
-                        {product.description ||
-                          "Chất liệu cao cấp, đường may tinh tế. Thiết kế tối giản phù hợp cho nhiều dịp khác nhau."}
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                <div className="border-b border-gray-100">
-                  <button
-                    onClick={() => toggleSection("sizeGuide")}
-                    className="w-full py-6 flex items-center justify-between text-left group"
-                  >
-                    <span className="text-sm font-bold text-gray-900">
-                      Bảng size
-                    </span>
-                    {openSections.sizeGuide ? (
-                      <Plus
-                        size={18}
-                        className="rotate-45 transition-transform"
-                      />
-                    ) : (
-                      <Plus size={18} />
-                    )}
-                  </button>
-                  {openSections.sizeGuide && (
-                    <div className="pb-6 animate-in slide-in-from-top-2 duration-300">
-                      <div className="p-4 bg-gray-50 rounded-xl">
-                        <p className="text-xs text-gray-500 font-medium">
-                          Hướng dẫn chọn kích thước chuẩn xác nhất theo chiều
-                          cao và cân nặng.
-                        </p>
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
           </div>
+          <div className="pt-12 space-y-px border-t border-gray-100">
+            <div className="border-b border-gray-100">
+              <button
+                onClick={() => toggleSection("details")}
+                className="w-full py-6 flex items-center justify-between text-left group"
+              >
+                <span className="text-sm font-bold text-gray-900 group-hover:text-black transition-colors">
+                  Thông tin chi tiết
+                </span>
+                {openSections.details ? (
+                  <Plus size={18} className="rotate-45 transition-transform" />
+                ) : (
+                  <Plus size={18} />
+                )}
+              </button>
+              {openSections.details && (
+                <div className="pb-6 animate-in slide-in-from-top-2 duration-300">
+                  <p className="text-sm text-gray-500 leading-relaxed font-medium">
+                    {product.description ||
+                      "Chất liệu cao cấp, đường may tinh tế. Thiết kế tối giản phù hợp cho nhiều dịp khác nhau."}
+                  </p>
+                </div>
+              )}
+            </div>
 
+            <div className="border-b border-gray-100">
+              <button
+                onClick={() => toggleSection("sizeGuide")}
+                className="w-full py-6 flex items-center justify-between text-left group"
+              >
+                <span className="text-sm font-bold text-gray-900">
+                  Bảng size
+                </span>
+                {openSections.sizeGuide ? (
+                  <Plus size={18} className="rotate-45 transition-transform" />
+                ) : (
+                  <Plus size={18} />
+                )}
+              </button>
+              {openSections.sizeGuide && (
+                <div className="pb-6 animate-in slide-in-from-top-2 duration-300">
+                  <div className="p-4 bg-gray-50 rounded-xl">
+                    <p className="text-xs text-gray-500 font-medium">
+                      Hướng dẫn chọn kích thước chuẩn xác nhất theo chiều cao và
+                      cân nặng.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
           {/* Review Summary */}
           <div className="mt-32 pt-16 border-t border-gray-100">
             <div className="space-y-4">
@@ -582,10 +749,10 @@ const ProductDetail = () => {
                       />
                     </Link>
                     <div className="space-y-1">
-                      <h4 className="font-bold text-sm text-gray-900 hover:text-black transition-colors">
+                      <h4 className=" text-[1.2rem] text-gray-700 hover:text-black transition-colors">
                         <Link to={`/products/${prod.slug}`}>{prod.name}</Link>
                       </h4>
-                      <p className="text-lg font-black text-gray-900">
+                      <p className="text-lg  text-gray-700">
                         {formatPrice(prod.price)}
                       </p>
                     </div>
