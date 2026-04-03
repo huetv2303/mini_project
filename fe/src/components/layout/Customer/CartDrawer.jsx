@@ -11,6 +11,7 @@ import {
   Info,
 } from "lucide-react";
 import { useCart } from "../../../context/CartContext";
+import { useBuyNow } from "../../../context/BuyNowContext";
 import { getImageUrl, formatPrice } from "../../../helper/helper";
 import PromotionModal from "../../../pages/Admin/order/components/PromotionModal";
 
@@ -32,6 +33,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
     isLoadingEligible,
     eligiblePromotions,
   } = useCart();
+  const { clearBuyNowItem } = useBuyNow();
   const [visible, setVisible] = useState(false);
   const [animating, setAnimating] = useState(false);
   const [isPromotionModalOpen, setIsPromotionModalOpen] = useState(false);
@@ -124,7 +126,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
           ) : (
             cartItems.map((item) => (
               <div key={item.variant_id} className="flex gap-4 group">
-                <div className="w-24 aspect-[3/4] bg-gray-50 rounded-lg overflow-hidden border border-gray-100 flex-shrink-0">
+                <div className="w-20 aspect-[3/4] bg-gray-50 rounded-lg overflow-hidden border border-gray-100 flex-shrink-0">
                   <img
                     src={getImageUrl(item.image)}
                     className="w-full h-full object-cover"
@@ -227,7 +229,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
                     )
                   }
                   disabled={isApplying || !promotionCode}
-                  className="px-6 h-full bg-black text-white rounded-xl text-[10px]  uppercase  hover:bg-gray-800 disabled:bg-gray-100 disabled:text-gray-400 transition-all flex items-center justify-center min-w-[100px] shadow-sm shadow-black/5"
+                  className="px-6 h-full bg-black text-white rounded-xl text-[0.7rem] font-bold  uppercase  hover:bg-gray-800 disabled:bg-gray-100 disabled:text-gray-400 transition-all flex items-center justify-center min-w-[100px] shadow-sm shadow-black/5"
                 >
                   {isApplying ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -302,10 +304,10 @@ const CartDrawer = ({ isOpen, onClose }) => {
                 </div>
               )}
               <div className="flex items-center justify-between pt-2">
-                <span className="text-gray-900  uppercase text-[1rem] font-medium">
+                <span className="text-gray-700  uppercase text-[1rem] font-bold ">
                   Tổng cộng:
                 </span>
-                <span className="text-2xl font-medium text-gray-900">
+                <span className="text-2xl font-bold text-gray-700">
                   {formatPrice(finalAmount)}
                 </span>
               </div>
@@ -317,7 +319,10 @@ const CartDrawer = ({ isOpen, onClose }) => {
             <div className="flex gap-3">
               <Link
                 to="/checkout"
-                onClick={onClose}
+                onClick={() => {
+                  onClose();
+                  clearBuyNowItem();
+                }}
                 className="flex-1 bg-black text-white text-center py-4 rounded-xl font-bold hover:shadow-lg transition-all active:scale-[0.98]"
               >
                 THANH TOÁN NGAY

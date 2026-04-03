@@ -33,6 +33,7 @@ class Order extends Model
         'promotion_id',
         'promotion_code_snapshot',
         'customer_id',
+        'source',
     ];
 
     protected $casts = [

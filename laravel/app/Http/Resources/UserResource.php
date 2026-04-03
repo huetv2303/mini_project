@@ -17,6 +17,7 @@ class UserResource extends JsonResource
             'role'              => new RoleResource($this->whenLoaded('role')),
             'customer_profile'  => new CustomerProfileResource($this->whenLoaded('customerProfile')),
             'avatar'            => $this->avatar,
+            'has_password'      => !is_null($this->password),
             'email_verified_at' => $this->email_verified_at,
             'created_at'        => $this->created_at?->format('Y-m-d H:i:s'),
             'updated_at'        => $this->updated_at?->format('Y-m-d H:i:s'),

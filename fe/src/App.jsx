@@ -12,7 +12,15 @@ import Profile from "./pages/Customer/Profile";
 import ProductList from "./pages/Customer/ProductList";
 import ProductDetail from "./pages/Customer/ProductDetail";
 import Wishlist from "./pages/Customer/Wishlist";
+import Promotions from "./pages/Customer/Promotions";
+import Checkout from "./pages/Customer/Checkout";
+import MyOrders from "./pages/Customer/MyOrders";
+import MyOrderDetails from "./pages/Customer/MyOrderDetails";
+import OrderSuccess from "./pages/Customer/OrderSuccess";
+import VNPayCallback from "./pages/Customer/VNPayCallback";
+
 import AdminDashboard from "./pages/Admin/AdminDashboard";
+import AdminProfile from "./pages/Admin/AdminProfile";
 
 // Auth & Route Guards
 import RoleGuard from "./middleware/RoleGuard";
@@ -21,6 +29,8 @@ import GuestGuard from "./middleware/GuestGuard";
 import { Toaster } from "react-hot-toast";
 import { CartProvider } from "./context/CartContext";
 import { WishlistProvider } from "./context/WishlistContext";
+import { BuyNowProvider } from "./context/BuyNowContext";
+
 import CategoryListPage from "./pages/Admin/category/CategoryListPage";
 import CategoryForm from "./pages/Admin/category/CategoryForm";
 import SupplierListPage from "./pages/Admin/supplier/SupplierListPage";
@@ -47,6 +57,8 @@ const App = () => {
     <AuthProvider>
       <CartProvider>
         <WishlistProvider>
+          <BuyNowProvider>
+
           <Toaster
             position="top-right"
             reverseOrder={false}
@@ -124,11 +136,78 @@ const App = () => {
               />
 
               <Route
+                path="/promotions"
+                element={
+                  <Promotions />
+                }
+              />
+
+              <Route
+                path="/checkout"
+                element={
+                  <Checkout />
+                }
+              />
+
+              <Route
+                path="/orders"
+                element={
+                  <AuthGuard>
+                    <MyOrders />
+                  </AuthGuard>
+                }
+              />
+
+              <Route
+                path="/orders/:id"
+                element={
+                  <AuthGuard>
+                    <MyOrderDetails />
+                  </AuthGuard>
+                }
+              />
+
+              <Route
+                path="/orders/:id/success"
+                element={
+                  <OrderSuccess />
+                }
+              />
+              
+              <Route
+                path="/checkout/vnpay-callback"
+                element={
+                  <VNPayCallback />
+                }
+              />
+
+
+              <Route
                 path="/admin/dashboard"
                 element={
                   <AuthGuard>
                     <RoleGuard permission="admin.manage">
                       <AdminDashboard />
+                    </RoleGuard>
+                  </AuthGuard>
+                }
+              />
+              <Route
+                path="/admin/profile"
+                element={
+                  <AuthGuard>
+                    <RoleGuard permission="admin.manage">
+                      <AdminProfile />
+                    </RoleGuard>
+                  </AuthGuard>
+                }
+              />
+              <Route
+                path="/admin/change-password"
+                element={
+                  <AuthGuard>
+                    <RoleGuard permission="admin.manage">
+                      <AdminProfile />
                     </RoleGuard>
                   </AuthGuard>
                 }
@@ -394,6 +473,7 @@ const App = () => {
               />
             </Routes>
           </Router>
+          </BuyNowProvider>
         </WishlistProvider>
       </CartProvider>
     </AuthProvider>

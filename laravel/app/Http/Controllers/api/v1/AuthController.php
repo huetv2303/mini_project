@@ -112,6 +112,48 @@ class AuthController extends Controller
         return response()->json(['message' => 'Successfully logged out']);
     }
 
+    public function changePassword(Request $request)
+    {
+        $user = auth('api')->user();
+
+        if ($user->password) {
+            $request->validate([
+                'old_password' => 'required|string',
+                'password' => 'required|string|min:8|confirmed',
+            ], [
+                'old_password.required' => 'Mật khẩu cũ không được để trống.',
+                'password.required' => 'Mật khẩu mới không được để trống.',
+                'password.min' => 'Mật khẩu mới phải có ít nhất 8 ký tự.',
+                'password.confirmed' => 'Mật khẩu xác nhận không khớp.',
+            ]);
+
+            if (!Hash::check($request->old_password, $user->password)) {
+                return response()->json([
+                    'message' => 'Mật khẩu cũ không chính xác.',
+                    'status' => 422
+                ], 422);
+            }
+        } else {
+            // Tài khoản Google chưa đặt mật khẩu
+            $request->validate([
+                'password' => 'required|string|min:8|confirmed',
+            ], [
+                'password.required' => 'Mật khẩu mới không được để trống.',
+                'password.min' => 'Mật khẩu mới phải có ít nhất 8 ký tự.',
+                'password.confirmed' => 'Mật khẩu xác nhận không khớp.',
+            ]);
+        }
+
+        $user->update([
+            'password' => Hash::make($request->password)
+        ]);
+
+        return response()->json([
+            'message' => 'Đổi mật khẩu thành công.',
+            'status' => 200
+        ]);
+    }
+
     protected function createNewToken($token)
     {
         $user = auth('api')->user()->load(['role.permissions', 'customerProfile']);

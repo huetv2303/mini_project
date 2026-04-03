@@ -8,17 +8,22 @@ use Illuminate\Support\Facades\Log;
 
 class VNPayService
 {
-    public function generatePaymentUrl(Order $order)
+    /**
+     * Generate VNPay Payment URL
+     * Support both Order model and raw session data
+     */
+    public function generatePaymentUrl($amount, $code, $returnUrl = null)
     {
         $vnp_Url = config('vnpay.url');
-        $vnp_Returnurl = config('vnpay.return_url');
+        $vnp_Returnurl = $returnUrl ?? config('vnpay.return_url');
+
         $vnp_TmnCode = config('vnpay.tmn_code');
         $vnp_HashSecret = config('vnpay.hash_secret');
 
-        $vnp_TxnRef = $order->code . '-' . time();
-        $vnp_OrderInfo = "Thanh toan don hang " . $order->code;
+        $vnp_TxnRef = $code . '-' . time();
+        $vnp_OrderInfo = "Thanh toan don hang " . $code;
         $vnp_OrderType = 'billpayment';
-        $vnp_Amount = $order->final_amount * 100;
+        $vnp_Amount = $amount * 100;
         $vnp_Locale = 'vn';
         $vnp_IpAddr = request()->ip();
 
@@ -36,6 +41,7 @@ class VNPayService
             "vnp_ReturnUrl" => $vnp_Returnurl,
             "vnp_TxnRef" => $vnp_TxnRef,
         );
+
 
         ksort($inputData);
         $query = "";
@@ -110,9 +116,15 @@ class VNPayService
                     return ['RspCode' => '04', 'Message' => 'invalid amount'];
                 }
             } else {
+                // Check if it's a payment session (for success-before-order flow)
+                if (str_starts_with($orderCode, 'SES-') && $responseCode == '00') {
+                     $updateOrderCallback(null, 'paid');
+                     return ['RspCode' => '00', 'Message' => 'Confirm Success (Session)'];
+                }
                 Log::error("VNPay Order Not Found: Code: {$orderCode}");
                 return ['RspCode' => '01', 'Message' => 'Order not found'];
             }
+
         } else {
             Log::error("VNPay Signature Mismatch!");
             Log::error("Calculated Hash: " . $secureHash);

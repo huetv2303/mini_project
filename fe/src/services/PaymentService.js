@@ -18,7 +18,7 @@ export const createVNPayPaymentRequest = async (orderId) => {
     }
 };
 
-export const getBankConfigRequest = async () => {
+export const fetchBankConfigRequest = async () => {
     try {
         const response = await api.get("/payments/bank-config");
         return response.data;

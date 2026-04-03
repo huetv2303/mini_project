@@ -35,7 +35,9 @@ class PromotionController extends Controller
         }
 
         $perPage = $request->input('per_page', 10);
-        $promotions = $query->orderBy('created_at', 'desc')->paginate($perPage);
+        $promotions = $query->with(['categories', 'products'])
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage);
 
         return response()->json([
             'status' => 'success',

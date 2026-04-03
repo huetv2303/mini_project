@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
-  getBankConfigRequest,
+  fetchBankConfigRequest,
   createVNPayPaymentRequest,
 } from "../../services/PaymentService";
 import {
@@ -32,7 +32,7 @@ const BulkPaymentModal = ({
 
   useEffect(() => {
     if (selectedMethod?.code === "bank_transfer") {
-      getBankConfigRequest()
+      fetchBankConfigRequest()
         .then((res) => setBankConfig(res?.data))
         .catch(console.error);
     }

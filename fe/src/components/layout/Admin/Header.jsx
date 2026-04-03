@@ -14,6 +14,7 @@ const Header = ({ toggleSidebar }) => {
         setIsOpen(false);
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
@@ -23,7 +24,6 @@ const Header = ({ toggleSidebar }) => {
       <div className="mx-auto px-4 sm:px-8 lg:px-12">
         <div className="flex justify-between items-center h-16 md:h-20">
           <div className="flex items-center gap-4">
-            {/* Hamburger Menu - Chỉ hiện trên di động/tablet */}
             <button
               onClick={toggleSidebar}
               className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-xl lg:hidden transition-all duration-300"

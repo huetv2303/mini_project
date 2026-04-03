@@ -10,7 +10,7 @@ import {
 } from "../../../services/OrderService";
 import {
   createVNPayPaymentRequest,
-  getBankConfigRequest,
+  fetchBankConfigRequest,
 } from "../../../services/PaymentService";
 import AdminLayout from "../../../components/layout/Admin/AdminLayout";
 import {
@@ -32,6 +32,7 @@ import {
   AlertTriangle,
   RotateCcw,
 } from "lucide-react";
+import { OrderSourceBadge } from "../../../components/common/OrderBadges";
 import ReturnOrderModal from "../../../components/Admin/Order/ReturnOrderModal";
 import toast from "react-hot-toast";
 import { formatPrice, getImageUrl } from "../../../helper/helper";
@@ -83,7 +84,7 @@ const OrderDetailsPage = () => {
         data.payment_method?.code === "bank_transfer" &&
         data.payment_status === "unpaid"
       ) {
-        getBankConfigRequest()
+        fetchBankConfigRequest()
           .then((res) => setBankConfig(res?.data))
           .catch(console.error);
       }
@@ -257,6 +258,7 @@ const OrderDetailsPage = () => {
                 <span className="px-3 py-1 bg-black text-white text-[12px] font-bold rounded-lg uppercase">
                   #{order.code}
                 </span>
+                <OrderSourceBadge source={order.source} />
               </div>
               <p className="text-xs text-gray-600">
                 Đặt ngày {new Date(order.created_at).toLocaleString("vi-VN")}

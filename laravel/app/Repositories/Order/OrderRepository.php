@@ -12,8 +12,20 @@ class OrderRepository implements OrderRepositoryInterface
         $query = Order::with(['paymentMethod', 'shippingMethod', 'staff', 'items', 'taxRate', 'customer.customerProfile']);
 
         if ($request) {
+            if ($request->filled('customer_id')) {
+                $query->where('customer_id', $request->customer_id);
+            }
+
             if ($request->filled('status') && $request->status !== 'all') {
                 $query->where('status', $request->status);
+            }
+
+            if ($request->filled('payment_status') && $request->payment_status !== 'all') {
+                $query->where('payment_status', $request->payment_status);
+            }
+
+            if ($request->filled('source') && $request->source !== 'all') {
+                $query->where('source', $request->source);
             }
 
             if ($request->filled('search')) {

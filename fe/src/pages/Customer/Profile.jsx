@@ -15,9 +15,13 @@ import {
   Package,
   CreditCard,
   Target,
+  Lock,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { updateCustomerRequest } from "../../services/CustomerService";
+import { changePasswordRequest } from "../../services/AuthService";
 import { getImageUrl } from "../../helper/helper";
 
 
@@ -36,6 +40,17 @@ const Profile = () => {
     address: "",
     avatar: "",
   });
+
+  const [passwordForm, setPasswordForm] = useState({
+    old_password: "",
+    password: "",
+    password_confirmation: "",
+  });
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirmation, setShowPasswordConfirmation] =
+    useState(false);
+  const [passwordSaving, setPasswordSaving] = useState(false);
 
 
   useEffect(() => {
@@ -90,6 +105,28 @@ const Profile = () => {
       );
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault();
+    setPasswordSaving(true);
+    try {
+      await changePasswordRequest(passwordForm);
+      toast.success("Đổi mật khẩu thành công!");
+      setPasswordForm({
+        old_password: "",
+        password: "",
+        password_confirmation: "",
+      });
+      await fetchUser();
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Đổi mật khẩu thất bại. Vui lòng thử lại.",
+      );
+    } finally {
+      setPasswordSaving(false);
     }
   };
 
@@ -373,6 +410,178 @@ const Profile = () => {
                       ) : (
                         <>
                           LƯU THAY ĐỔI
+                          <Save
+                            size={20}
+                            className="group-hover:scale-110 transition-transform"
+                          />
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              {/* Password Section */}
+              <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-10 md:p-14 mt-12">
+                <div className="flex items-center gap-4 mb-12">
+                  <div className="w-12 h-12 bg-black text-white rounded-2xl flex items-center justify-center">
+                    <Lock size={24} />
+                  </div>
+                  <div>
+                    <h3 className="text-3xl font-bold text-slate-900 ">
+                      {user?.has_password
+                        ? "ĐỔI MẬT KHẨU"
+                        : "THIẾT LẬP MẬT KHẨU"}
+                    </h3>
+                    <p className="text-gray-400 font-medium">
+                      {user?.has_password
+                        ? "Thay đổi mật khẩu thường xuyên để bảo vệ tài khoản."
+                        : "Tài khoản của bạn chưa có mật khẩu. Thiết lập mật khẩu để đăng nhập bằng email."}
+                    </p>
+                  </div>
+                </div>
+
+                <form onSubmit={handlePasswordSubmit} className="space-y-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {/* Old Password */}
+                    {user?.has_password && (
+                      <div className="space-y-3">
+                        <label className="text-xs font-bold text-gray-700 uppercase ml-2">
+                          Mật khẩu hiện tại
+                        </label>
+                        <div className="relative group">
+                          <Lock
+                            className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-700 group-focus-within:text-black transition-colors"
+                            size={20}
+                          />
+                          <input
+                            type={showOldPassword ? "text" : "password"}
+                            required
+                            value={passwordForm.old_password}
+                            onChange={(e) =>
+                              setPasswordForm({
+                                ...passwordForm,
+                                old_password: e.target.value,
+                              })
+                            }
+                            className="w-full h-16 bg-gray-50 border border-gray-100 rounded-lg pl-14 pr-14 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-black/5 focus:border-black transition-all"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowOldPassword(!showOldPassword)}
+                            className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black transition-colors"
+                          >
+                            {showOldPassword ? (
+                              <EyeOff size={20} />
+                            ) : (
+                              <Eye size={20} />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    <div
+                      className={
+                        user?.has_password
+                          ? "md:col-span-2 invisible h-0"
+                          : "hidden"
+                      }
+                    ></div>
+
+                    {/* New Password */}
+                    <div className="space-y-3">
+                      <label className="text-xs font-bold text-gray-700 uppercase ml-2">
+                        Mật khẩu mới
+                      </label>
+                      <div className="relative group">
+                        <Lock
+                          className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-700 group-focus-within:text-black transition-colors"
+                          size={20}
+                        />
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          required
+                          value={passwordForm.password}
+                          onChange={(e) =>
+                            setPasswordForm({
+                              ...passwordForm,
+                              password: e.target.value,
+                            })
+                          }
+                          className="w-full h-16 bg-gray-50 border border-gray-100 rounded-lg pl-14 pr-14 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-black/5 focus:border-black transition-all"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black transition-colors"
+                        >
+                          {showPassword ? (
+                            <EyeOff size={20} />
+                          ) : (
+                            <Eye size={20} />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Confirm Password */}
+                    <div className="space-y-3">
+                      <label className="text-xs font-bold text-gray-700 uppercase ml-2">
+                        Xác nhận mật khẩu mới
+                      </label>
+                      <div className="relative group">
+                        <Lock
+                          className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-700 group-focus-within:text-black transition-colors"
+                          size={20}
+                        />
+                        <input
+                          type={showPasswordConfirmation ? "text" : "password"}
+                          required
+                          value={passwordForm.password_confirmation}
+                          onChange={(e) =>
+                            setPasswordForm({
+                              ...passwordForm,
+                              password_confirmation: e.target.value,
+                            })
+                          }
+                          className="w-full h-16 bg-gray-50 border border-gray-100 rounded-lg pl-14 pr-14 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-black/5 focus:border-black transition-all"
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setShowPasswordConfirmation(
+                              !showPasswordConfirmation,
+                            )
+                          }
+                          className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black transition-colors"
+                        >
+                          {showPasswordConfirmation ? (
+                            <EyeOff size={20} />
+                          ) : (
+                            <Eye size={20} />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-8 flex justify-end">
+                    <button
+                      type="submit"
+                      disabled={passwordSaving}
+                      className="group flex items-center gap-3 px-12 py-5 bg-black text-white rounded-lg font-bold transition-all hover:bg-black/90 disabled:opacity-50 shadow-2xl shadow-black/20 hover:-translate-y-1 active:translate-y-0"
+                    >
+                      {passwordSaving ? (
+                        <>
+                          <Loader2 className="animate-spin" size={22} />
+                          Đang lưu...
+                        </>
+                      ) : (
+                        <>
+                          {user?.has_password
+                            ? "CẬP NHẬT MẬT KHẨU"
+                            : "THIẾT LẬP MẬT KHẨU"}
                           <Save
                             size={20}
                             className="group-hover:scale-110 transition-transform"

@@ -47,3 +47,7 @@ export const refreshTokenRequest = async () => {
 export const resendVerificationRequest = (email) => {
   return api.post("/email/resend", { email });
 };
+
+export const changePasswordRequest = (payload) => {
+  return api.post("/change-password", payload);
+};

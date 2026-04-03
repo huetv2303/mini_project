@@ -76,7 +76,7 @@ const Home = () => {
           <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
         </div>
 
-        <div className="max-w-9xl mx-auto px-4 md:px-12 relative z-10 w-full">
+        <div className="max-w-9xl mx-auto pt-20 px-10 md:px-20 relative z-10 w-full">
           <div className="max-w-4xl space-y-10 animate-in fade-in slide-in-from-left-10 duration-1000">
             <h1 className="text-7xl md:text-[140px] font-black text-white leading-[0.85] tracking-tighter">
               ĐỊNH HÌNH <br />
@@ -263,9 +263,12 @@ const Home = () => {
                 Áp dụng cho tất cả các sản phẩm thời trang trong bộ sưu tập mới
                 nhất. Sở hữu ngay những siêu phẩm với mức giá không tưởng.
               </p>
-              <button className="px-12 py-5 bg-white text-black font-black rounded-[32px] hover:bg-black hover:text-white transition-all duration-500 shadow-2xl shadow-white/10">
+              <Link
+                to="/promotions"
+                className="inline-flex items-center justify-center px-12 py-5 bg-white text-black font-black rounded-[32px] hover:bg-black hover:text-white transition-all duration-500 shadow-2xl shadow-white/10"
+              >
                 LẤY MÃ NGAY
-              </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -334,7 +337,7 @@ const Home = () => {
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                       />
 
-                      <button className="absolute bottom-6 left-1/2 -translate-x-1/2 translate-y-10 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-black text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 shadow-2xl z-10">
+                      <button className="absolute bottom-6 left-1/2 -translate-x-1/2 translate-y-10 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-black text-white px-6 py-3 rounded-lg font-bold flex items-center gap-2 shadow-2xl z-10">
                         <ShoppingBag size={18} /> MUA NGAY
                       </button>
                     </Link>

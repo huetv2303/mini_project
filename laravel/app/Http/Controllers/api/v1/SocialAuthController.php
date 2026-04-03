@@ -9,12 +9,16 @@ use Illuminate\Http\Request;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Str;
 use App\Http\Resources\UserResource;
+use App\Models\CustomerProfile;
 
 class SocialAuthController extends Controller
 {
     public function redirectToGoogle()
     {
-        return Socialite::driver('google')->stateless()->redirect();
+        return Socialite::driver('google')
+            ->stateless()
+            ->with(['prompt' => 'select_account'])
+            ->redirect();
     }
 
     public function handleGoogleCallback()
@@ -41,7 +45,7 @@ class SocialAuthController extends Controller
                 ]);
             } else {
                 // Nếu chưa có cả email, tạo user mới
-                $defaultRole = Role::where('code', 'staff')->first();
+                $defaultRole = Role::where('code', 'customer')->first();
 
                 $user = User::create([
                     'name' => $googleUser->name,
@@ -49,12 +53,26 @@ class SocialAuthController extends Controller
                     'google_id' => $googleUser->id,
                     'avatar' => $googleUser->avatar,
                     'password' => null,
-                    'email_verified_at' => now(),
-                    'role_id' => $defaultRole ? $defaultRole->id : null,
+                    'email_verified_at' => null,
+                    'role_id' => 4,
                 ]);
+
+                // Create customer profile if role is customer
+                if ($defaultRole && $defaultRole->code === 'customer') {
+                    CustomerProfile::create([
+                        'user_id' => $user->id,
+                    ]);
+                }
+
+                // Gửi email xác nhận
+                $user->sendEmailVerificationNotification();
             }
         } else {
             $user->update(['avatar' => $googleUser->avatar]);
+        }
+
+        if (is_null($user->email_verified_at)) {
+            return redirect(env('FRONTEND_URL') . '/login?error=Vui lòng kiểm tra email để xác thực tài khoản trước khi đăng nhập.');
         }
 
         $token = auth('api')->login($user);

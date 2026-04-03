@@ -203,6 +203,32 @@ export const getRefundStatusTag = (status) => {
   }
 };
 
+export const getOrderSourceStyle = (source) => {
+  switch (source) {
+    case "web":
+      return {
+        bg: "bg-blue-50",
+        text: "text-blue-600",
+        border: "border-blue-100",
+        label: "Website",
+      };
+    case "pos":
+      return {
+        bg: "bg-purple-50",
+        text: "text-purple-600",
+        border: "border-purple-100",
+        label: "Tại quầy (POS)",
+      };
+    default:
+      return {
+        bg: "bg-gray-50",
+        text: "text-gray-600",
+        border: "border-gray-100",
+        label: source,
+      };
+  }
+};
+
 export const OrderStatusBadge = ({ status, className = "" }) => {
   const style = getOrderStatusStyle(status);
   return (
@@ -225,6 +251,17 @@ export const PaymentStatusBadge = ({ status, className = "" }) => {
     >
       <span className={`w-1.5 h-1.5 rounded-full mr-2 ${pStyle.dot}`}></span>
       {pStyle.label}
+    </div>
+  );
+};
+
+export const OrderSourceBadge = ({ source, className = "" }) => {
+  const style = getOrderSourceStyle(source);
+  return (
+    <div
+      className={`inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border ${style.bg} ${style.text} ${style.border} ${className}`}
+    >
+      {style.label}
     </div>
   );
 };

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Services\Payment\VNPayService;
 use Illuminate\Support\Facades\Log;
+use \Illuminate\Support\Facades\Cache;
 
 class PaymentController extends Controller
 {
@@ -32,7 +33,7 @@ class PaymentController extends Controller
             ], 400);
         }
 
-        $url = $this->vnPayService->generatePaymentUrl($order);
+        $url = $this->vnPayService->generatePaymentUrl($order->final_amount, $order->code);
 
         return response()->json([
             'status' => 'success',
@@ -45,7 +46,7 @@ class PaymentController extends Controller
     public function vnpayIpn(Request $request)
     {
         $inputData = $request->all();
-        
+
         $result = $this->vnPayService->handleIpn($inputData, function ($order, $status) {
             $order->update([
                 'payment_status' => $status,
@@ -59,21 +60,48 @@ class PaymentController extends Controller
     public function vnpayVerify(Request $request)
     {
         $inputData = $request->all();
-        
-        $result = $this->vnPayService->handleIpn($inputData, function ($order, $status) {
-            $order->update([
-                'payment_status' => $status,
-                'status' => $status === 'paid' ? 'processing' : $order->status
-            ]);
+        $orderId = null;
+
+        // Lấy mã phiên thanh toán hoặc mã đơn hàng
+        $vnp_TxnRef = $request->get('vnp_TxnRef');
+        $lastHyphenPos = strrpos($vnp_TxnRef, '-');
+        $sessionCode = $lastHyphenPos !== false ? substr($vnp_TxnRef, 0, $lastHyphenPos) : $vnp_TxnRef;
+
+        $result = $this->vnPayService->handleIpn($inputData, function ($order, $status) use ($sessionCode, &$orderId) {
+            if ($order) {
+                $order->update([
+                    'payment_status' => $status,
+                    'status' => $status === 'paid' ? 'pending' : $order->status
+                ]);
+                $orderId = $order->id;
+            } else {
+                if ($status === 'paid') {
+                    $payload = Cache::get($sessionCode);
+                    if ($payload) {
+                        $newOrder = app(\App\Interfaces\Order\CheckoutRepositoryInterface::class)->checkout($payload);
+                        $newOrder->update([
+                            'payment_status' => 'paid',
+                            'status'         => 'processing'
+                        ]);
+                        $orderId = $newOrder->id;
+                        Cache::forget($sessionCode);
+                    }
+                }
+            }
         });
 
+
         if ($result['RspCode'] === '00' || $result['RspCode'] === '02') {
-             return response()->json([
+            return response()->json([
                 'status' => 'success',
                 'message' => $result['Message'] ?? 'Thanh toán thành công.',
-                'data' => $result
+                'data' => [
+                    'id' => $orderId,
+                    'vnpay' => $result
+                ]
             ]);
         }
+
 
         return response()->json([
             'status' => 'error',

@@ -207,7 +207,7 @@ const ProductList = () => {
                         <button className="absolute top-4 right-4 z-10 p-2 bg-white/70 backdrop-blur-md rounded-full text-gray-900 shadow-sm hover:bg-black hover:text-white transition-all duration-300 transform hover:scale-110 active:scale-95">
                           <Heart size={18} />
                         </button>
-                        <button className="absolute hover:bg-black/80 bottom-6 left-1/2 -translate-x-1/2 translate-y-10 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-black text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 shadow-2xl">
+                        <button className="absolute hover:bg-black/80 bottom-6 left-1/2 -translate-x-1/2 translate-y-10 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-black text-white px-6 py-3 rounded-lg font-bold flex items-center gap-2 shadow-2xl">
                           Mua ngay
                         </button>
                       </Link>
@@ -223,11 +223,6 @@ const ProductList = () => {
                           <Link to={`/products/${prod.slug}`}>{prod.name}</Link>
                         </h3>
                         <div className="flex items-baseline gap-3">
-                          {prod.old_price && (
-                            <span className="text-sm text-red-500  text-gray-300 line-through">
-                              {formatPrice(prod.old_price)}
-                            </span>
-                          )}
                           <span className="text-sm text-gray-800">
                             {formatPrice(prod.price)}
                           </span>

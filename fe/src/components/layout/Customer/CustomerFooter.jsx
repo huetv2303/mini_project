@@ -16,17 +16,20 @@ const CustomerFooter = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-16 mb-24">
           {/* Brand Column */}
           <div className="lg:col-span-2 space-y-8">
-            <Link to="/" className="flex items-center gap-3">
+            <Link to="/" className="  flex items-center gap-3">
               <div className="w-12 h-12 bg-black flex items-center justify-center rounded-2xl shadow-xl shadow-black/10">
-                <img src={LogoTrendora} className="w-8 h-8 object-contain contrast-125" />
+                <img
+                  src={LogoTrendora}
+                  className="w-10 h-10 object-contain contrast-125"
+                />
               </div>
               <span className="text-2xl font-black tracking-tighter text-slate-900 uppercase">
                 TRENDORA<span className="text-gray-300 font-bold">FASHION</span>
               </span>
             </Link>
             <p className="text-gray-400 text-lg leading-relaxed max-w-sm font-medium">
-              Chúng tôi không chỉ bán thời trang, chúng tôi kiến tạo phong cách sống hiện đại, 
-              tinh tế và bền vững cho thế hệ mới.
+              Chúng tôi không chỉ bán thời trang, chúng tôi kiến tạo phong cách
+              sống hiện đại, tinh tế và bền vững cho thế hệ mới.
             </p>
             <div className="flex items-center gap-5">
               {[Facebook, Instagram, Twitter, Youtube].map((Icon, i) => (
@@ -51,10 +54,15 @@ const CustomerFooter = () => {
                 { name: "Tất cả sản phẩm", path: "/products" },
                 { name: "Danh mục nổi bật", path: "/categories" },
                 { name: "Khuyến mãi hấp dẫn", path: "/promotions" },
-                { name: "Bộ sưu tập mới", path: "/new-arrivals" }
-              ].map(link => (
+                { name: "Bộ sưu tập mới", path: "/new-arrivals" },
+              ].map((link) => (
                 <li key={link.name}>
-                  <Link to={link.path} className="text-gray-500 hover:text-black transition-colors text-sm font-bold">{link.name}</Link>
+                  <Link
+                    to={link.path}
+                    className="text-gray-500 hover:text-black transition-colors text-sm font-bold"
+                  >
+                    {link.name}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -69,10 +77,15 @@ const CustomerFooter = () => {
                 { name: "Trung tâm trợ giúp", path: "/help" },
                 { name: "Chính sách vận chuyển", path: "/shipping" },
                 { name: "Hướng dẫn đổi trả", path: "/returns" },
-                { name: "Câu hỏi thường gặp", path: "/faq" }
-              ].map(link => (
+                { name: "Câu hỏi thường gặp", path: "/faq" },
+              ].map((link) => (
                 <li key={link.name}>
-                  <Link to={link.path} className="text-gray-500 hover:text-black transition-colors text-sm font-bold">{link.name}</Link>
+                  <Link
+                    to={link.path}
+                    className="text-gray-500 hover:text-black transition-colors text-sm font-bold"
+                  >
+                    {link.name}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -84,7 +97,8 @@ const CustomerFooter = () => {
               Newsletter
             </h4>
             <p className="text-gray-400 text-sm font-medium">
-              Đăng ký để nhận thông tin về các bộ sưu tập và ưu đãi sớm nhất từ TRENDORA.
+              Đăng ký để nhận thông tin về các bộ sưu tập và ưu đãi sớm nhất từ
+              TRENDORA.
             </p>
             <div className="relative group">
               <input
@@ -104,7 +118,7 @@ const CustomerFooter = () => {
             © 2026 TRENDORA FASHION. THIẾT KẾ BỞI ANTIGRAVITY.
           </p>
           <div className="flex items-center gap-10">
-            {["Điều khoản", "Bảo mật", "Cookies"].map(item => (
+            {["Điều khoản", "Bảo mật", "Cookies"].map((item) => (
               <Link
                 key={item}
                 to="#"

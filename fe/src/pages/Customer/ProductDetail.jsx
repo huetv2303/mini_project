@@ -7,6 +7,8 @@ import {
 } from "../../services/ProductService";
 import { useCart } from "../../context/CartContext";
 import { useWishlist } from "../../context/WishlistContext";
+import { useBuyNow } from "../../context/BuyNowContext";
+
 import { getImageUrl, formatPrice } from "../../helper/helper";
 import {
   ShoppingBag,
@@ -22,6 +24,8 @@ import {
   ChevronUp,
   Tag,
   Loader2,
+  ShoppingCartIcon,
+  ShoppingCart,
 } from "lucide-react";
 import { usePromotion } from "../../hooks/usePromotion";
 import PromotionModal from "../Admin/order/components/PromotionModal";
@@ -31,6 +35,8 @@ const ProductDetail = () => {
   const navigate = useNavigate();
   const { addToCart, setIsCartOpen } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
+  const { setBuyNowItem } = useBuyNow();
+
   const {
     applyPromotion,
     fetchEligiblePromotions,
@@ -42,7 +48,7 @@ const ProductDetail = () => {
     eligiblePromotions,
     isApplying,
     isLoadingEligible,
-  } = useCart();
+  } = usePromotion();
 
   const [product, setProduct] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
@@ -262,7 +268,7 @@ const ProductDetail = () => {
     if (!product) return null;
 
     const unitPrice = Number(activeVariant?.price || 0);
-    const comparePrice = Number(activeVariant?.compare_price || 0);
+    // const comparePrice = Number(activeVariant?.compare_price || 0);
     const subtotal = unitPrice * quantity;
     const finalTotal = Math.max(0, subtotal - (discountAmount || 0));
 
@@ -272,12 +278,9 @@ const ProductDetail = () => {
           <span className="text-2xl  text-red-500 tracking-tighter">
             {formatPrice(finalTotal)}
           </span>
-          {(comparePrice > unitPrice || discountAmount > 0) && (
+          {discountAmount > 0 && unitPrice > 0 && (
             <span className="text-[1rem] text-gray-400 line-through decoration-gray-300">
-              {formatPrice(
-                (comparePrice > unitPrice ? comparePrice : unitPrice) *
-                  quantity,
-              )}
+              {formatPrice(unitPrice * quantity)}
             </span>
           )}
           {discountAmount > 0 && (
@@ -297,9 +300,25 @@ const ProductDetail = () => {
   };
 
   const handleBuyNow = () => {
-    if (!activeVariant) return;
-    // addToCart(product, activeVariant, quantity);
-    navigate("/checkout"); // Assuming checkout exists or will be created
+    if (!activeVariant) {
+      toast.error("Vui lòng chọn biến thể sản phẩm");
+      return;
+    }
+    setBuyNowItem({
+      product_id: product.id,
+      category_id: product.category_id,
+      product_variant_id: activeVariant.id,
+      quantity,
+      name: product.name,
+      variant_name: activeVariant.name,
+      price: activeVariant.price,
+      image: activeVariant.image ?? product.feature_image,
+      sku: activeVariant.sku,
+      // Lưu lại mã đang áp dụng (nếu có)
+      appliedPromotion: appliedPromotion,
+      discountAmount: discountAmount,
+    });
+    navigate("/checkout");
   };
 
   const handleToggleWishlist = (e) => {
@@ -620,9 +639,9 @@ const ProductDetail = () => {
                   </button>
                   <button
                     onClick={handleAddToCart}
-                    className="flex-1 p-5 h-10 md:h-16 border-2 border-black text-black text-xs font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all rounded-lg"
+                    className="hidden sm:flex w-16 h-16 border-2 border-black hover:bg-black hover:text-white items-center justify-center rounded-lg transition-colors"
                   >
-                    Thêm vào giỏ hàng
+                    <ShoppingCart />
                   </button>
                   <button
                     onClick={handleBuyNow}

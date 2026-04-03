@@ -10,9 +10,28 @@ export const fetchOrdersRequest = async (params = {}) => {
   }
 };
 
+export const fetchMyOrdersRequest = async (params = {}) => {
+  try {
+    const query = new URLSearchParams(params).toString();
+    const response = await api.get(`/my-orders?${query}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const fetchOrderRequest = async (id) => {
   try {
     const response = await api.get(`/orders/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const fetchMyOrderRequest = async (id) => {
+  try {
+    const response = await api.get(`/my-orders/${id}`);
     return response.data;
   } catch (error) {
     throw error;
@@ -40,6 +59,15 @@ export const updateOrderRequest = async (id, orderData) => {
 export const cancelOrderRequest = async (id) => {
   try {
     const response = await api.patch(`/orders/${id}/cancel`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const cancelMyOrderRequest = async (id) => {
+  try {
+    const response = await api.patch(`/my-orders/${id}/cancel`);
     return response.data;
   } catch (error) {
     throw error;

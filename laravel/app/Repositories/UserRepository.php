@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Repositories;
 
 use App\Models\User;
@@ -10,7 +11,7 @@ class UserRepository implements UserRepositoryInterface
 {
     public function getAllUsers()
     {
-        return User::with('role')->get();
+        return User::with('role', 'customerProfile')->get();
     }
 
     public function createUser(array $data)
@@ -24,8 +25,8 @@ class UserRepository implements UserRepositoryInterface
 
         $user = User::create([
             'name' => $data['name'],
-            'email'=> $data['email'],
-            'password'=> Hash::make($data['password']),
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
             'role_id' => $roleId,
         ]);
 

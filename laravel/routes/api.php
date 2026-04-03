@@ -25,6 +25,7 @@ use App\Http\Controllers\api\v1\PromotionController;
 use App\Http\Controllers\api\v1\Storefront\CouponController;
 use App\Http\Controllers\api\v1\Storefront\CartController;
 use App\Http\Controllers\api\v1\Storefront\WishlistController;
+use App\Http\Controllers\api\v1\Storefront\CheckoutController;
 use App\Http\Resources\UserResource;
 
 Route::group(['prefix' => 'v1'], function () {
@@ -53,6 +54,7 @@ Route::group(['prefix' => 'v1'], function () {
 
     Route::middleware('auth:api')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
+        Route::post('/change-password', [AuthController::class, 'changePassword']);
 
         Route::middleware('permission:admin.manage')->group(function () {
             Route::prefix('roles')->group(function () {
@@ -193,6 +195,16 @@ Route::group(['prefix' => 'v1'], function () {
             Route::post('/toggle', [WishlistController::class, 'toggle']);
             Route::post('/clear', [WishlistController::class, 'clear']);
         });
+
+        // Storefront Orders
+        Route::prefix('my-orders')->group(function () {
+            Route::get('/', [\App\Http\Controllers\api\v1\Storefront\OrderController::class, 'index']);
+            Route::get('/{id}', [\App\Http\Controllers\api\v1\Storefront\OrderController::class, 'show']);
+            Route::patch('/{id}/cancel', [\App\Http\Controllers\api\v1\Storefront\OrderController::class, 'cancel']);
+        });
+
+        // Storefront Checkout (Cart + Buy Now)
+        Route::post('/checkout', [CheckoutController::class, 'checkout']);
 
         Route::get('/user', function (Request $request) {
             $user = $request->user()->load(['role.permissions', 'customerProfile']);

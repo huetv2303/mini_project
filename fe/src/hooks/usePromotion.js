@@ -9,6 +9,20 @@ export const usePromotion = () => {
   const [eligiblePromotions, setEligiblePromotions] = useState([]);
   const [isApplying, setIsApplying] = useState(false);
   const [isLoadingEligible, setIsLoadingEligible] = useState(false);
+  const [promotions, setPromotions] = useState([]);
+
+  const fetchPromotions = useCallback(async (params = { is_active: true }) => {
+    try {
+      const res = await PromotionService.getAll(params);
+      // Paginator structure is res.data.data.data
+      const data = res.data?.data?.data || res.data?.data || res.data || [];
+      setPromotions(data);
+      return data;
+    } catch (error) {
+      console.error("Failed to fetch promotions:", error);
+      return [];
+    }
+  }, []);
 
   const applyPromotion = useCallback(
     async (code, cartItems, customerId = null, channel = "storefront") => {
@@ -83,10 +97,14 @@ export const usePromotion = () => {
     promotionCode,
     setPromotionCode,
     appliedPromotion,
+    setAppliedPromotion,
     discountAmount,
+    setDiscountAmount,
     eligiblePromotions,
     isApplying,
     isLoadingEligible,
+    promotions,
+    fetchPromotions,
     applyPromotion,
     fetchEligiblePromotions,
     clearPromotion,

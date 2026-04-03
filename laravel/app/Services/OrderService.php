@@ -150,6 +150,7 @@ class OrderService
                 'tax_amount'             => $taxAmount,
                 'promotion_id'           => $data['promotion_id'] ?? null,
                 'promotion_code_snapshot' => $data['promotion_code_snapshot'] ?? null,
+                'source'                 => 'pos',
             ]);
 
             // Tạo OrderItems

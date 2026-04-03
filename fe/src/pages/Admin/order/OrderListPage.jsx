@@ -5,22 +5,9 @@ import {
   Search,
   Eye,
   Loader2,
-  ChevronLeft,
-  ChevronRight,
   ShoppingBag,
-  Calendar,
-  User,
-  CreditCard,
-  XCircle,
-  Clock,
-  CheckCircle,
-  Truck,
-  AlertCircle,
   Plus,
   RotateCcw,
-  Phone,
-  Settings,
-  MoreHorizontal,
   ChevronDown,
 } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -35,6 +22,7 @@ import BulkRefundOrderModal from "../../../components/common/BulkRefundOrderModa
 import {
   OrderStatusBadge,
   PaymentStatusBadge,
+  OrderSourceBadge,
 } from "../../../components/common/OrderBadges";
 import {
   fetchOrdersRequest,
@@ -52,6 +40,7 @@ const debounce = (func, delay) => {
 
 const OrderListPage = () => {
   const [filterStatus, setFilterStatus] = useState("all");
+  const [filterSource, setFilterSource] = useState("all");
   const [searchType, setSearchType] = useState("all");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
@@ -112,6 +101,7 @@ const OrderListPage = () => {
     page = 1,
     currentSearch = "",
     currentStatus = "all",
+    currentSource = "all",
     type = "all",
     from = "",
     to = "",
@@ -123,6 +113,7 @@ const OrderListPage = () => {
         page,
         search: currentSearch,
         status: currentStatus,
+        source: currentSource,
         search_type: type,
         from_date: from,
         to_date: to,
@@ -155,6 +146,7 @@ const OrderListPage = () => {
         newPage,
         searchTerm,
         filterStatus,
+        filterSource,
         searchType,
         fromDate,
         toDate,
@@ -166,9 +158,9 @@ const OrderListPage = () => {
   };
 
   const debouncedSearch = useCallback(
-    debounce((val, status, type, from, to, perPage) => {
+    debounce((val, status, source, type, from, to, perPage) => {
       setCurrentPage(1);
-      getOrders(1, val, status, type, from, to, perPage);
+      getOrders(1, val, status, source, type, from, to, perPage);
     }, 500),
     [],
   );
@@ -178,13 +170,14 @@ const OrderListPage = () => {
       currentPage,
       searchTerm,
       filterStatus,
+      filterSource,
       searchType,
       fromDate,
       toDate,
       itemsPerPage,
     );
     fetchPaymentMethods();
-  }, [filterStatus, searchType, fromDate, toDate, itemsPerPage]);
+  }, [filterStatus, filterSource, searchType, fromDate, toDate, itemsPerPage]);
 
   const handleSearchChange = (e) => {
     const val = e.target.value;
@@ -192,6 +185,7 @@ const OrderListPage = () => {
     debouncedSearch(
       val,
       filterStatus,
+      filterSource,
       searchType,
       fromDate,
       toDate,
@@ -205,6 +199,7 @@ const OrderListPage = () => {
     setSearchType("all");
     setFromDate("");
     setToDate("");
+    setFilterSource("all");
     setItemsPerPage(15);
     setCurrentPage(1);
   };
@@ -263,6 +258,7 @@ const OrderListPage = () => {
         currentPage,
         searchTerm,
         filterStatus,
+        filterSource,
         searchType,
         fromDate,
         toDate,
@@ -300,6 +296,7 @@ const OrderListPage = () => {
         currentPage,
         searchTerm,
         filterStatus,
+        filterSource,
         searchType,
         fromDate,
         toDate,
@@ -336,6 +333,7 @@ const OrderListPage = () => {
         currentPage,
         searchTerm,
         filterStatus,
+        filterSource,
         searchType,
         fromDate,
         toDate,
@@ -486,7 +484,15 @@ const OrderListPage = () => {
                 className="px-3 py-2 border border-gray-300 rounded text-sm text-gray-600 outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
-
+            <select
+              value={filterSource}
+              onChange={(e) => setFilterSource(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded text-sm text-gray-600 outline-none focus:ring-1 focus:ring-blue-500"
+            >
+              <option value="all">Mọi nguồn</option>
+              <option value="web">Website</option>
+              <option value="pos">Tại quầy (POS)</option>
+            </select>
             <button
               onClick={clearFilters}
               className="p-2 text-gray-500 hover:text-blue-600 transition-colors"
@@ -513,6 +519,9 @@ const OrderListPage = () => {
                   </th>
                   <th className="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Mã đơn hàng
+                  </th>
+                  <th className="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center">
+                    Nguồn
                   </th>
 
                   <th className="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -578,6 +587,9 @@ const OrderListPage = () => {
                               )}
                             </div>
                           </Link>
+                        </td>
+                        <td className="px-4 py-4 text-center">
+                          <OrderSourceBadge source={order.source} />
                         </td>
 
                         <td className="px-4 py-4">

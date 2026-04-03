@@ -15,11 +15,13 @@ import {
   Settings,
   ChevronDown,
   ChevronRight,
+  Ticket,
 } from "lucide-react";
 import LogoTrendora from "../../../assets/LogoTrendora.png";
 import { getImageUrl } from "../../../helper/helper";
 import { fetchCategoriesRequest } from "../../../services/CategoryService";
 import CartDrawer from "./CartDrawer";
+import { usePromotion } from "../../../hooks/usePromotion";
 
 const CustomerNavbar = () => {
   const { user, logout } = useAuth();
@@ -33,6 +35,8 @@ const CustomerNavbar = () => {
   const [categories, setCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState(null);
   const [expandedMobileCategory, setExpandedMobileCategory] = useState(null);
+
+  const { promotions, fetchPromotions } = usePromotion();
   // Remove isCartOpen local state
 
   useEffect(() => {
@@ -56,6 +60,7 @@ const CustomerNavbar = () => {
 
     window.addEventListener("scroll", handleScroll);
     loadCategories();
+    fetchPromotions();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -77,11 +82,11 @@ const CustomerNavbar = () => {
             : "bg-transparent py-5"
         }`}
       >
-        <div className="max-w-full mx-auto px-4 md:px-8">
+        <div className="max-w-full mx-auto px-10 md:px-20">
           <div className="flex items-center justify-between">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2">
-              <div className=" flex items-center justify-center ">
+              <div className=" flex items-center justify-center w-full ">
                 <img
                   src={LogoTrendora}
                   alt="Logo"
@@ -142,12 +147,6 @@ const CustomerNavbar = () => {
                   )}
                 </div>
               ))}
-              <Link
-                to="/promotions"
-                className="px-4 py-2 text-sm font-bold text-gray-500 hover:text-black hover:bg-gray-50 rounded-xl transition-all"
-              >
-                KHUYẾN MÃI
-              </Link>
             </div>
 
             {/* Action Icons */}
@@ -172,8 +171,20 @@ const CustomerNavbar = () => {
               >
                 <Heart size={22} />
                 {wishlistItems.length > 0 && (
-                  <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-white">
+                  <span className="absolute top-1 right-1 w-4 h-4 bg-black text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-white">
                     {wishlistItems.length}
+                  </span>
+                )}
+              </button>
+
+              <button
+                onClick={() => navigate("/promotions")}
+                className="p-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-full transition-all relative"
+              >
+                <Ticket size={22} />
+                {promotions.length > 0 && (
+                  <span className="absolute top-1 right-1 w-4 h-4 bg-black text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-white">
+                    {promotions.length}
                   </span>
                 )}
               </button>

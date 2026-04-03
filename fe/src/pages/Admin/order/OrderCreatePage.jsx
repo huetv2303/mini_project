@@ -33,7 +33,7 @@ import PromotionModal from "./components/PromotionModal";
 import SelectSearch from "../../../components/common/SelectSearch";
 import { usePromotion } from "../../../hooks/usePromotion";
 import PaymentIntegration from "../../../components/common/PaymentIntegration";
-import { getBankConfigRequest } from "../../../services/PaymentService";
+import { fetchBankConfigRequest } from "../../../services/PaymentService";
 
 const debounce = (func, delay) => {
   let timer;
@@ -302,7 +302,7 @@ const OrderCreatePage = () => {
         const [pm, tr, bc] = await Promise.all([
           api.get("/payment-methods"),
           api.get("/tax-rates"),
-          getBankConfigRequest(),
+          fetchBankConfigRequest(),
         ]);
         setPaymentMethods(pm.data.data || pm.data);
         setTaxRates(tr.data.data || tr.data);
