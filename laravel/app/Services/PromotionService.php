@@ -97,7 +97,6 @@ class PromotionService
 
         if ($promotion->type === 'fixed') {
             $discountAmount = $promotion->value;
-            // Discount cannot exceed eligible subtotal
             if ($discountAmount > $eligibleSubtotal) {
                 $discountAmount = $eligibleSubtotal;
             }

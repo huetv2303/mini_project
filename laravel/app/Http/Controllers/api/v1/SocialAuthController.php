@@ -29,22 +29,18 @@ class SocialAuthController extends Controller
             return redirect(env('FRONTEND_URL') . '/login?error=Google authentication failed');
         }
 
-        // Tìm user theo google_id
         $user = User::where('google_id', $googleUser->id)->first();
 
         if (!$user) {
-            // Nếu chưa có google_id, tìm theo email
             $user = User::where('email', $googleUser->email)->first();
 
             if ($user) {
-                // Nếu tìm thấy email, cập nhật google_id và avatar
                 $user->update([
                     'google_id' => $googleUser->id,
                     'avatar' => $googleUser->avatar,
                     'email_verified_at' => $user->email_verified_at ?? now(),
                 ]);
             } else {
-                // Nếu chưa có cả email, tạo user mới
                 $defaultRole = Role::where('code', 'customer')->first();
 
                 $user = User::create([
@@ -57,14 +53,12 @@ class SocialAuthController extends Controller
                     'role_id' => 4,
                 ]);
 
-                // Create customer profile if role is customer
                 if ($defaultRole && $defaultRole->code === 'customer') {
                     CustomerProfile::create([
                         'user_id' => $user->id,
                     ]);
                 }
 
-                // Gửi email xác nhận
                 $user->sendEmailVerificationNotification();
             }
         } else {

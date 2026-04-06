@@ -24,7 +24,6 @@ class StockReceipt extends Model
         'total_amount' => 'decimal:2',
     ];
 
-    // ─── Relationships ───────────────────────────────────────────────────────
 
     public function supplier()
     {

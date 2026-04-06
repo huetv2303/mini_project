@@ -100,10 +100,10 @@ class PromotionController extends Controller
 
             if ($request->scope == 'category') {
                 $promotion->categories()->sync($request->category_ids ?? []);
-                $promotion->products()->detach(); // clear other scope
+                $promotion->products()->detach();
             } elseif ($request->scope == 'product') {
                 $promotion->products()->sync($request->product_ids ?? []);
-                $promotion->categories()->detach(); // clear other scope
+                $promotion->categories()->detach();
             } else {
                 $promotion->categories()->detach();
                 $promotion->products()->detach();
@@ -156,7 +156,6 @@ class PromotionController extends Controller
         }
 
         try {
-            // Channel is 'pos', customer_id is usually null for offline POS, or can be provided if selected
             $customerId = $request->input('customer_id');
 
             $promotion = $this->promotionService->validate(

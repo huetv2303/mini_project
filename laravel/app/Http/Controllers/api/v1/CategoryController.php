@@ -8,9 +8,11 @@ use App\Http\Requests\Category\UpdateCategoryRequest;
 use App\Services\CategoryService;
 use App\Services\UploadService;
 use App\Http\Resources\CategoryResource;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Facades\DB;
 
 class CategoryController extends Controller
 {
@@ -36,8 +38,6 @@ class CategoryController extends Controller
             ]);
         }
 
-        // Mặc định: Phân trang danh mục gốc để xây dựng cây thư mục (TreeView)
-        // Nếu gõ tìm kiếm: Lấy tất cả (không lọc cha) để người dùng tìm thấy cả cấp con
         if ($query instanceof Builder || $query instanceof Relation) {
             if (!$request->has('search') || empty($request->search)) {
                 $query->where(function ($q) {
@@ -49,7 +49,6 @@ class CategoryController extends Controller
                 ->withCount('children')
                 ->paginate(10);
         } else {
-            // Nếu là collection, lọc bằng PHP
             $data = $query->whereIn('parent_id', [null, 0]);
         }
 
@@ -125,7 +124,6 @@ class CategoryController extends Controller
                 return response()->json(['status' => 'error', 'message' => 'Không tìm thấy danh mục'], 404);
             }
 
-            // Kiểm tra xem có danh mục con không
             if ($category->children()->count() > 0) {
                 return response()->json([
                     'status' => 'error',
@@ -166,18 +164,16 @@ class CategoryController extends Controller
         $failedNames = [];
 
         try {
-            \Illuminate\Support\Facades\DB::beginTransaction();
+            DB::beginTransaction();
 
             foreach ($ids as $id) {
-                $category = \App\Models\Category::find($id);
+                $category = Category::find($id);
                 if ($category) {
-                    // Ngăn chặn xóa nếu còn danh mục con
                     if ($category->children()->count() > 0) {
                         $failedNames[] = $category->name;
                         continue;
                     }
 
-                    // Xóa ảnh trước khi xóa bản ghi
                     if ($category->image) {
                         $this->uploadService->deleteFile($category->image);
                     }
@@ -187,7 +183,7 @@ class CategoryController extends Controller
                 }
             }
 
-            \Illuminate\Support\Facades\DB::commit();
+            DB::commit();
 
             if (count($failedNames) > 0) {
                 $message = "Đã xóa {$deletedCount} danh mục.";
@@ -207,7 +203,7 @@ class CategoryController extends Controller
                 'deleted_count' => $deletedCount
             ]);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\DB::rollBack();
+            DB::rollBack();
             return response()->json([
                 'status' => 'error',
                 'message' => 'Có lỗi xảy ra: ' . $e->getMessage()

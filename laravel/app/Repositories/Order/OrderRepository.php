@@ -66,7 +66,7 @@ class OrderRepository implements OrderRepositoryInterface
 
     public function findById($id)
     {
-        return Order::with(['paymentMethod', 'shippingMethod', 'staff', 'items.variant', 'items.product', 'items.returnItems', 'taxRate', 'customer.customerProfile'])->findOrFail($id);
+        return Order::with(['paymentMethod', 'shippingMethod', 'staff', 'items.variant', 'items.product', 'items.returnItems', 'taxRate', 'customer.customerProfile', 'returns.items'])->findOrFail($id);
     }
 
     public function createOrder(array $data): Order

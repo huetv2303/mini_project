@@ -63,7 +63,6 @@ class DashboardController extends Controller
             $currentDate->addDay();
         }
 
-        // 6. Biểu đồ trạng thái đơn hàng
         $orderStatuses = Order::whereBetween('created_at', [$chartStart, $chartEnd])
             ->select('status', DB::raw('COUNT(*) as count'))
             ->groupBy('status')
@@ -81,11 +80,11 @@ class DashboardController extends Controller
 
         $orderStatusChart = [];
         $statusColors = [
-            'pending' => '#f59e0b',    // yellow/orange
-            'processing' => '#3b82f6', // blue
-            'shipped' => '#06b6d4',   // cyan
-            'delivered' => '#10b981',  // green
-            'cancelled' => '#ef4444',  // red
+            'pending' => '#f59e0b',
+            'processing' => '#3b82f6',
+            'shipped' => '#06b6d4',
+            'delivered' => '#10b981',
+            'cancelled' => '#ef4444',
             'returned' => '#d388d0ff',
             'partially' => '#9ca3af'
         ];
@@ -93,13 +92,12 @@ class DashboardController extends Controller
         foreach ($orderStatuses as $status) {
             $key = $status->status;
             $orderStatusChart[] = [
-                'name' => isset($statusMapping[$key]) ? $statusMapping[$key] : current(explode('_', $key)), // fallback
+                'name' => isset($statusMapping[$key]) ? $statusMapping[$key] : current(explode('_', $key)),
                 'value' => $status->count,
                 'color' => isset($statusColors[$key]) ? $statusColors[$key] : '#9ca3af',
             ];
         }
 
-        // 7. Top 5 sản phẩm bán chạy
         $topProducts = OrderItem::select('product_name', DB::raw('SUM(quantity) as total_sold'))
             ->join('orders', 'orders.id', '=', 'order_items.order_id')
             ->whereBetween('orders.created_at', [$chartStart, $chartEnd])
@@ -109,7 +107,6 @@ class DashboardController extends Controller
             ->limit(5)
             ->get()
             ->map(function ($item, $index) {
-                // Thêm màu sắc tĩnh cho chart
                 $colors = ['#22c55e', '#3b82f6', '#f59e0b', '#a855f7', '#ef4444'];
                 return [
                     'name' => $item->product_name,
@@ -118,7 +115,6 @@ class DashboardController extends Controller
                 ];
             });
 
-        // 8. Đơn hàng mới nhất
         $latestOrders = Order::with('paymentMethod')
             ->orderBy('created_at', 'desc')
             ->limit(5)
@@ -135,7 +131,6 @@ class DashboardController extends Controller
                 ];
             });
 
-        // 9. Sản phẩm sắp hết hàng
         $lowStockProducts = Inventory::with(['variant.product', 'variant.attributes'])
             ->whereColumn('quantity', '<=', 'min_quantity')
             ->orderBy('quantity', 'asc')

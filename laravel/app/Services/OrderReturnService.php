@@ -39,13 +39,12 @@ class OrderReturnService
         return DB::transaction(function () use ($data, $userId) {
             $order = $this->orderRepo->findById($data['order_id']);
 
-            if ($order->status !== 'delivered') {
+            if (!in_array($order->status, ['delivered', 'partially_returned'])) {
                 throw new \Exception('Chỉ có thể trả hàng cho đơn hàng đã giao thành công.');
             }
 
             $returnCode = 'RET-' . date('Ymd') . '-' . strtoupper(Str::random(5));
 
-            // Determine initial refund status
             $refundStatus = ($order->payment_status === 'paid' || $order->payment_status === 'partially_refunded')
                 ? 'pending'
                 : 'not_needed';
@@ -66,7 +65,6 @@ class OrderReturnService
             foreach ($data['items'] as $itemData) {
                 $orderItem = $order->items()->where('id', $itemData['order_item_id'])->firstOrFail();
 
-                // Check if returning quantity is valid
                 $alreadyReturned = $order->returns()
                     ->join('order_return_items', 'order_returns.id', '=', 'order_return_items.order_return_id')
                     ->where('order_return_items.order_item_id', $orderItem->id)
@@ -91,7 +89,6 @@ class OrderReturnService
 
             $orderReturn->update(['total_return_amount' => $totalReturnAmount]);
 
-            // Cập nhật số lượng "Đang về kho" (returning) trong tồn kho
             foreach ($orderReturn->items as $item) {
                 if ($item->product_variant_id) {
                     $this->inventoryService->updateReturningStock($item->product_variant_id, $item->quantity, true);
@@ -112,9 +109,7 @@ class OrderReturnService
             }
 
             foreach ($orderReturn->items as $item) {
-                // Update inventory
                 if ($item->product_variant_id) {
-                    // 1. Tăng kho thực tế
                     $this->inventoryService->increaseStock(
                         $item->product_variant_id,
                         $item->quantity,
@@ -125,11 +120,9 @@ class OrderReturnService
                         'order_return'
                     );
 
-                    // 2. Giảm số lượng "Đang về kho"
                     $this->inventoryService->updateReturningStock($item->product_variant_id, $item->quantity, false);
                 }
 
-                // Decrement sold_count
                 if ($item->product_id) {
                     Product::where('id', $item->product_id)
                         ->decrement('sold_count', $item->quantity);
@@ -138,12 +131,10 @@ class OrderReturnService
 
             $orderReturn->update(['receive_status' => 'received']);
 
-            // If refund is already done or not needed, complete the return
             if ($orderReturn->refund_status === 'refunded' || $orderReturn->refund_status === 'not_needed') {
                 $orderReturn->update(['status' => 'completed']);
             }
 
-            // Always update order status (partially_returned / returned)
             $this->updateOrderStatuses($orderReturn->order);
 
             return $orderReturn->load(['order', 'staff', 'items.orderItem']);
@@ -165,12 +156,10 @@ class OrderReturnService
 
             $orderReturn->update(['refund_status' => 'refunded']);
 
-            // If stock is already received, complete the return
             if ($orderReturn->receive_status === 'received') {
                 $orderReturn->update(['status' => 'completed']);
             }
 
-            // Always update order status
             $this->updateOrderStatuses($orderReturn->order);
 
             return $orderReturn->load(['order', 'staff', 'items.orderItem']);
@@ -189,7 +178,6 @@ class OrderReturnService
                 $this->refundMoney($id, $userId);
                 $updatedCount++;
             } catch (\Exception $e) {
-                // Ignore exceptions for batch processing (e.g. invalid status for refund)
                 continue;
             }
         }

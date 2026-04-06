@@ -25,11 +25,10 @@ class CartController extends Controller
     {
         $userId = $request->user()->id;
         $cartKey = $this->getCartKey($userId);
-        
+
         $cart = Redis::get($cartKey);
         $cartItems = $cart ? json_decode($cart, true) : [];
 
-        // Hydrate cart items with current product/variant data (Price, Image, etc.)
         $detailedItems = [];
         foreach ($cartItems as $variantId => $item) {
             $variant = ProductVariant::with(['product', 'attributes'])->find($variantId);
@@ -44,7 +43,7 @@ class CartController extends Controller
                     'image' => $variant->image ?? $variant->product->image,
                     'sku' => $variant->sku,
                     'attributes' => $variant->attributes,
-                    'slug' => $variant->product->slug // Added for frontend links
+                    'slug' => $variant->product->slug
                 ];
             }
         }
@@ -70,11 +69,9 @@ class CartController extends Controller
         $variantId = $request->variant_id;
         $quantity = $request->quantity;
 
-        // Get existing cart
         $cart = Redis::get($cartKey);
         $cartItems = $cart ? json_decode($cart, true) : [];
 
-        // Update or Add
         if (isset($cartItems[$variantId])) {
             $cartItems[$variantId]['quantity'] += $quantity;
         } else {
@@ -84,7 +81,6 @@ class CartController extends Controller
             ];
         }
 
-        // Save back to Redis (Expires in 30 days)
         Redis::setex($cartKey, 2592000, json_encode($cartItems));
 
         return response()->json([
@@ -112,7 +108,7 @@ class CartController extends Controller
         if (isset($cartItems[$variantId])) {
             $cartItems[$variantId]['quantity'] = $request->quantity;
             Redis::setex($cartKey, 2592000, json_encode($cartItems));
-            
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Số lượng đã được cập nhật'
@@ -139,7 +135,7 @@ class CartController extends Controller
         if (isset($cartItems[$variantId])) {
             unset($cartItems[$variantId]);
             Redis::setex($cartKey, 2592000, json_encode($cartItems));
-            
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Sản phẩm đã được xóa khỏi giỏ hàng'
@@ -159,7 +155,7 @@ class CartController extends Controller
     {
         $userId = $request->user()->id;
         $cartKey = $this->getCartKey($userId);
-        
+
         Redis::del($cartKey);
 
         return response()->json([

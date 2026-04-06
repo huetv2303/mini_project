@@ -4,7 +4,11 @@ namespace App\Http\Controllers\api\v1\Storefront;
 
 use App\Http\Controllers\Controller;
 use App\Interfaces\Order\CheckoutRepositoryInterface;
+use App\Models\PaymentMethod;
+use App\Services\Payment\VNPayService;
 use Illuminate\Http\Request;
+use \Illuminate\Support\Str;
+use \Illuminate\Support\Facades\Cache;
 
 class CheckoutController extends Controller
 {
@@ -50,20 +54,18 @@ class CheckoutController extends Controller
         $request->validate(array_merge($commonRules, $modeRules));
 
         try {
-            $paymentMethod = \App\Models\PaymentMethod::findOrFail($request->payment_method_id);
+            $paymentMethod = PaymentMethod::findOrFail($request->payment_method_id);
 
-            // Xử lý ví điện tử VNPay - KHÔNG tạo đơn ngay lập tức
             if ($paymentMethod->code === 'vnpay') {
                 $summary = $this->checkoutRepo->calculateSummary($request);
-                $paymentSessionCode = 'SES-' . strtoupper(\Illuminate\Support\Str::random(10));
+                $paymentSessionCode = 'SES-' . strtoupper(Str::random(10));
 
-                // Lưu thông tin đặt hàng vào Cache để dùng khi VNPay gọi callback/IPN
-                \Illuminate\Support\Facades\Cache::put($paymentSessionCode, $request->all(), now()->addHours(2));
+                Cache::put($paymentSessionCode, $request->all(), now()->addHours(2));
 
                 $frontendUrl = env('FRONTEND_URL', 'http://localhost:3000');
                 $returnUrl = rtrim($frontendUrl, '/') . '/checkout/vnpay-callback';
 
-                $paymentUrl = app(\App\Services\Payment\VNPayService::class)->generatePaymentUrl(
+                $paymentUrl = app(VNPayService::class)->generatePaymentUrl(
                     $summary['final_amount'],
                     $paymentSessionCode,
                     $returnUrl

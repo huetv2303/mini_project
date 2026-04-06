@@ -7,7 +7,6 @@ import React, {
 } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
-  ArrowLeft,
   Search,
   Plus,
   Minus,
@@ -18,9 +17,7 @@ import {
   MapPin,
   Tag,
   CreditCard,
-  Save,
   Loader2,
-  AlertCircle,
   Truck,
   Percent,
   X,
@@ -770,7 +767,6 @@ const OrderCreatePage = () => {
               )}
             </div>
 
-            {/* FULFILLMENT SECTION */}
             {activeSession.selectedItems.length > 0 && (
               <div className="bg-white rounded-lg border shadow-sm p-6 space-y-4">
                 <h3 className="font-bold text-sm uppercase flex items-center gap-2">
@@ -1107,11 +1103,13 @@ const OrderCreatePage = () => {
                 </h4>
                 <SelectSearch
                   placeholder="Chọn phương thức thanh toán"
-                  options={paymentMethods.map((pm) => ({
-                    icon: getImageUrl(pm.image),
-                    label: pm.name,
-                    value: pm.id,
-                  }))}
+                  options={paymentMethods
+                    .filter((pm) => pm.code !== "vnpay")
+                    .map((pm) => ({
+                      icon: getImageUrl(pm.image),
+                      label: pm.name,
+                      value: pm.id,
+                    }))}
                   value={activeSession.selectedPaymentMethod || ""}
                   onChange={(val) =>
                     patchSession({ selectedPaymentMethod: val })
@@ -1124,9 +1122,7 @@ const OrderCreatePage = () => {
                   const selectedMethod = paymentMethods.find(
                     (pm) => pm.id === activeSession.selectedPaymentMethod,
                   );
-                  if (
-                    ["bank_transfer", "vnpay"].includes(selectedMethod?.code)
-                  ) {
+                  if (["bank_transfer"].includes(selectedMethod?.code)) {
                     return (
                       <div className="bg-white rounded-lg border border-gray-100 p-6 shadow-sm animate-in fade-in slide-in-from-right-2 duration-300">
                         <h4 className="text-[0.8rem] font-bold text-gray-700 uppercase flex items-center gap-2 mb-4">
@@ -1141,11 +1137,6 @@ const OrderCreatePage = () => {
                           ]}
                           totalAmount={calculateTotal()}
                           isVnpayLoading={false}
-                          onVnpayPayment={() =>
-                            toast.error(
-                              "Vui lòng 'Xác nhận tạo đơn' trước khi tiến hành thanh toán VNPay",
-                            )
-                          }
                         />
                       </div>
                     );

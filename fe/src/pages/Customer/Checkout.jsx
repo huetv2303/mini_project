@@ -494,42 +494,45 @@ const Checkout = () => {
                 </div>
 
                 <div className="space-y-3">
-                  {shippingMethods.map((method) => (
-                    <label
-                      key={method.id}
-                      className={`flex items-center justify-between px-5 py-4 rounded-2xl border-2 cursor-pointer transition-all ${
-                        parseInt(formData.shipping_method_id) === method.id
-                          ? "border-black bg-gray-50"
-                          : "border-gray-100 hover:border-gray-200"
-                      }`}
-                    >
-                      <div className="flex items-center gap-4">
-                        <input
-                          type="radio"
-                          name="shipping_method_id"
-                          value={method.id}
-                          checked={
-                            parseInt(formData.shipping_method_id) === method.id
-                          }
-                          onChange={handleInputChange}
-                          className="w-5 h-5 accent-black"
-                        />
-                        <div>
-                          <p className="font-bold text-gray-900">
-                            {method.name}
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            {method.estimated_days
-                              ? `Dự kiến ${method.estimated_days} ngày`
-                              : method.estimated_delivery || ""}
-                          </p>
+                  {shippingMethods
+                    .filter((method) => method.id !== 3)
+                    .map((method) => (
+                      <label
+                        key={method.id}
+                        className={`flex items-center justify-between px-5 py-4 rounded-2xl border-2 cursor-pointer transition-all ${
+                          parseInt(formData.shipping_method_id) === method.id
+                            ? "border-black bg-gray-50"
+                            : "border-gray-100 hover:border-gray-200"
+                        }`}
+                      >
+                        <div className="flex items-center gap-4">
+                          <input
+                            type="radio"
+                            name="shipping_method_id"
+                            value={method.id}
+                            checked={
+                              parseInt(formData.shipping_method_id) ===
+                              method.id
+                            }
+                            onChange={handleInputChange}
+                            className="w-5 h-5 accent-black"
+                          />
+                          <div>
+                            <p className="font-bold text-gray-900">
+                              {method.name}
+                            </p>
+                            <p className="text-sm text-gray-500">
+                              {method.estimated_days
+                                ? `Dự kiến ${method.estimated_days} ngày`
+                                : method.estimated_delivery || ""}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                      <span className="font-black text-gray-900">
-                        {formatPrice(method.cost)}
-                      </span>
-                    </label>
-                  ))}
+                        <span className="font-black text-gray-900">
+                          {formatPrice(method.cost)}
+                        </span>
+                      </label>
+                    ))}
                   {errors.shipping_method_id && (
                     <p className="text-red-500 text-[10px] font-bold uppercase">
                       {errors.shipping_method_id}

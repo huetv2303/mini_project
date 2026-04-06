@@ -16,6 +16,7 @@ import {
   ChevronDown,
   ChevronRight,
   Ticket,
+  LayoutDashboard,
 } from "lucide-react";
 import LogoTrendora from "../../../assets/LogoTrendora.png";
 import { getImageUrl } from "../../../helper/helper";
@@ -35,6 +36,7 @@ const CustomerNavbar = () => {
   const [categories, setCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState(null);
   const [expandedMobileCategory, setExpandedMobileCategory] = useState(null);
+  const [isMobileAnimating, setIsMobileAnimating] = useState(false);
 
   const { promotions, fetchPromotions } = usePromotion();
   // Remove isCartOpen local state
@@ -84,7 +86,6 @@ const CustomerNavbar = () => {
       >
         <div className="max-w-full mx-auto px-10 md:px-20">
           <div className="flex items-center justify-between">
-            {/* Logo */}
             <Link to="/" className="flex items-center gap-2">
               <div className=" flex items-center justify-center w-full ">
                 <img
@@ -98,7 +99,6 @@ const CustomerNavbar = () => {
               </span>
             </Link>
 
-            {/* Navigation Links - Desktop */}
             <div className="hidden lg:flex items-center gap-1">
               {/* Dynamic Categories */}
               {categories.slice(0, 5).map((category) => (
@@ -121,7 +121,6 @@ const CustomerNavbar = () => {
                     )}
                   </Link>
 
-                  {/* Subcategories Dropdown */}
                   {category.children && category.children.length > 0 && (
                     <div className="absolute top-full left-0 min-w-[220px] bg-white border border-gray-100 shadow-2xl rounded-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 p-3 translate-y-2 group-hover:translate-y-0">
                       <div className="flex flex-col gap-1">
@@ -149,7 +148,6 @@ const CustomerNavbar = () => {
               ))}
             </div>
 
-            {/* Action Icons */}
             <div className="flex items-center gap-2 sm:gap-4">
               <button className="p-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-full transition-all">
                 <Search size={22} />
@@ -304,7 +302,6 @@ const CustomerNavbar = () => {
                 </div>
               )}
 
-              {/* Mobile Menu Toggle */}
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="lg:hidden p-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-full transition-all"
@@ -314,69 +311,105 @@ const CustomerNavbar = () => {
             </div>
           </div>
         </div>
+      </nav>
 
-        {/* Mobile Menu Overlay */}
-        {isMobileMenuOpen && (
-          <div className="fixed inset-0 z-[60] bg-white animate-in slide-in-from-right duration-300">
-            <div className="p-4 flex flex-col h-full">
-              <div className="flex items-center justify-between mb-8">
-                <Link
-                  to="/"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center gap-2"
-                >
-                  <div className=" flex items-center justify-center ">
-                    <img
-                      src={LogoTrendora}
-                      alt="Logo"
-                      className="w-10 h-10 object-cover rounded-lg"
-                    />
-                  </div>
-                  <span className="text-xl font-bold tracking-tight text-slate-900  sm:block">
-                    TRENDORA<span className="text-gray-400">FASHION</span>
+      {/* Mobile Menu Drawer */}
+      <div
+        className={`fixed inset-0 z-[100] lg:hidden transition-all duration-300 ${
+          isMobileMenuOpen ? "visible" : "invisible pointer-events-none"
+        }`}
+      >
+        {/* Backdrop */}
+        <div
+          className={`absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300 ${
+            isMobileMenuOpen ? "opacity-100" : "opacity-0"
+          }`}
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+
+        {/* Drawer Content */}
+        <div
+          className={`absolute top-0 right-0 w-[85%] max-w-sm h-full bg-white shadow-2xl transition-transform duration-300 ease-out flex flex-col ${
+            isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
+          }`}
+        >
+          {/* Header */}
+          <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-white sticky top-0 z-10">
+            <Link
+              to="/"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="flex items-center gap-2"
+            >
+              <img
+                src={LogoTrendora}
+                alt="Logo"
+                className="w-9 h-9 object-cover rounded-lg"
+              />
+              <span className="text-lg font-bold tracking-tight text-slate-900">
+                TRENDORA<span className="text-gray-400">FASHION</span>
+              </span>
+            </Link>
+            <button
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="p-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-full transition-all"
+            >
+              <X size={22} />
+            </button>
+          </div>
+
+          {/* Menu Items */}
+          <div className="flex-1 overflow-y-auto bg-white">
+            <div className="p-6 space-y-2">
+              <Link
+                to="/products"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl group transition-all active:scale-[0.98]"
+              >
+                <div className="flex items-center gap-3">
+                  <Package size={20} className="text-gray-400" />
+                  <span className="text-lg font-bold text-slate-900">
+                    Sản phẩm
                   </span>
-                </Link>
+                </div>
+                <ChevronRight size={18} className="text-gray-300" />
+              </Link>
+
+              {/* Mobile Categories Accordion */}
+              <div className="bg-gray-50 rounded-2xl overflow-hidden">
                 <button
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="p-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-full transition-all"
+                  onClick={() =>
+                    setExpandedMobileCategory(
+                      expandedMobileCategory === "all" ? null : "all",
+                    )
+                  }
+                  className="w-full flex items-center justify-between p-4 transition-all"
                 >
-                  <X size={24} />
-                </button>
-              </div>
-
-              <div className="flex flex-col gap-4">
-                <Link
-                  to="/products"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="text-2xl font-bold border-b border-gray-50 pb-2 flex items-center justify-between"
-                >
-                  Sản phẩm
-                  <ChevronRight size={20} className="text-gray-300" />
-                </Link>
-
-                {/* Mobile Categories */}
-                <div className="flex flex-col">
-                  <div
-                    className="text-2xl font-bold border-b border-gray-50 pb-2 flex items-center justify-between cursor-pointer"
-                    onClick={() =>
-                      setExpandedMobileCategory(
-                        expandedMobileCategory === "all" ? null : "all",
-                      )
-                    }
-                  >
-                    Danh mục
-                    <ChevronDown
-                      size={20}
-                      className={`transition-transform ${expandedMobileCategory === "all" ? "rotate-180" : ""} text-gray-300`}
-                    />
+                  <div className="flex items-center gap-3">
+                    <Menu size={20} className="text-gray-400" />
+                    <span className="text-lg font-bold text-slate-900">
+                      Danh mục
+                    </span>
                   </div>
+                  <ChevronDown
+                    size={18}
+                    className={`transition-transform duration-300 ${
+                      expandedMobileCategory === "all" ? "rotate-180" : ""
+                    } text-gray-400`}
+                  />
+                </button>
 
-                  {expandedMobileCategory === "all" && (
-                    <div className="pl-4 py-4 flex flex-col gap-4 animate-in fade-in slide-in-from-left-2 transition-all">
-                      {categories.map((category) => (
-                        <div key={category.id} className="flex flex-col gap-2">
+                {expandedMobileCategory && (
+                  <div className="px-4 pb-4 animate-in fade-in slide-in-from-top-2">
+                    <div className="space-y-4 pt-2 border-t border-gray-100">
+                      {(expandedMobileCategory === "all"
+                        ? categories
+                        : categories.filter(
+                            (c) => c.id === expandedMobileCategory,
+                          )
+                      ).map((category) => (
+                        <div key={category.id} className="space-y-2">
                           <div
-                            className="font-bold text-gray-900 flex items-center justify-between"
+                            className="flex items-center justify-between"
                             onClick={(e) => {
                               if (
                                 category.children &&
@@ -395,26 +428,31 @@ const CustomerNavbar = () => {
                             <Link
                               to={`/products?category=${category.slug}`}
                               onClick={() => setIsMobileMenuOpen(false)}
+                              className="font-bold text-slate-700 text-sm py-1"
                             >
                               {category.name}
                             </Link>
                             {category.children &&
                               category.children.length > 0 && (
-                                <ChevronDown
-                                  size={18}
-                                  className={`transition-transform ${expandedMobileCategory === category.id ? "rotate-180" : ""} text-gray-400`}
+                                <ChevronRight
+                                  size={16}
+                                  className={`text-gray-300 transition-transform ${
+                                    expandedMobileCategory === category.id
+                                      ? "rotate-90"
+                                      : ""
+                                  }`}
                                 />
                               )}
                           </div>
 
                           {expandedMobileCategory === category.id && (
-                            <div className="pl-4 py-2 flex flex-col gap-3 border-l-2 border-gray-100">
+                            <div className="pl-4 space-y-3 pt-1 border-l border-gray-100 ml-1">
                               {category.children.map((child) => (
                                 <Link
                                   key={child.id}
                                   to={`/products?category=${child.slug}`}
                                   onClick={() => setIsMobileMenuOpen(false)}
-                                  className="text-gray-500 font-medium"
+                                  className="block text-sm text-gray-500 font-medium py-1"
                                 >
                                   {child.name}
                                 </Link>
@@ -424,58 +462,96 @@ const CustomerNavbar = () => {
                         </div>
                       ))}
                     </div>
-                  )}
-                </div>
-
-                <Link
-                  to="/promotions"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="text-2xl font-bold border-b border-gray-50 pb-2 flex items-center justify-between"
-                >
-                  Khuyến mãi
-                  <ChevronRight size={20} className="text-gray-300" />
-                </Link>
-                <Link
-                  to="/wishlist"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="text-2xl font-bold border-b border-gray-50 pb-2 flex items-center justify-between"
-                >
-                  Yêu thích
-                  <ChevronRight size={20} className="text-gray-300" />
-                </Link>
-              </div>
-
-              <div className="mt-auto py-8">
-                {!user ? (
-                  <div className="flex flex-col gap-4">
-                    <Link
-                      to="/login"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="w-full py-4 text-center font-bold border-2 border-gray-100 rounded-2xl"
-                    >
-                      Đăng nhập
-                    </Link>
-                    <Link
-                      to="/register"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="w-full py-4 text-center font-bold bg-black text-white rounded-2xl"
-                    >
-                      Đăng ký ngay
-                    </Link>
                   </div>
-                ) : (
-                  <button
-                    onClick={handleLogout}
-                    className="w-full py-4 text-center font-bold bg-red-50 text-red-500 rounded-2xl"
-                  >
-                    Đăng xuất
-                  </button>
                 )}
               </div>
+
+              <Link
+                to="/promotions"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl transition-all active:scale-[0.98]"
+              >
+                <div className="flex items-center gap-3">
+                  <Ticket size={20} className="text-gray-400" />
+                  <span className="text-lg font-bold text-slate-900">
+                    Khuyến mãi
+                  </span>
+                </div>
+                <ChevronRight size={18} className="text-gray-300" />
+              </Link>
+
+              <Link
+                to="/profile"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl transition-all active:scale-[0.98]"
+              >
+                <div className="flex items-center gap-3">
+                  <User size={20} className="text-gray-400" />
+                  <span className="text-lg font-bold text-slate-900">
+                    Tài khoản
+                  </span>
+                </div>
+                <ChevronRight size={18} className="text-gray-300" />
+              </Link>
             </div>
           </div>
-        )}
-      </nav>
+
+          {/* Footer Actions */}
+          <div className="p-6 border-t border-gray-100 bg-white sticky bottom-0">
+            {!user ? (
+              <div className="grid grid-cols-2 gap-4">
+                <Link
+                  to="/login"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="py-4 text-center text-sm font-bold border border-gray-200 rounded-2xl hover:bg-gray-50 transition-colors"
+                >
+                  Đăng nhập
+                </Link>
+                <Link
+                  to="/register"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="py-4 text-center text-sm font-bold bg-black text-white rounded-2xl hover:bg-black/90 shadow-lg shadow-black/10 transition-all"
+                >
+                  Đăng ký
+                </Link>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center gap-4 p-3 bg-gray-50 rounded-2xl">
+                  <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-200 border border-white shadow-sm">
+                    {user.avatar ? (
+                      <img
+                        src={getImageUrl(user.avatar)}
+                        alt={user.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-black text-white text-sm font-bold">
+                        {user.name?.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-slate-900 truncate">
+                      {user.name}
+                    </p>
+                    <p className="text-xs text-gray-500 truncate">
+                      {user.email}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="w-full py-4 text-center text-sm font-bold bg-rose-50 text-rose-500 rounded-2xl hover:bg-rose-100 transition-colors flex items-center justify-center gap-2"
+                >
+                  <LogOut size={18} />
+                  Đăng xuất
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
       <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </>
   );

@@ -42,7 +42,6 @@ class PaymentMethodController extends Controller
         $data = $request->except('image');
 
         if ($request->hasFile('image')) {
-            // Delete old image if exists
             if ($method->image && Storage::disk('public')->exists($method->image)) {
                 Storage::disk('public')->delete($method->image);
             }

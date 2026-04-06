@@ -13,7 +13,6 @@ class UploadService
 
     public function __construct()
     {
-        // Khởi tạo ImageManager với driver GD
         $this->manager = new ImageManager(new Driver());
     }
 

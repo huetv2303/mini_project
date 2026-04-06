@@ -26,11 +26,10 @@ class OrderReturnResource extends JsonResource
             'created_by'          => $this->created_by,
             'created_at'          => $this->created_at,
             'updated_at'          => $this->updated_at,
-            
-            // Relations
+
             'order' => new OrderResource($this->whenLoaded('order')),
             'staff' => new UserResource($this->whenLoaded('staff')),
-            'items' => $this->whenLoaded('items'), // You can add OrderReturnItemResource later if needed
+            'items' => $this->whenLoaded('items'),
         ];
     }
 }

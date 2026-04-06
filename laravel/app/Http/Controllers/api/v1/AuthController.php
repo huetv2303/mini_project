@@ -62,7 +62,6 @@ class AuthController extends Controller
 
     public function verify(Request $request, $id, $hash)
     {
-        // Kiểm tra chữ ký hợp lệ của Laravel
         if (!$request->hasValidSignature()) {
             return response()->json(['message' => 'Đường dẫn xác nhận đã hết hạn hoặc không hợp lệ.'], 400);
         }
@@ -134,7 +133,6 @@ class AuthController extends Controller
                 ], 422);
             }
         } else {
-            // Tài khoản Google chưa đặt mật khẩu
             $request->validate([
                 'password' => 'required|string|min:8|confirmed',
             ], [

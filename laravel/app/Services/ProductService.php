@@ -41,16 +41,13 @@ class ProductService
     public function createProduct(array $data, $request)
     {
         return DB::transaction(function () use ($data, $request) {
-            //  Tạo Product chính
             $product = $this->productRepo->createProduct($data);
 
-            //  Upload Feature Image
             if ($request->hasFile('feature_image')) {
                 $img =  $this->uploadImageService->uploadFile($request->file('feature_image'), 'products', 800, 800);
                 $product->update(['feature_image' => $img['path']]);
             }
 
-            // Tạo Product Images 
             if (isset($data['images']) && is_array($data['images'])) {
                 foreach ($data['images'] as $index => $imgData) {
                     if ($request->hasFile("images.$index.file")) {
@@ -66,7 +63,6 @@ class ProductService
                 }
             }
 
-            //  Tạo Product Attributes 
             if (isset($data['attributes']) && is_array($data['attributes'])) {
                 foreach ($data['attributes'] as $attr) {
                     $this->productAttributeRepo->createProAttribute([
@@ -78,7 +74,6 @@ class ProductService
                 }
             }
 
-            // Tạo Product Variants
             if (isset($data['variants']) && is_array($data['variants'])) {
                 foreach ($data['variants'] as $vIndex => $variantData) {
                     $variantData['product_id'] = $product->id;
@@ -173,7 +168,7 @@ class ProductService
                     if ($imgId && in_array($imgId, $existingImageIds)) {
                         $imageRecord = $existingImages->firstWhere('id', $imgId);
                         $imgUpdateData = $imgData;
-                        unset($imgUpdateData['file']); // Không để lọt object file vào model
+                        unset($imgUpdateData['file']);
 
                         if ($request->hasFile("images.$index.file")) {
                             if ($imageRecord && $imageRecord->image_path) {

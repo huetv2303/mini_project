@@ -14,7 +14,6 @@ const CustomerFooter = () => {
     <footer className="bg-white border-t border-gray-100 pt-32 pb-16">
       <div className="max-w-full mx-auto px-4 md:px-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-16 mb-24">
-          {/* Brand Column */}
           <div className="lg:col-span-2 space-y-8">
             <Link to="/" className="  flex items-center gap-3">
               <div className="w-12 h-12 bg-black flex items-center justify-center rounded-2xl shadow-xl shadow-black/10">
@@ -91,7 +90,6 @@ const CustomerFooter = () => {
             </ul>
           </div>
 
-          {/* Newsletter Column */}
           <div className="space-y-8">
             <h4 className="font-black text-slate-900 uppercase text-xs tracking-[0.2em]">
               Newsletter
@@ -115,7 +113,7 @@ const CustomerFooter = () => {
 
         <div className="pt-12 border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-8">
           <p className="text-gray-400 text-xs font-bold uppercase tracking-widest">
-            © 2026 TRENDORA FASHION. THIẾT KẾ BỞI ANTIGRAVITY.
+            © 2026 TRENDORA FASHION.
           </p>
           <div className="flex items-center gap-10">
             {["Điều khoản", "Bảo mật", "Cookies"].map((item) => (

@@ -203,7 +203,6 @@ class InventoryService
         $startDate = \Carbon\Carbon::createFromDate($year, $month, 1)->startOfMonth();
         $endDate = $startDate->copy()->endOfMonth();
 
-        // 1. Lấy toàn bộ dữ liệu để tính "Biến động trong tháng" (Totals) phục vụ các thẻ thống kê
         $allInventories = Inventory::with(['variant.product', 'variant.attributes'])->get();
 
         $transactionsInMonthRaw = DB::table('inventory_transactions')
@@ -224,7 +223,6 @@ class InventoryService
         foreach ($allInventories as $inv) {
             if (!$inv->variant) continue;
 
-            // Tính toán lượng thay đổi sau tháng báo cáo để ra endStock của tháng đó
             $changesAfter = DB::table('inventory_transactions')
                 ->where('variant_id', $inv->variant_id)
                 ->where('created_at', '>', $endDate)
@@ -246,7 +244,6 @@ class InventoryService
             }
         }
 
-        // 2. Lấy dữ liệu phân trang cho bảng hiển thị
         $paginatedInventories = Inventory::with(['variant.product', 'variant.attributes'])->paginate(10);
 
         $transactionsAfter = DB::table('inventory_transactions')

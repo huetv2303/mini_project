@@ -621,11 +621,13 @@ const OrderDetailsPage = () => {
                     label="Thay đổi phương thức"
                     value={selectedPaymentMethod}
                     onChange={(val) => handleUpdatePaymentMethod(val)}
-                    options={paymentMethods.map((pm) => ({
-                      icon: getImageUrl(pm.image),
-                      value: pm.id,
-                      label: pm.name,
-                    }))}
+                    options={paymentMethods
+                      .filter((pm) => pm.code !== "vnpay")
+                      .map((pm) => ({
+                        icon: getImageUrl(pm.image),
+                        value: pm.id,
+                        label: pm.name,
+                      }))}
                     disabled={updating || order.payment_status === "paid"}
                   />
                 </div>
@@ -635,8 +637,6 @@ const OrderDetailsPage = () => {
                   bankConfig={bankConfig}
                   validOrders={[order]}
                   totalAmount={order.final_amount}
-                  isVnpayLoading={updating}
-                  onVnpayPayment={handleVnpayPayment}
                 />
               </div>
             )}

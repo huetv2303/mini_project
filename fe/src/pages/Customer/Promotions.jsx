@@ -256,11 +256,6 @@ const Promotions = () => {
                         </div>
                         <div className="h-px flex-1 bg-slate-200  hidden lg:block mx-12 mb-6" />
                       </div>
-                      {/* <div className="hidden md:block mb-3">
-                        <span className="text-sm font-black  items-center   uppercase">
-                          {groupedPromotions[scope].length} Mã khả dụng
-                        </span>
-                      </div> */}
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {groupedPromotions[scope].map((promo) => (
                           <PromotionCard key={promo.id} promo={promo} />

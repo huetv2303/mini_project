@@ -62,7 +62,6 @@ class PaymentController extends Controller
         $inputData = $request->all();
         $orderId = null;
 
-        // Lấy mã phiên thanh toán hoặc mã đơn hàng
         $vnp_TxnRef = $request->get('vnp_TxnRef');
         $lastHyphenPos = strrpos($vnp_TxnRef, '-');
         $sessionCode = $lastHyphenPos !== false ? substr($vnp_TxnRef, 0, $lastHyphenPos) : $vnp_TxnRef;
@@ -115,7 +114,7 @@ class PaymentController extends Controller
         return response()->json([
             'status' => 'success',
             'data' => [
-                'bank_id' => config('bank.bank_id', '970436'), // VCB by default
+                'bank_id' => config('bank.bank_id', '970436'),
                 'account_no' => config('bank.account_no', '1111111111'),
                 'account_name' => config('bank.account_name', 'NGUYEN VAN A'),
             ]

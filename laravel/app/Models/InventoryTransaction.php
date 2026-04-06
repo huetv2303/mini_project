@@ -6,8 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class InventoryTransaction extends Model
 {
-    public $timestamps = false; // Chỉ dùng created_at, không có updated_at
-
+    public $timestamps = false;
     protected $fillable = [
         'variant_id',
         'type',

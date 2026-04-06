@@ -39,7 +39,6 @@ class StockReceiptService
             $items       = $data['items'];
             $totalAmount = 0;
 
-            // Tính tổng tiền
             foreach ($items as $item) {
                 $totalAmount += $item['quantity'] * $item['unit_price'];
             }
@@ -56,7 +55,6 @@ class StockReceiptService
                 'received_at'  => $data['received_at'] ?? null,
             ]);
 
-            // Tạo các dòng chi tiết
             foreach ($items as $item) {
                 $receipt->items()->create([
                     'variant_id'  => $item['variant_id'],

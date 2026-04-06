@@ -111,3 +111,12 @@ export const refundOrderRequest = async (id) => {
     throw error;
   }
 };
+
+export const submitReturnRequest = async (id, data) => {
+  try {
+    const response = await api.post(`/my-orders/${id}/return`, data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

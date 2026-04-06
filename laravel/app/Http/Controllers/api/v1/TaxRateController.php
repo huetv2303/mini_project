@@ -58,9 +58,9 @@ class TaxRateController extends Controller
     public function destroy($id)
     {
         $taxRate = TaxRate::findOrFail($id);
-        
+
         if (Order::where('tax_rate_id', $id)->exists()) {
-             return response()->json(['message' => 'Không thể xóa mức thuế đang được sử dụng trong đơn hàng.'], 400);
+            return response()->json(['message' => 'Không thể xóa mức thuế đang được sử dụng trong đơn hàng.'], 400);
         }
 
         $taxRate->delete();
@@ -80,7 +80,6 @@ class TaxRateController extends Controller
             $end   = Carbon::now()->endOfDay();
         }
 
-        // Tổng hợp theo mức thuế
         $byTaxRate = Order::where('status', 'delivered')
             ->whereBetween('created_at', [$start, $end])
             ->whereNotNull('tax_rate_id')
@@ -103,12 +102,10 @@ class TaxRateController extends Controller
                 'total_revenue'    => (float) $row->total_revenue,
             ]);
 
-        // Tổng tiền thuế tất cả mức
         $totalTax = Order::where('status', 'delivered')
             ->whereBetween('created_at', [$start, $end])
             ->sum('tax_amount');
 
-        // Số đơn không áp thuế
         $ordersWithoutTax = Order::where('status', 'delivered')
             ->whereBetween('created_at', [$start, $end])
             ->where(function ($q) {
@@ -116,7 +113,6 @@ class TaxRateController extends Controller
             })
             ->count();
 
-        // Biểu đồ thuế theo ngày
         $dailyData = Order::where('status', 'delivered')
             ->whereBetween('created_at', [$start, $end])
             ->select(

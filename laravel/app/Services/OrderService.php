@@ -52,7 +52,6 @@ class OrderService
             foreach ($items as $item) {
                 $variant = ProductVariant::with('product')->findOrFail($item['product_variant_id']);
 
-                // Kiểm tra tồn kho
                 $inventory = Inventory::where('variant_id', $variant->id)->first();
                 $available = $inventory ? $inventory->quantity : 0;
                 if ($available < $item['quantity']) {
@@ -78,7 +77,6 @@ class OrderService
                 ];
             }
 
-            // Tính phí vận chuyển và ngày dự kiến
             $shippingMethodId = $data['shipping_method_id'] ?? null;
             if ($shippingMethodId) {
                 $shippingMethod = ShippingMethod::findOrFail($shippingMethodId);
@@ -91,7 +89,6 @@ class OrderService
 
             $discountAmount = $data['discount_amount'] ?? 0;
 
-            // Tính thuế
             $taxRateId = $data['tax_rate_id'] ?? null;
             $taxRateSnapshot = 0;
             $taxAmount = 0;
@@ -107,7 +104,6 @@ class OrderService
 
             $code = 'ORD-' . date('Ymd') . '-' . strtoupper(Str::random(5));
 
-            // Xử lý thông tin khách hàng (Snapshot)
             $customerId = $data['customer_id'] ?? null;
             $customerName = $data['customer_name'] ?? null;
             $customerPhone = $data['customer_phone'] ?? null;
@@ -153,7 +149,6 @@ class OrderService
                 'source'                 => 'pos',
             ]);
 
-            // Tạo OrderItems
             foreach ($preparedItems as $itemData) {
                 $order->items()->create($itemData);
             }
@@ -474,17 +469,14 @@ class OrderService
 
     private function getItemImage($variant)
     {
-        // 1. Ưu tiên ảnh của biến thể
         if ($variant->image) {
             return $variant->image;
         }
 
-        // 2. Nếu không có, lấy ảnh đại diện (Feature Image) của sản phẩm
         if ($variant->product && $variant->product->feature_image) {
             return $variant->product->feature_image;
         }
 
-        // 3. Nếu vẫn không có, lấy ảnh đầu tiên trong gallery sản phẩm
         if ($variant->product) {
             $firstImage = $variant->product->images()->first();
             if ($firstImage) {

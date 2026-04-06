@@ -71,7 +71,7 @@ class CustomerController extends Controller
             'address' => 'nullable|string',
             'gender' => 'nullable|string',
             'date_of_birth' => 'nullable|date',
-            'image' => 'nullable|image|max:2048', // Nhận file upload
+            'image' => 'nullable|image|max:2048',
         ]);
 
         if ($request->hasFile('image')) {

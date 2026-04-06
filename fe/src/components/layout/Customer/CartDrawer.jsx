@@ -80,7 +80,6 @@ const CartDrawer = ({ isOpen, onClose }) => {
         promotions={eligiblePromotions}
       />
 
-      {/* Drawer */}
       <div
         className={`relative w-full max-w-md bg-white h-full shadow-2xl flex flex-col transition-transform duration-300 ${
           animating ? "translate-x-0" : "translate-x-full"

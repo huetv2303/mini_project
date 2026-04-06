@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\User;
 use App\Models\Role;
 use App\Interfaces\UserRepositoryInterface;
+use App\Models\CustomerProfile;
 use Illuminate\Support\Facades\Hash;
 
 class UserRepository implements UserRepositoryInterface
@@ -33,8 +34,7 @@ class UserRepository implements UserRepositoryInterface
         if ($roleId) {
             $customerRole = Role::where('code', 'customer')->first();
             if ($customerRole && $roleId == $customerRole->id) {
-                // Tạo customer profile cho customer
-                \App\Models\CustomerProfile::create([
+                CustomerProfile::create([
                     'user_id' => $user->id,
                 ]);
             }

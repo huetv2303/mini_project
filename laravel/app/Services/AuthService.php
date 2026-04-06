@@ -28,7 +28,6 @@ class AuthService
             throw new \Exception('InvalidCredentials');
         }
 
-        // Nếu là tài khoản Google mà chưa đặt mật khẩu
         if ($user->google_id && !$user->password) {
             throw new \Exception('GoogleAccountOnly');
         }

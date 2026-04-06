@@ -75,6 +75,26 @@ class OrderResource extends JsonResource
             ),
             'created_at'       => $this->created_at?->format('Y-m-d H:i:s'),
             'updated_at'       => $this->updated_at?->format('Y-m-d H:i:s'),
+            'returns'          => $this->whenLoaded('returns', fn() =>
+                $this->returns->map(fn($r) => [
+                    'id'                  => $r->id,
+                    'return_code'         => $r->return_code,
+                    'reason'              => $r->reason,
+                    'status'              => $r->status,
+                    'receive_status'      => $r->receive_status,
+                    'refund_status'       => $r->refund_status,
+                    'total_return_amount' => (float) $r->total_return_amount,
+                    'created_at'          => $r->created_at?->format('Y-m-d H:i:s'),
+                    'items'               => $r->items->map(fn($item) => [
+                        'id'           => $item->id,
+                        'order_item_id'=> $item->order_item_id,
+                        'product_id'   => $item->product_id,
+                        'quantity'     => $item->quantity,
+                        'price'        => (float) $item->price,
+                        'subtotal'     => (float) $item->subtotal,
+                    ]),
+                ])
+            ),
         ];
     }
 }

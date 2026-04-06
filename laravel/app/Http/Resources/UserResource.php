@@ -3,7 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Http\Request; // Added this import for Request type hint
+use Illuminate\Http\Request;
 
 class UserResource extends JsonResource
 {

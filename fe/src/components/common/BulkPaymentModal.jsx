@@ -3,15 +3,8 @@ import {
   fetchBankConfigRequest,
   createVNPayPaymentRequest,
 } from "../../services/PaymentService";
-import {
-  X,
-  CheckCircle,
-  XCircle,
-  AlertTriangle,
-  CreditCard,
-  ExternalLink,
-} from "lucide-react";
-import { formatPrice } from "../../helper/helper";
+import { X } from "lucide-react";
+import { formatPrice, getImageUrl } from "../../helper/helper";
 import toast from "react-hot-toast";
 import PaymentIntegration from "./PaymentIntegration";
 
@@ -43,19 +36,16 @@ const BulkPaymentModal = ({
     let total = 0;
 
     selectedOrders.forEach((order) => {
-      // Logic: Already fully paid is invalid
       if (order.payment_status === "paid") {
         invalid.push({ order, reason: "Đơn hàng đã thanh toán toàn bộ" });
         return;
       }
 
-      // Logic: Refunded orders shouldn't be paid
       if (order.payment_status === "refunded") {
         invalid.push({ order, reason: "Đơn hàng đã được hoàn tiền" });
         return;
       }
 
-      // Logic: Cancelled or Fully Returned are invalid
       if (order.status === "cancelled" || order.status === "returned") {
         invalid.push({ order, reason: "Đơn hàng đã chốt (Hủy/Trả hàng)" });
         return;
@@ -95,8 +85,6 @@ const BulkPaymentModal = ({
         bankConfig={bankConfig}
         validOrders={validOrders}
         totalAmount={totalAmount}
-        isVnpayLoading={isVnpayLoading}
-        onVnpayPayment={handleVnpayPayment}
       />
     );
   };
@@ -111,15 +99,12 @@ const BulkPaymentModal = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
       <div
         className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm"
         onClick={onClose}
       />
 
-      {/* Modal */}
       <div className="relative bg-white rounded-xl max-h-[800px] overflow-y-auto shadow-2xl w-full max-w-2xl flex flex-col animate-in fade-in zoom-in-95 duration-200">
-        {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-100">
           <h2 className="text-xl font-bold text-gray-800">
             Thanh toán đơn hàng
@@ -173,7 +158,6 @@ const BulkPaymentModal = ({
 
               {invalidOrders.length > 0 && (
                 <div className="space-y-2 pl-6">
-                  {/* Group invalid orders by reason for cleaner UI if many */}
                   {Array.from(new Set(invalidOrders.map((i) => i.reason))).map(
                     (reason) => (
                       <div
@@ -209,11 +193,18 @@ const BulkPaymentModal = ({
               className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
             >
               <option value="">Chọn phương thức thanh toán</option>
-              {paymentMethods.map((method) => (
-                <option key={method.id} value={method.id}>
-                  {method.name}
-                </option>
-              ))}
+              {paymentMethods
+                .filter((pm) => pm.code !== "vnpay")
+                .map((method) => (
+                  <option key={method.id} value={method.id}>
+                    <img
+                      src={getImageUrl(method.image)}
+                      alt={method.name}
+                      className="w-5 h-5"
+                    />
+                    {method.name}
+                  </option>
+                ))}
             </select>
           </div>
 

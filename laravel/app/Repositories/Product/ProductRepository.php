@@ -3,6 +3,7 @@
 namespace App\Repositories\Product;
 
 use App\Interfaces\Product\ProductRepositoryInterface;
+use App\Models\Category;
 use App\Models\Product;
 
 class ProductRepository implements ProductRepositoryInterface
@@ -10,14 +11,13 @@ class ProductRepository implements ProductRepositoryInterface
     public function getAll($request = null)
     {
         $query = Product::with(['category', 'supplier', 'images', 'attributes', 'variants.attributes', 'variants.inventories']);
-        
+
         if ($request) {
             if ($request->search) {
                 $query->where('name', 'like', '%' . $request->search . '%');
             }
             if ($request->category) {
-                // Find all category IDs including descendants
-                $category = \App\Models\Category::where('slug', $request->category)->first();
+                $category = Category::where('slug', $request->category)->first();
                 if ($category) {
                     $categoryIds = $this->getAllCategoryIds($category);
                     $query->whereIn('category_id', $categoryIds);
@@ -25,10 +25,6 @@ class ProductRepository implements ProductRepositoryInterface
             }
             if ($request->sort) {
                 if ($request->sort === 'latest') $query->latest();
-                if ($request->sort === 'price_low') {
-                    // This is complex because price is in variants. 
-                    // Let's just do a simple fallback for now or leave it.
-                }
             }
         }
 

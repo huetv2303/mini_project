@@ -116,15 +116,13 @@ class VNPayService
                     return ['RspCode' => '04', 'Message' => 'invalid amount'];
                 }
             } else {
-                // Check if it's a payment session (for success-before-order flow)
                 if (str_starts_with($orderCode, 'SES-') && $responseCode == '00') {
-                     $updateOrderCallback(null, 'paid');
-                     return ['RspCode' => '00', 'Message' => 'Confirm Success (Session)'];
+                    $updateOrderCallback(null, 'paid');
+                    return ['RspCode' => '00', 'Message' => 'Confirm Success (Session)'];
                 }
                 Log::error("VNPay Order Not Found: Code: {$orderCode}");
                 return ['RspCode' => '01', 'Message' => 'Order not found'];
             }
-
         } else {
             Log::error("VNPay Signature Mismatch!");
             Log::error("Calculated Hash: " . $secureHash);

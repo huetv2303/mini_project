@@ -21,7 +21,7 @@ class WishlistController extends Controller
     {
         $userId = $request->user()->id;
         $wishlistKey = $this->getWishlistKey($userId);
-        
+
         $wishlist = Redis::get($wishlistKey);
         $productIds = $wishlist ? json_decode($wishlist, true) : [];
 
@@ -52,18 +52,15 @@ class WishlistController extends Controller
         $index = array_search($productId, $wishlist);
 
         if ($index !== false) {
-            // Remove
             array_splice($wishlist, $index, 1);
             $action = 'removed';
             $message = 'Đã xóa khỏi danh sách yêu thích';
         } else {
-            // Add
             $wishlist[] = $productId;
             $action = 'added';
             $message = 'Đã thêm vào danh sách yêu thích';
         }
 
-        // Save back to Redis (No expiration for wishlist usually, but let's keep it long 90 days)
         Redis::setex($wishlistKey, 7776000, json_encode($wishlist));
 
         return response()->json([

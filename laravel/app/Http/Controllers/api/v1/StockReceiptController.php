@@ -62,7 +62,6 @@ class StockReceiptController extends Controller
         }
     }
 
-    // Xác nhận phiếu nhập
     public function confirm($id)
     {
         try {
@@ -80,7 +79,6 @@ class StockReceiptController extends Controller
         }
     }
 
-    // Hủy phiếu nhập kho
     public function cancel($id)
     {
         try {

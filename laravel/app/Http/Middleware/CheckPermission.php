@@ -8,16 +8,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CheckPermission
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  Closure(Request): (Response)  $next
-     */
+
     public function handle(Request $request, Closure $next, string $permission): Response
     {
         $user = $request->user();
 
-        // Nếu chưa đăng nhập hoặc không có quyền tương ứng
         if (!$user || !$user->hasPermission($permission)) {
             return response()->json([
                 'success' => false,

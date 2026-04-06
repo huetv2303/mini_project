@@ -4,21 +4,24 @@ namespace App\Http\Controllers\api\v1\Storefront;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\OrderResource;
+use App\Http\Resources\OrderReturnResource;
 use App\Services\OrderService;
+use App\Services\OrderReturnService;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
     protected $orderService;
+    protected $orderReturnService;
 
-    public function __construct(OrderService $orderService)
+    public function __construct(OrderService $orderService, OrderReturnService $orderReturnService)
     {
         $this->orderService = $orderService;
+        $this->orderReturnService = $orderReturnService;
     }
 
     public function index(Request $request)
     {
-        // Force customer_id filter to current authenticated user
         $request->merge(['customer_id' => auth()->id()]);
 
         $orders = $this->orderService->getAll($request);
@@ -75,6 +78,48 @@ class OrderController extends Controller
                 'message' => 'Đơn hàng đã được hủy thành công.',
                 'data'    => new OrderResource($order),
             ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => $e->getMessage(),
+            ], 422);
+        }
+    }
+
+    public function return(Request $request, $id)
+    {
+        try {
+            $order = $this->orderService->findById($id);
+
+            if ($order->customer_id !== auth()->id()) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'Bạn không có quyền thực hiện thao tác này.',
+                ], 403);
+            }
+
+            $data = $request->validate([
+                'reason'               => 'nullable|string|max:1000',
+                'items'                => 'required|array|min:1',
+                'items.*.order_item_id' => 'required|exists:order_items,id',
+                'items.*.quantity'      => 'required|integer|min:1',
+            ]);
+
+            $data['order_id'] = $order->id;
+
+            $orderReturn = $this->orderReturnService->processReturn($data, auth()->id());
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Yêu cầu trả hàng đã được gửi thành công.',
+                'data'    => new OrderReturnResource($orderReturn),
+            ], 201);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => $e->getMessage(),
+                'errors'  => $e->errors(),
+            ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'status'  => 'error',

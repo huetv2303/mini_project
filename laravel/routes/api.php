@@ -201,6 +201,7 @@ Route::group(['prefix' => 'v1'], function () {
             Route::get('/', [\App\Http\Controllers\api\v1\Storefront\OrderController::class, 'index']);
             Route::get('/{id}', [\App\Http\Controllers\api\v1\Storefront\OrderController::class, 'show']);
             Route::patch('/{id}/cancel', [\App\Http\Controllers\api\v1\Storefront\OrderController::class, 'cancel']);
+            Route::post('/{id}/return', [\App\Http\Controllers\api\v1\Storefront\OrderController::class, 'return']);
         });
 
         // Storefront Checkout (Cart + Buy Now)
