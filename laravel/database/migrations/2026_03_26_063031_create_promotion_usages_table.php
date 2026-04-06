@@ -16,7 +16,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('promotion_id')->constrained('promotions');
             $table->foreignId('order_id')->constrained('orders');
-            $table->foreignId('customer_id')->nullable()->constrained('customers');
             $table->foreignId('user_id')->nullable()->constrained('users');
             $table->timestamp('used_at');
             $table->timestamps();
