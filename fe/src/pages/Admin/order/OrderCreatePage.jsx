@@ -167,8 +167,6 @@ const OrderCreatePage = () => {
           return parsed.map((s) => ({
             fulfillmentType: null,
             shippingFee: 0,
-            shippingInfo: { name: "", phone: "", address: "" },
-            customer: { name: "", phone: "" },
             ...s,
             shippingInfo: {
               name: "",
