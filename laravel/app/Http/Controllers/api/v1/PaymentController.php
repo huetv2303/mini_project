@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\api\v1;
 
 use App\Http\Controllers\Controller;
+use App\Interfaces\Order\CheckoutRepositoryInterface;
 use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Services\Payment\VNPayService;
@@ -77,7 +78,7 @@ class PaymentController extends Controller
                 if ($status === 'paid') {
                     $payload = Cache::get($sessionCode);
                     if ($payload) {
-                        $newOrder = app(\App\Interfaces\Order\CheckoutRepositoryInterface::class)->checkout($payload);
+                        $newOrder = app(CheckoutRepositoryInterface::class)->checkout($payload);
                         $newOrder->update([
                             'payment_status' => 'paid',
                             'status'         => 'processing'

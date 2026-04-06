@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::dropIfExists('promotion_usages');
         Schema::create('promotion_usages', function (Blueprint $table) {
             $table->id();
             $table->foreignId('promotion_id')->constrained('promotions');

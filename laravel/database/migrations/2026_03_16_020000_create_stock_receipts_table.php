@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('stock_receipts', function (Blueprint $table) {
             $table->id();
-            $table->string('code')->unique();               // Mã phiếu nhập: PN-20260316-001
+            $table->string('code')->unique();
             $table->foreignId('supplier_id')
                 ->constrained('suppliers')
                 ->onDelete('restrict');
@@ -20,7 +20,7 @@ return new class extends Migration
             $table->enum('status', ['pending', 'completed', 'cancelled'])->default('pending');
             $table->decimal('total_amount', 15, 2)->default(0);
             $table->text('note')->nullable();
-            $table->timestamp('received_at')->nullable();   // Ngày nhận hàng thực tế
+            $table->timestamp('received_at')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
