@@ -90,7 +90,7 @@ class AuthController extends Controller
     public function resendVerificationEmail(Request $request)
     {
         $request->validate(['email' => 'required|email']);
-        $user = \App\Models\User::where('email', $request->email)->first();
+        $user = User::where('email', $request->email)->first();
 
         if (!$user) {
             return response()->json(['message' => 'Người dùng không tồn tại.'], 404);
