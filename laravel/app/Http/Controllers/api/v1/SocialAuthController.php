@@ -49,8 +49,8 @@ class SocialAuthController extends Controller
                     'google_id' => $googleUser->id,
                     'avatar' => $googleUser->avatar,
                     'password' => null,
-                    'email_verified_at' => null,
-                    'role_id' => 4,
+                    'email_verified_at' => now(), // Đăng nhập Google thì cho xác thực luôn
+                    'role_id' => $defaultRole ? $defaultRole->id : 4, // Ưu tiên tìm ID thật
                 ]);
 
                 if ($defaultRole && $defaultRole->code === 'customer') {
