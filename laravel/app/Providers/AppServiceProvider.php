@@ -31,6 +31,8 @@ use App\Repositories\Order\CheckoutRepository;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use App\Models\Permission;
+use Illuminate\Support\Facades\Mail;
+use Symfony\Component\Mailer\Bridge\Brevo\Transport\BrevoApiTransport;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -73,5 +75,11 @@ class AppServiceProvider extends ServiceProvider
             // Tránh lỗi khi migrate chưa có table permissions
         }
         */
+
+        Mail::extend('brevo', function (array $config) {
+            return new BrevoApiTransport(
+                $config['key']
+            );
+        });
     }
 }

@@ -122,6 +122,16 @@
       <excludeFolder url="file://$MODULE_DIR$/laravel/vendor/voku/portable-ascii" />
       <excludeFolder url="file://$MODULE_DIR$/laravel/storage/app" />
       <excludeFolder url="file://$MODULE_DIR$/laravel/storage/framework" />
+      <excludeFolder url="file://$MODULE_DIR$/laravel/vendor/firebase/php-jwt" />
+      <excludeFolder url="file://$MODULE_DIR$/laravel/vendor/intervention/gif" />
+      <excludeFolder url="file://$MODULE_DIR$/laravel/vendor/intervention/image" />
+      <excludeFolder url="file://$MODULE_DIR$/laravel/vendor/laravel/socialite" />
+      <excludeFolder url="file://$MODULE_DIR$/laravel/vendor/lcobucci/jwt" />
+      <excludeFolder url="file://$MODULE_DIR$/laravel/vendor/league/oauth1-client" />
+      <excludeFolder url="file://$MODULE_DIR$/laravel/vendor/paragonie/constant_time_encoding" />
+      <excludeFolder url="file://$MODULE_DIR$/laravel/vendor/paragonie/random_compat" />
+      <excludeFolder url="file://$MODULE_DIR$/laravel/vendor/phpseclib/phpseclib" />
+      <excludeFolder url="file://$MODULE_DIR$/laravel/vendor/tymon/jwt-auth" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

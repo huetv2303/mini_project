@@ -26,7 +26,7 @@ api.interceptors.request.use(
 );
 
 let isRefreshing = false;
-const failedQueue = [];
+let failedQueue = [];
 
 const processQueue = (error, token = null) => {
   failedQueue.forEach(({ resolve, reject }) => {
