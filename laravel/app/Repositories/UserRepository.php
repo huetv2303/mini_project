@@ -14,7 +14,7 @@ class UserRepository implements UserRepositoryInterface
     {
         return User::with('role', 'customerProfile')->get();
     }
- 
+
     public function createUser(array $data)
     {
         $roleId = $data['role_id'] ?? null;
