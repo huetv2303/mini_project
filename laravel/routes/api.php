@@ -21,6 +21,8 @@ use App\Http\Controllers\api\v1\ShippingMethodController;
 use App\Http\Controllers\api\v1\TaxRateController;
 use App\Http\Controllers\api\v1\DashboardController;
 use App\Http\Controllers\api\v1\PaymentController;
+use App\Http\Controllers\api\v1\SepayController;
+
 use App\Http\Controllers\api\v1\PromotionController;
 use App\Http\Controllers\api\v1\Storefront\CouponController;
 use App\Http\Controllers\api\v1\Storefront\CartController;
@@ -215,6 +217,9 @@ Route::group(['prefix' => 'v1'], function () {
 
     // Webhooks should not be authenticated
     Route::post('/payments/vnpay/ipn', [PaymentController::class, 'vnpayIpn']);
+    Route::post('/payments/sepay/webhook', [SepayController::class, 'webhook']);
+    Route::get('/payments/sepay/check-status', [SepayController::class, 'checkStatus']);
+
 
     // Public Promotions / Coupons endpoints
     Route::prefix('public')->group(function () {

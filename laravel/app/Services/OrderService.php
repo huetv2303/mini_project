@@ -119,8 +119,15 @@ class OrderService
             }
 
             $isPickup = ($data['fulfillment_type'] ?? null) === 'pickup';
-            $initialStatus = $isPickup ? 'delivered' : 'pending';
-            $initialPaymentStatus = $isPickup ? 'paid' : 'unpaid';
+            
+            // Tìm code của phương thức thanh toán để xác định xem có phải trả sau/online không
+            $paymentMethod = \App\Models\PaymentMethod::find($data['payment_method_id']);
+            $isOnlinePayment = $paymentMethod && in_array($paymentMethod->code, ['bank_transfer', 'vnpay']);
+
+            // Nếu nhận tại quầy và KHÔNG PHẢI thanh toán online (chuyển khoản/vnpay) thì mới coi là đã trả tiền (tiền mặt)
+            // Nếu là chuyển khoản thì phải đợi tiền về mới được coi là paid
+            $initialStatus = ($isPickup && !$isOnlinePayment) ? 'delivered' : 'pending';
+            $initialPaymentStatus = ($isPickup && !$isOnlinePayment) ? 'paid' : 'unpaid';
 
             $order = $this->orderRepo->createOrder([
                 'code'                   => $code,

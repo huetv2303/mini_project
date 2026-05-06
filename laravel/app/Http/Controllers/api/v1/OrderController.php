@@ -46,6 +46,7 @@ class OrderController extends Controller
     {
         try {
             $order = $this->orderService->findById($id);
+            $order->load(['paymentMethod', 'shippingMethod', 'items']);
             return response()->json([
                 'status' => 'success',
                 'data'   => new OrderResource($order),

@@ -41,4 +41,8 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
 
+    'sepay' => [
+        'api_key' => env('SEPAY_API_KEY'),
+    ],
+
 ];

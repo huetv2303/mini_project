@@ -47,7 +47,7 @@ class VerifyEmailNotification extends Notification implements ShouldQueue
             ]
         );
 
-        $frontendUrl = env('FRONTEND_URL', 'http://localhost:3000');
+        $frontendUrl = env('FRONTEND_URL', 'http://localhost:3001');
         return $frontendUrl . '/verify-email?url=' . urlencode($url);
     }
 }
