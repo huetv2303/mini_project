@@ -30,7 +30,10 @@ import PromotionModal from "./components/PromotionModal";
 import SelectSearch from "../../../components/common/SelectSearch";
 import { usePromotion } from "../../../hooks/usePromotion";
 import PaymentIntegration from "../../../components/common/PaymentIntegration";
-import { fetchBankConfigRequest } from "../../../services/PaymentService";
+import {
+  fetchBankConfigRequest,
+  checkSepayStatusRequest,
+} from "../../../services/PaymentService";
 
 const debounce = (func, delay) => {
   let timer;
@@ -269,6 +272,46 @@ const OrderCreatePage = () => {
   const [editingTabId, setEditingTabId] = useState(null);
   const [editingLabel, setEditingLabel] = useState("");
 
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [currentBankInfo, setCurrentBankInfo] = useState(null);
+  const [createdOrderId, setCreatedOrderId] = useState(null);
+
+  useEffect(() => {
+    let pollingInterval;
+
+    if (showPaymentModal && currentBankInfo && createdOrderId) {
+      pollingInterval = setInterval(async () => {
+        try {
+          const resp = await checkSepayStatusRequest(
+            currentBankInfo.order_code,
+            currentBankInfo.amount,
+          );
+
+          if (resp && resp.paid) {
+            clearInterval(pollingInterval);
+            toast.success("Thanh toán thành công! Đơn hàng đã được xác nhận.");
+            setShowPaymentModal(false);
+            // Sau khi thanh toán thành công, xóa tab và chuyển hướng
+            removeTab(null, activeSessionId);
+            navigate(`/admin/orders/${createdOrderId}`);
+          }
+        } catch (error) {
+          console.error("Polling failed:", error);
+        }
+      }, 5000);
+    }
+
+    return () => {
+      if (pollingInterval) clearInterval(pollingInterval);
+    };
+  }, [
+    showPaymentModal,
+    currentBankInfo,
+    createdOrderId,
+    navigate,
+    activeSessionId,
+  ]);
+
   const searchResultsRef = useRef(null);
   const customerResultsRef = useRef(null);
 
@@ -491,6 +534,12 @@ const OrderCreatePage = () => {
       }
     }
 
+    // BUG FIX: Nếu đã tạo đơn trước đó rồi (do nhân viên tắt QR rồi bấm lại) thì không tạo đơn mới nữa
+    if (createdOrderId && currentBankInfo) {
+      setShowPaymentModal(true);
+      return;
+    }
+
     setSubmitting(true);
     try {
       const data = {
@@ -535,9 +584,25 @@ const OrderCreatePage = () => {
           "",
       };
       const res = await api.post("/orders", data);
-      toast.success("Tạo đơn hàng thành công!");
-      removeTab(null, activeSessionId);
-      navigate(`/admin/orders/${res.data.data?.id || res.data.id}`);
+      const orderData = res.data.data || res.data;
+
+      const selectedMethod = paymentMethods.find(
+        (pm) => pm.id === activeSession.selectedPaymentMethod,
+      );
+
+      if (selectedMethod?.code === "bank_transfer") {
+        setCreatedOrderId(orderData.id);
+        setCurrentBankInfo({
+          ...bankConfig,
+          amount: calculateTotal(),
+          order_code: orderData.code,
+        });
+        setShowPaymentModal(true);
+      } else {
+        toast.success("Tạo đơn hàng thành công!");
+        removeTab(null, activeSessionId);
+        navigate(`/admin/orders/${orderData.id}`);
+      }
     } catch (e) {
       toast.error(e.response?.data?.message || "Lỗi tạo đơn");
     } finally {
@@ -1115,7 +1180,7 @@ const OrderCreatePage = () => {
                 />
               </div>
 
-              {activeSession.selectedPaymentMethod &&
+              {/* {activeSession.selectedPaymentMethod &&
                 (() => {
                   const selectedMethod = paymentMethods.find(
                     (pm) => pm.id === activeSession.selectedPaymentMethod,
@@ -1140,7 +1205,7 @@ const OrderCreatePage = () => {
                     );
                   }
                   return null;
-                })()}
+                })()} */}
 
               <div className="space-y-2">
                 <h4 className="text-[0.8rem] font-medium text-gray-700 uppercase">
@@ -1168,7 +1233,86 @@ const OrderCreatePage = () => {
           setIsPromotionModalOpen(false);
         }}
       />
+
+      <BankPaymentModal
+        isOpen={showPaymentModal}
+        onClose={() => setShowPaymentModal(false)}
+        bankInfo={currentBankInfo}
+      />
     </AdminLayout>
+  );
+};
+
+const BankPaymentModal = ({ isOpen, onClose, bankInfo }) => {
+  if (!isOpen || !bankInfo) return null;
+
+  const qrUrl = `https://qr.sepay.vn/img?bank=${bankInfo.bank_id}&acc=${bankInfo.account_no}&template=compact&amount=${bankInfo.amount}&des=${bankInfo.order_code}`;
+
+  return (
+    <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
+      <div
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        // Chặn việc bấm ra ngoài để đóng modal (tránh việc chưa trả tiền đã tắt mã)
+      />
+      <div className="relative bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
+        <div className="bg-blue-600 p-6 text-white text-center">
+          <h3 className="text-xl font-bold">Thanh toán chuyển khoản</h3>
+          <p className="text-blue-100 text-sm mt-1">
+            Quét mã để hoàn tất đơn hàng
+          </p>
+        </div>
+
+        <div className="p-8 flex flex-col items-center">
+          <div className="relative p-4 bg-white rounded-2xl shadow-lg border border-gray-100 mb-6 group">
+            <img
+              src={qrUrl}
+              alt="SePay QR"
+              className="w-64 h-64 object-contain transition-transform group-hover:scale-105 duration-300"
+            />
+            <div className="absolute inset-0 border-2 border-blue-500/20 rounded-2xl pointer-events-none" />
+          </div>
+
+          <div className="w-full space-y-4">
+            <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
+              <span className="text-gray-500 text-xs font-medium">
+                Số tiền:
+              </span>
+              <span className="text-blue-600 font-bold">
+                {formatPrice(bankInfo.amount)}
+              </span>
+            </div>
+            <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
+              <span className="text-gray-500 text-xs font-medium">
+                Nội dung:
+              </span>
+              <span className="text-gray-900 font-bold uppercase tracking-wider">
+                {bankInfo.order_code}
+              </span>
+            </div>
+          </div>
+
+          <div className="mt-8 flex flex-col items-center gap-3">
+            <div className="flex items-center gap-3 text-blue-600">
+              <Loader2 className="w-5 h-5 animate-spin" />
+              <span className="text-sm font-medium animate-pulse">
+                Đang chờ thanh toán...
+              </span>
+            </div>
+            <p className="text-[10px] text-gray-400 text-center max-w-[250px]">
+              Vui lòng không đóng cửa sổ này cho đến khi hệ thống xác nhận thành
+              công.
+            </p>
+          </div>
+
+          <button
+            onClick={onClose}
+            className="mt-6 text-gray-400 hover:text-gray-600 text-[10px] font-bold uppercase tracking-widest transition-colors underline underline-offset-4"
+          >
+            Quay lại và thanh toán sau
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 

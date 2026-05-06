@@ -12,49 +12,49 @@ const PaymentIntegration = ({
 }) => {
   if (!selectedMethod) return null;
 
-  if (selectedMethod.code === "bank_transfer") {
-    if (!bankConfig) return null;
+  // if (selectedMethod.code === "bank_transfer") {
+  //   if (!bankConfig) return null;
 
-    const message =
-      validOrders.length === 1
-        ? `Thanh toan don hang ${validOrders[0].code}`
-        : `Thanh toan ${validOrders.length} don hang`;
+  //   const message =
+  //     validOrders.length === 1
+  //       ? `Thanh toan don hang ${validOrders[0].code}`
+  //       : `Thanh toan ${validOrders.length} don hang`;
 
-    return (
-      <div className="flex flex-col items-center bg-gray-50 p-6 rounded-xl border border-dashed border-gray-200 animate-in fade-in slide-in-from-top-2 duration-300 w-full mb-6">
-        <p className="text-sm font-medium mb-4 text-center">
-          Quét mã QR để thanh toán (VietQR)
-        </p>
-        <div className="relative p-2 bg-white rounded-xl shadow-sm border border-gray-100 mb-4 group cursor-pointer overflow-hidden">
-          <img
-            src={`https://img.vietqr.io/image/${bankConfig.bank_id}-${bankConfig.account_no}-compact2.png?amount=${Math.floor(totalAmount)}&addInfo=${encodeURIComponent(message)}&accountName=${encodeURIComponent(bankConfig.account_name)}`}
-            alt="VietQR"
-            className="w-48 h-48 transition-transform group-hover:scale-105 duration-300"
-          />
-        </div>
-        <div className="w-full text-left text-xs text-gray-600 space-y-2 px-4 bg-white/50 p-4 rounded-lg">
-          <div className="flex gap-4">
-            <span className="text-gray-400 w-24">Ngân hàng:</span>
-            <strong className="text-gray-900">{bankConfig.bank_id}</strong>
-          </div>
-          <div className="flex gap-4">
-            <span className="text-gray-400 w-24">Số tài khoản:</span>
-            <strong className="text-gray-900">{bankConfig.account_no}</strong>
-          </div>
-          <div className="flex gap-4">
-            <span className="text-gray-400 w-24">Chủ tài khoản:</span>
-            <strong className="text-gray-900">{bankConfig.account_name}</strong>
-          </div>
-          <div className="flex gap-4">
-            <span className="text-gray-400 w-24">Nội dung:</span>
-            <strong className="text-gray-900 font-bold text-blue-600">
-              {message}
-            </strong>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  //   return (
+  //     <div className="flex flex-col items-center bg-gray-50 p-6 rounded-xl border border-dashed border-gray-200 animate-in fade-in slide-in-from-top-2 duration-300 w-full mb-6">
+  //       <p className="text-sm font-medium mb-4 text-center">
+  //         Quét mã QR để thanh toán (VietQR)
+  //       </p>
+  //       <div className="relative p-2 bg-white rounded-xl shadow-sm border border-gray-100 mb-4 group cursor-pointer overflow-hidden">
+  //         <img
+  //           src={`https://img.vietqr.io/image/${bankConfig.bank_id}-${bankConfig.account_no}-compact2.png?amount=${Math.floor(totalAmount)}&addInfo=${encodeURIComponent(message)}&accountName=${encodeURIComponent(bankConfig.account_name)}`}
+  //           alt="VietQR"
+  //           className="w-48 h-48 transition-transform group-hover:scale-105 duration-300"
+  //         />
+  //       </div>
+  //       <div className="w-full text-left text-xs text-gray-600 space-y-2 px-4 bg-white/50 p-4 rounded-lg">
+  //         <div className="flex gap-4">
+  //           <span className="text-gray-400 w-24">Ngân hàng:</span>
+  //           <strong className="text-gray-900">{bankConfig.bank_id}</strong>
+  //         </div>
+  //         <div className="flex gap-4">
+  //           <span className="text-gray-400 w-24">Số tài khoản:</span>
+  //           <strong className="text-gray-900">{bankConfig.account_no}</strong>
+  //         </div>
+  //         <div className="flex gap-4">
+  //           <span className="text-gray-400 w-24">Chủ tài khoản:</span>
+  //           <strong className="text-gray-900">{bankConfig.account_name}</strong>
+  //         </div>
+  //         <div className="flex gap-4">
+  //           <span className="text-gray-400 w-24">Nội dung:</span>
+  //           <strong className="text-gray-900 font-bold text-blue-600">
+  //             {message}
+  //           </strong>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   if (selectedMethod.code === "vnpay") {
     return (

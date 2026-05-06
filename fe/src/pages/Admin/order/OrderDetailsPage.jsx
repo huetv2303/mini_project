@@ -11,6 +11,7 @@ import {
 import {
   createVNPayPaymentRequest,
   fetchBankConfigRequest,
+  checkSepayStatusRequest,
 } from "../../../services/PaymentService";
 import AdminLayout from "../../../components/layout/Admin/AdminLayout";
 import {
@@ -52,6 +53,36 @@ const OrderDetailsPage = () => {
   const [bankConfig, setBankConfig] = useState(null);
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
+
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+
+  useEffect(() => {
+    let pollingInterval;
+
+    if (showPaymentModal && bankConfig && order) {
+      pollingInterval = setInterval(async () => {
+        try {
+          const resp = await checkSepayStatusRequest(
+            order.code,
+            order.final_amount,
+          );
+
+          if (resp && resp.paid) {
+            clearInterval(pollingInterval);
+            toast.success("Thanh toán thành công! Đơn hàng đã được xác nhận.");
+            setShowPaymentModal(false);
+            getOrderDetails(); // Reload order data
+          }
+        } catch (error) {
+          console.error("Polling failed:", error);
+        }
+      }, 5000);
+    }
+
+    return () => {
+      if (pollingInterval) clearInterval(pollingInterval);
+    };
+  }, [showPaymentModal, bankConfig, order]);
 
   const statusOptions = [
     { value: "pending", label: "Chờ xử lý" },
@@ -638,6 +669,14 @@ const OrderDetailsPage = () => {
                   validOrders={[order]}
                   totalAmount={order.final_amount}
                 />
+
+                <button
+                  onClick={() => setShowPaymentModal(true)}
+                  className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm mt-4"
+                >
+                  <CreditCard className="w-4 h-4" />
+                  MỞ QR THANH TOÁN TỰ ĐỘNG
+                </button>
               </div>
             )}
 
@@ -710,7 +749,91 @@ const OrderDetailsPage = () => {
           onRefresh={getOrderDetails}
         />
       )}
+
+      <BankPaymentModal
+        isOpen={showPaymentModal}
+        onClose={() => setShowPaymentModal(false)}
+        bankInfo={
+          bankConfig
+            ? { ...bankConfig, amount: order?.final_amount, order_code: order?.code }
+            : null
+        }
+      />
     </AdminLayout>
+  );
+};
+
+
+const BankPaymentModal = ({ isOpen, onClose, bankInfo }) => {
+  if (!isOpen || !bankInfo) return null;
+
+  const qrUrl = `https://qr.sepay.vn/img?bank=${bankInfo.bank_id}&acc=${bankInfo.account_no}&template=compact&amount=${bankInfo.amount}&des=${bankInfo.order_code}`;
+
+  return (
+    <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
+      <div
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        // Chặn việc bấm ra ngoài để đóng modal
+      />
+      <div className="relative bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
+        <div className="bg-blue-600 p-6 text-white text-center">
+          <h3 className="text-xl font-bold">Thanh toán chuyển khoản</h3>
+          <p className="text-blue-100 text-sm mt-1">
+            Quét mã để hoàn tất đơn hàng
+          </p>
+        </div>
+
+        <div className="p-8 flex flex-col items-center">
+          <div className="relative p-4 bg-white rounded-2xl shadow-lg border border-gray-100 mb-6 group">
+            <img
+              src={qrUrl}
+              alt="SePay QR"
+              className="w-64 h-64 object-contain transition-transform group-hover:scale-105 duration-300"
+            />
+            <div className="absolute inset-0 border-2 border-blue-500/20 rounded-2xl pointer-events-none" />
+          </div>
+
+          <div className="w-full space-y-4">
+            <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
+              <span className="text-gray-500 text-xs font-medium">
+                Số tiền:
+              </span>
+              <span className="text-blue-600 font-bold">
+                {formatPrice(bankInfo.amount)}
+              </span>
+            </div>
+            <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
+              <span className="text-gray-500 text-xs font-medium">
+                Nội dung:
+              </span>
+              <span className="text-gray-900 font-bold uppercase tracking-wider">
+                {bankInfo.order_code}
+              </span>
+            </div>
+          </div>
+
+          <div className="mt-8 flex flex-col items-center gap-3">
+            <div className="flex items-center gap-3 text-blue-600">
+              <Loader2 className="w-5 h-5 animate-spin" />
+              <span className="text-sm font-medium animate-pulse">
+                Đang chờ thanh toán...
+              </span>
+            </div>
+            <p className="text-[10px] text-gray-400 text-center max-w-[250px]">
+              Vui lòng không đóng cửa sổ này cho đến khi hệ thống xác nhận thành
+              công.
+            </p>
+          </div>
+
+          <button
+            onClick={onClose}
+            className="mt-6 text-gray-400 hover:text-gray-600 text-[10px] font-bold uppercase tracking-widest transition-colors underline underline-offset-4"
+          >
+            Đóng lại
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 

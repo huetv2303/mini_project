@@ -35,3 +35,13 @@ export const verifyVNPayPaymentRequest = async (queryString) => {
         throw error;
     }
 };
+
+export const checkSepayStatusRequest = async (orderCode, amount) => {
+    try {
+        const response = await api.get(`/payments/sepay/check-status?orderCode=${orderCode}&amount=${amount}`);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+

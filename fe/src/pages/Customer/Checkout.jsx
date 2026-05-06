@@ -25,7 +25,8 @@ import ShippingMethodService from "../../services/ShippingMethodService";
 import { fetchPaymentMethodsRequest } from "../../services/PaymentMethodService";
 import { storefrontCheckoutRequest } from "../../services/CheckoutService";
 import { usePromotion } from "../../hooks/usePromotion";
-import { fetchBankConfigRequest } from "../../services/PaymentService";
+import { fetchBankConfigRequest, checkSepayStatusRequest } from "../../services/PaymentService";
+
 import toast from "react-hot-toast";
 import { format } from "date-fns";
 import PromotionModal from "../Admin/order/components/PromotionModal";
@@ -188,8 +189,7 @@ const Checkout = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [currentBankInfo, setCurrentBankInfo] = useState(null);
-  const [pendingCheckoutPayload, setPendingCheckoutPayload] = useState(null);
-  const [tempRefCode, setTempRefCode] = useState("");
+  const [createdOrderId, setCreatedOrderId] = useState(null);
   const [isPromotionModalOpen, setIsPromotionModalOpen] = useState(false);
 
   const handleInputChange = (e) => {
@@ -214,6 +214,7 @@ const Checkout = () => {
 
   const handleSubmit = async (evt) => {
     evt.preventDefault();
+    console.log(">>> Checkout Submit - Payment Method:", formData.payment_method_id);
     if (!validate()) {
       toast.error("Vui lòng điền đầy đủ thông tin");
       return;
@@ -255,20 +256,25 @@ const Checkout = () => {
         (m) => m.id === parseInt(formData.payment_method_id),
       );
 
+      // Nếu là chuyển khoản ngân hàng, tạo đơn hàng trước để lấy mã ORD thật
       if (paymentMethod?.code === "bank_transfer") {
-        const ref =
-          "PAY-" + Math.random().toString(36).substring(2, 8).toUpperCase();
-        setTempRefCode(ref);
-        setPendingCheckoutPayload(payload);
-        setCurrentBankInfo({
-          ...bankConfig,
-          amount: total,
-          order_code: ref,
-        });
-        setShowPaymentModal(true);
-        setIsSubmitting(false); // Dừng loading vì chỉ đang hiện modal
+        const response = await storefrontCheckoutRequest(payload);
+        
+        if (response.status === "success") {
+          const orderData = response.data;
+          toast.success("Đặt hàng thành công!");
+          
+          // Xóa giỏ hàng sau khi đã tạo đơn thành công
+          if (mode === "cart") clearCart();
+          else clearBuyNowItem();
+
+          // Chuyển hướng sang trang thành công (nơi có mã QR và polling)
+          navigate(`/orders/${orderData.id}/success`);
+        }
+        setIsSubmitting(false);
         return;
       }
+
 
       // Xử lý ví điện tử VNPay (Vẫn giữ logic cũ vì backend đã xử lý session)
       const response = await storefrontCheckoutRequest(payload);
@@ -299,24 +305,6 @@ const Checkout = () => {
     }
   };
 
-  const handleConfirmBankOrder = async () => {
-    if (isSubmitting) return;
-    setIsSubmitting(true);
-    try {
-      const resp = await storefrontCheckoutRequest(pendingCheckoutPayload);
-      if (resp.status === "success") {
-        toast.success("Đặt hàng thành công!");
-        if (mode === "cart") clearCart();
-        else clearBuyNowItem();
-        setShowPaymentModal(false);
-        navigate(`/orders/${resp.data.id}/success`);
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Lỗi đặt hàng");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   const selectedShipping = shippingMethods.find(
     (m) => m.id === parseInt(formData.shipping_method_id),
@@ -326,6 +314,35 @@ const Checkout = () => {
     0,
     Number(subtotal) - Number(discount) + Number(shippingFee),
   );
+
+  useEffect(() => {
+    let pollingInterval;
+
+    if (showPaymentModal && currentBankInfo && createdOrderId) {
+      pollingInterval = setInterval(async () => {
+        try {
+          const resp = await checkSepayStatusRequest(
+            currentBankInfo.order_code,
+            currentBankInfo.amount
+          );
+
+          if (resp && resp.paid) {
+            clearInterval(pollingInterval);
+            toast.success("Thanh toán thành công! Đơn hàng đã được xác nhận.");
+            setShowPaymentModal(false);
+            navigate(`/orders/${createdOrderId}/success`);
+          }
+        } catch (error) {
+          console.error("Polling error:", error);
+          // Không hiện toast error để tránh spam, chỉ log ra console
+        }
+      }, 5000); // Poll mỗi 5 giây
+    }
+
+    return () => {
+      if (pollingInterval) clearInterval(pollingInterval);
+    };
+  }, [showPaymentModal, currentBankInfo, createdOrderId, navigate]);
 
   if (isLoading) {
     return (
@@ -884,7 +901,6 @@ const Checkout = () => {
       <BankPaymentModal
         isOpen={showPaymentModal}
         onClose={() => setShowPaymentModal(false)}
-        onConfirm={handleConfirmBankOrder}
         isSubmitting={isSubmitting}
         bankInfo={currentBankInfo}
       />
@@ -901,7 +917,7 @@ const BankPaymentModal = ({
 }) => {
   if (!isOpen || !bankInfo) return null;
 
-  const qrUrl = `https://img.vietqr.io/image/${bankInfo.bank_id}-${bankInfo.account_no}-compact2.png?amount=${bankInfo.amount}&addInfo=${bankInfo.order_code}&accountName=${encodeURIComponent(bankInfo.account_name)}`;
+  const qrUrl = `https://qr.sepay.vn/img?bank=${bankInfo.bank_id}&acc=${bankInfo.account_no}&template=compact&amount=${bankInfo.amount}&des=${bankInfo.order_code}`;
 
   return (
     <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
@@ -921,100 +937,110 @@ const BankPaymentModal = ({
                 Thanh toán chuyển khoản
               </h3>
               <p className="text-white/60 text-[10px] uppercase font-bold tracking-widest">
-                Xác nhận thanh toán đơn hàng
+                Tự động xác nhận sau 1-3 phút
               </p>
             </div>
           </div>
           <button
-            disabled={isSubmitting}
             onClick={onClose}
-            className="p-2 hover:bg-white/10 rounded-full transition-colors text-white disabled:opacity-50"
+            className="p-2 hover:bg-white/10 rounded-full transition-colors text-white"
           >
             <X size={20} />
           </button>
         </div>
 
-        <div className="p-8 max-h-[600px] overflow-y-auto ">
+        <div className="p-8 max-h-[650px] overflow-y-auto ">
           <div className="flex flex-col items-center">
+            {/* Status Indicator */}
+            <div className="mb-6 flex items-center gap-3 px-5 py-2.5 bg-orange-50 text-orange-600 rounded-full border border-orange-100 animate-pulse">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span className="text-[11px] font-black uppercase tracking-widest">Đang chờ bạn thanh toán...</span>
+            </div>
+
             {/* QR Code Container */}
-            <div className="relative w-full max-w-[240px] aspect-square bg-white rounded-3xl p-4 shadow-xl border border-gray-100 mb-8 group">
+            <div className="relative w-full max-w-[240px] aspect-square bg-white rounded-3xl p-4 shadow-xl border border-gray-100 mb-8">
               <img
                 src={qrUrl}
                 className="w-full h-full object-contain"
                 alt="Payment QR"
               />
-              <div className="absolute inset-0 bg-white/0 group-hover:bg-white/5 transition-colors cursor-pointer rounded-3xl"></div>
+              <div className="absolute inset-0 rounded-3xl border-2 border-black/5"></div>
             </div>
 
             {/* Account Details */}
             <div className="w-full space-y-4 bg-gray-50 rounded-2xl p-6 mb-8 border border-gray-100 text-left">
               <div className="flex justify-between items-center text-sm">
                 <span className="text-gray-400 font-medium">Ngân hàng</span>
-                <span className="font-bold text-gray-900 uppercase">
-                  MB Bank
-                </span>
+                <span className="font-bold text-gray-900 uppercase">MB Bank</span>
               </div>
               <div className="flex justify-between items-center text-sm">
                 <span className="text-gray-400 font-medium">Số tài khoản</span>
                 <div className="flex items-center gap-2">
-                  <span className="text-gray-900">{bankInfo.account_no}</span>
+                  <span className="text-gray-900 font-mono font-bold tracking-wider">{bankInfo.account_no}</span>
                   <button
                     onClick={() => {
                       navigator.clipboard.writeText(bankInfo.account_no);
                       toast.success("Đã copy số tài khoản");
                     }}
-                    className="p-1 hover:bg-gray-200 rounded text-gray-400 active:scale-90 transition-all"
+                    className="p-1.5 hover:bg-white bg-white/50 border border-gray-200 rounded-lg text-gray-400 active:scale-90 transition-all shadow-sm"
                   >
-                    <Copy size={14} />
+                    <Copy size={12} />
                   </button>
                 </div>
               </div>
               <div className="flex justify-between items-center text-sm">
                 <span className="text-gray-400 font-medium">Chủ tài khoản</span>
-                <span className="text-gray-800">{bankInfo.account_name}</span>
+                <span className="text-gray-800 font-bold">{bankInfo.account_name}</span>
               </div>
               <div className="h-px bg-gray-100 w-full my-2"></div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-400 font-medium text-sm">
-                  Số tiền
-                </span>
-                <span className="text-xl text-gray-800">
+                <span className="text-gray-400 font-medium text-sm">Số tiền</span>
+                <span className="text-2xl font-black text-gray-900">
                   {formatPrice(bankInfo.amount)}
                 </span>
               </div>
               <div className="flex justify-between items-center text-sm">
                 <span className="text-gray-400 font-medium">Nội dung</span>
-                <div className="flex items-center gap-2">
-                  <span className=" px-2 py-0.5 rounded-md  text-xs">
+                <div className="flex items-center gap-2 bg-white px-2 py-1 rounded-lg border border-gray-200">
+                  <span className="text-black font-mono font-bold uppercase text-xs tracking-wider">
                     {bankInfo.order_code}
                   </span>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(bankInfo.order_code);
+                      toast.success("Đã copy nội dung");
+                    }}
+                    className="p-1 text-gray-400 hover:text-black transition-colors"
+                  >
+                    <Copy size={12} />
+                  </button>
                 </div>
               </div>
             </div>
 
-            {/* Instruction */}
-            <div className="flex items-start gap-3 p-4 bg-blue-50 rounded-2xl border border-blue-100 mb-8">
-              <div className="p-1 bg-blue-500 rounded-full">
-                <CheckCircle2 className="text-white" size={12} />
+            {/* Instruction / Note */}
+            <div className="w-full p-5 bg-green-50 rounded-2xl border border-green-100">
+              <div className="flex items-start gap-3">
+                <div className="p-1 bg-green-500 rounded-full mt-0.5">
+                  <CheckCircle2 className="text-white" size={10} />
+                </div>
+                <div>
+                  <p className="text-[11px] text-green-700 leading-relaxed font-bold uppercase tracking-tight">
+                    Hệ thống sẽ tự động xác nhận đơn hàng
+                  </p>
+                  <p className="text-[10px] text-green-600 mt-1">
+                    Bạn vui lòng giữ nguyên màn hình này, đơn hàng sẽ được xử lý ngay sau khi tiền vào tài khoản.
+                  </p>
+                </div>
               </div>
-              <p className="text-[11px] text-blue-700 leading-relaxed font-medium">
-                Vui lòng quét mã QR hoặc nhập chính xác thông tin chuyển khoản.{" "}
-                <br />
-                Nhấn "Xác nhận đã chuyển" để hoàn tất việc đặt đơn hàng.
-              </p>
             </div>
-
-            {/* Footer Action */}
+            
+            {/* Minimal secondary fallback */}
             <button
-              disabled={isSubmitting}
-              onClick={onConfirm}
-              className="w-full bg-black text-white py-5 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-gray-800 hover:shadow-2xl hover:shadow-black/20 active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              onClick={onClose}
+              className="mt-6 text-gray-400 hover:text-gray-600 text-[10px] font-bold uppercase tracking-widest transition-colors underline underline-offset-4"
             >
-              {isSubmitting ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                "Tôi đã chuyển khoản & Xác nhận đơn"
-              )}
+              Tôi muốn quay lại và thanh toán sau
             </button>
           </div>
         </div>
@@ -1022,5 +1048,6 @@ const BankPaymentModal = ({
     </div>
   );
 };
+
 
 export default Checkout;
