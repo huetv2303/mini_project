@@ -62,7 +62,7 @@ class CheckoutController extends Controller
 
                 Cache::put($paymentSessionCode, $request->all(), now()->addHours(2));
 
-                $frontendUrl = env('FRONTEND_URL', 'http://localhost:3000');
+                $frontendUrl = env('FRONTEND_URL', 'http://localhost:3001');
                 $returnUrl = rtrim($frontendUrl, '/') . '/checkout/vnpay-callback';
 
                 $paymentUrl = app(VNPayService::class)->generatePaymentUrl(
