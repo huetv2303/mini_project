@@ -22,6 +22,7 @@ use App\Http\Controllers\api\v1\TaxRateController;
 use App\Http\Controllers\api\v1\DashboardController;
 use App\Http\Controllers\api\v1\PaymentController;
 use App\Http\Controllers\api\v1\SepayController;
+use App\Http\Controllers\api\v1\CommentController;
 
 use App\Http\Controllers\api\v1\PromotionController;
 use App\Http\Controllers\api\v1\Storefront\CouponController;
@@ -52,6 +53,7 @@ Route::group(['prefix' => 'v1'], function () {
         Route::get('/', [ProductController::class, 'index']);
         Route::get('/search', [ProductController::class, 'search']);
         Route::get('/{slug}', [ProductController::class, 'show']);
+        Route::get('/{id}/comments', [CommentController::class, 'index']);
     });
 
     Route::middleware('auth:api')->group(function () {
@@ -212,6 +214,13 @@ Route::group(['prefix' => 'v1'], function () {
         Route::get('/user', function (Request $request) {
             $user = $request->user()->load(['role.permissions', 'customerProfile']);
             return new UserResource($user);
+        });
+
+        // Comment routes
+        Route::prefix('comments')->group(function () {
+            Route::post('/', [CommentController::class, 'store']);
+            Route::delete('/{id}', [CommentController::class, 'destroy']);
+            Route::get('/can-review/{productId}', [CommentController::class, 'checkCanReview']);
         });
     });
 

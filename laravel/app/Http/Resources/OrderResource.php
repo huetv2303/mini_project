@@ -65,6 +65,7 @@ class OrderResource extends JsonResource
                                 : null)
                         ),
                     'product_name' => $item->product_name,
+                    'product_slug' => $item->product?->slug,
                     'variant_name' => $item->variant_name,
                     'sku'          => $item->sku,
                     'price'        => $item->price,

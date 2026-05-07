@@ -57,4 +57,19 @@ class Product extends Model
     {
         return $this->belongsTo(Supplier::class, 'supplier_id');
     }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    public function getAverageRatingAttribute()
+    {
+        return $this->comments()->avg('rating') ?: 0;
+    }
+
+    public function getReviewCountAttribute()
+    {
+        return $this->comments()->count();
+    }
 }
