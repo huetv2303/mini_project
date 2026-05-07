@@ -22,6 +22,7 @@ import axios from "axios";
 import { fetchCategoriesRequest } from "../services/CategoryService";
 import { fetchProductsRequest } from "../services/ProductService";
 import { getImageUrl, formatPrice } from "../helper/helper";
+import StarRating from "../components/review/StarRating";
 
 const Home = () => {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
@@ -347,13 +348,33 @@ const Home = () => {
                         <h3 className="text-[1rem] font-medium text-gray-800">
                           <Link to={`/products/${prod.slug}`}>{prod.name}</Link>
                         </h3>
-                        <div className="flex items-center gap-1 text-yellow-500">
-                          <Star size={12} fill="currentColor" />
-                          <span>{prod.rating || 4.8}</span>
+                        <div>
+                          {prod.review_count > 0 && (
+                            <div className="flex items-center">
+                              <div className="flex items-center   ">
+                                <StarRating
+                                  rating={prod.average_rating}
+                                  size={15}
+                                />
+                                <span className="text-[1rem] font-medium ml-1">
+                                  ({Number(prod.average_rating || 0).toFixed(1)}
+                                  )
+                                </span>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
-
-                      <p className="text-[1rem] ">{formatPrice(prod.price)}</p>
+                      <div className="pt-1 flex items-center justify-between">
+                        <p className="text-[1rem] ">
+                          {formatPrice(prod.price)}
+                        </p>
+                        <div className="pt-1">
+                          <span className="text-[1rem] text-gray-500 ">
+                            {prod.review_count || 0} Đánh giá
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </SwiperSlide>

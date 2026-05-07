@@ -29,6 +29,8 @@ import {
 } from "lucide-react";
 import { usePromotion } from "../../hooks/usePromotion";
 import PromotionModal from "../Admin/order/components/PromotionModal";
+import ReviewSection from "../../components/review/ReviewSection";
+import StarRating from "../../components/review/StarRating";
 
 const ProductDetail = () => {
   const { slug } = useParams();
@@ -418,20 +420,16 @@ const ProductDetail = () => {
                             {activeVariant?.sku || "N/A"}
                           </span>
                         </span>
-                        <div className="flex items-center gap-1.5 border-l border-gray-200 pl-6">
-                          <div className="flex gap-0.5 text-[1rem] text-yellow-400">
-                            {[...Array(5)].map((_, i) => (
-                              <Star
-                                key={i}
-                                size={14}
-                                fill={i < 4 ? "currentColor" : "none"}
-                                stroke="currentColor"
-                              />
-                            ))}
-                          </div>
-                          <span className="text-xs font-medium">(0)</span>
-                          <span className="text-[1rem] text-gray-300 ml-2">
-                            0 Đánh giá
+                        <div className="flex items-center gap-1.5">
+                          <StarRating
+                            rating={product.average_rating}
+                            size={18}
+                          />
+                          <span className="text-[1rem] font-medium">
+                            ({Number(product.average_rating || 0).toFixed(1)})
+                          </span>
+                          <span className="text-[1rem] text-gray-800 ml-2">
+                            {product.review_count || 0} Đánh giá
                           </span>
                         </div>
                       </div>
@@ -527,36 +525,33 @@ const ProductDetail = () => {
               <div className="space-y-8 pt-4">
                 {/* Color Selector */}
                 <div className="space-y-4 flex items-center gap-4">
-                  <h4 className="text-sm font-medium text-gray-900">
+                  <h4 className="text-[1rem] font-medium text-gray-900">
                     Màu sắc:
                   </h4>
-                  <div className="flex items-center flex-wrap gap-4">
+                  <div className="flex items-center flex-wrap gap-4 min-w-12  px-3 border rounded-lg font-bold text-xs transition-all bg-black text-white border-black shadow-md ">
                     {availableColors.map((color, i) => {
                       const isAvailable = isColorAvailable(color, selectedSize);
                       return (
                         <button
                           key={i}
                           onClick={() => handleColorChange(color)}
-                          className={`w-9 h-9 rounded-full p-0.5 transition-all ${
+                          className={`w-10 h-10 rounded-md p-0.5 transition-all ${
                             selectedColor === color
                               ? "bg-black text-white"
                               : "border-transparent"
                           } ${!isAvailable ? "opacity-20 grayscale" : ""}`}
                         >
                           <div
-                            className={`w-full h-full rounded-full border border-gray-100 shadow-sm`}
+                            className={`w-full h-full rounded flex items-center justify-center `}
                             style={{
                               backgroundColor: color.startsWith("#")
                                 ? color
                                 : "transparent",
-                              border: !color.startsWith("#")
-                                ? "1px solid #e5e7eb"
-                                : "none",
                             }}
                             title={color}
                           >
                             {!color.startsWith("#") && (
-                              <span className="text-[10px] truncate px-0.5">
+                              <span className="text-[1rem] truncate ">
                                 {color}
                               </span>
                             )}
@@ -722,22 +717,7 @@ const ProductDetail = () => {
               )}
             </div>
           </div>
-          {/* Review Summary */}
-          <div className="mt-32 pt-16 border-t border-gray-100">
-            <div className="space-y-4">
-              <h3 className="text-xl font-bold text-gray-900">
-                Đánh giá sản phẩm
-              </h3>
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-1 text-yellow-400">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} size={16} fill="none" stroke="currentColor" />
-                  ))}
-                </div>
-                <p className="text-sm font-medium text-gray-400">0 đánh giá</p>
-              </div>
-            </div>
-          </div>
+          <ReviewSection productId={product.id} />
 
           {/* Related Products Section */}
           {relatedProducts.length > 0 && (

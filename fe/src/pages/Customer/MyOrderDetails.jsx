@@ -19,7 +19,10 @@ import {
   fetchMyOrderRequest,
   cancelMyOrderRequest,
 } from "../../services/OrderService";
-import { fetchBankConfigRequest, checkSepayStatusRequest } from "../../services/PaymentService";
+import {
+  fetchBankConfigRequest,
+  checkSepayStatusRequest,
+} from "../../services/PaymentService";
 import {
   OrderStatusBadge,
   PaymentStatusBadge,
@@ -47,8 +50,14 @@ const MyOrderDetails = () => {
   const [isPaidLocally, setIsPaidLocally] = useState(false);
 
   useEffect(() => {
-    if (order && order.payment_method?.code === "bank_transfer" && order.payment_status === "unpaid") {
-      fetchBankConfigRequest().then(res => setBankConfig(res.data)).catch(console.error);
+    if (
+      order &&
+      order.payment_method?.code === "bank_transfer" &&
+      order.payment_status === "unpaid"
+    ) {
+      fetchBankConfigRequest()
+        .then((res) => setBankConfig(res.data))
+        .catch(console.error);
     }
   }, [order]);
 
@@ -57,11 +66,16 @@ const MyOrderDetails = () => {
     if (showPaymentModal && bankConfig && order && !isPaidLocally) {
       pollingInterval = setInterval(async () => {
         try {
-          const resp = await checkSepayStatusRequest(order.code, order.final_amount);
+          const resp = await checkSepayStatusRequest(
+            order.code,
+            order.final_amount,
+          );
           if (resp && resp.paid) {
             clearInterval(pollingInterval);
             setIsPaidLocally(true);
-            toast.success("Thanh toán thành công! Đơn hàng của bạn đã được xác nhận.");
+            toast.success(
+              "Thanh toán thành công! Đơn hàng của bạn đã được xác nhận.",
+            );
             setShowPaymentModal(false);
             loadOrder(); // Tải lại đơn hàng để cập nhật UI
           }
@@ -71,7 +85,7 @@ const MyOrderDetails = () => {
       }, 5000);
     }
     return () => {
-        if (pollingInterval) clearInterval(pollingInterval);
+      if (pollingInterval) clearInterval(pollingInterval);
     };
   }, [showPaymentModal, bankConfig, order, isPaidLocally]);
 
@@ -325,11 +339,14 @@ const MyOrderDetails = () => {
                 </button>
               )}
 
-              {order.status === "delivered" && (
-                <button className="h-12 px-4 bg-yellow-50 text-yellow-700 rounded-lg font-medium text-sm flex items-center justify-center gap-2 hover:bg-yellow-500 hover:text-white transition-all shadow-xl shadow-yellow-500/10">
+              {order.status === "delivered" && order.items?.length > 0 && (
+                <Link
+                  to={`/products/${order.items[0].product_slug || order.items[0].product_id}?order_id=${order.id}#reviews`}
+                  className="h-12 px-4 bg-yellow-50 text-yellow-700 rounded-lg font-medium text-sm flex items-center justify-center gap-2 hover:bg-yellow-500 hover:text-white transition-all shadow-xl shadow-yellow-500/10"
+                >
                   <Star size={20} />
                   ĐÁNH GIÁ ĐƠN HÀNG
-                </button>
+                </Link>
               )}
             </div>
           </div>
@@ -375,11 +392,22 @@ const MyOrderDetails = () => {
                             {new Intl.NumberFormat("vi-VN").format(item.price)}₫
                             × {item.quantity}
                           </div>
-                          {item.returned_quantity > 0 && (
-                            <span className="text-xs text-rose-400 font-medium">
-                              Đã trả: {item.returned_quantity}
-                            </span>
-                          )}
+                          <div className="flex items-center gap-3">
+                            {item.returned_quantity > 0 && (
+                              <span className="text-xs text-rose-400 font-medium">
+                                Đã trả: {item.returned_quantity}
+                              </span>
+                            )}
+                            {order.status === "delivered" && (
+                              <Link
+                                to={`/products/${item.product_slug || item.product_id}?order_id=${order.id}#reviews`}
+                                className="text-xs font-bold text-yellow-600 hover:text-yellow-700 flex items-center gap-1 bg-yellow-50 px-2 py-1 rounded"
+                              >
+                                <Star size={12} fill="currentColor" />
+                                Đánh giá
+                              </Link>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -512,15 +540,16 @@ const MyOrderDetails = () => {
                     />
                   </div>
                 </div>
-                {order.payment_status === "unpaid" && order.payment_method?.code === "bank_transfer" && (
-                  <button
-                    onClick={() => setShowPaymentModal(true)}
-                    className="w-full mt-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm"
-                  >
-                    <CreditCard size={18} />
-                    MỞ QR THANH TOÁN TỰ ĐỘNG
-                  </button>
-                )}
+                {order.payment_status === "unpaid" &&
+                  order.payment_method?.code === "bank_transfer" && (
+                    <button
+                      onClick={() => setShowPaymentModal(true)}
+                      className="w-full mt-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm"
+                    >
+                      <CreditCard size={18} />
+                      MỞ QR THANH TOÁN TỰ ĐỘNG
+                    </button>
+                  )}
               </div>
             </div>
 
@@ -652,14 +681,17 @@ const MyOrderDetails = () => {
         onClose={() => setShowPaymentModal(false)}
         bankInfo={
           bankConfig
-            ? { ...bankConfig, amount: order?.final_amount, order_code: order?.code }
+            ? {
+                ...bankConfig,
+                amount: order?.final_amount,
+                order_code: order?.code,
+              }
             : null
         }
       />
     </CustomerLayout>
   );
 };
-
 
 const BankPaymentModal = ({ isOpen, onClose, bankInfo }) => {
   if (!isOpen || !bankInfo) return null;

@@ -11,6 +11,7 @@ import {
   ChevronRight,
   Heart,
 } from "lucide-react";
+import StarRating from "../../components/review/StarRating";
 
 const ProductList = () => {
   const [searchParams] = useSearchParams();
@@ -214,19 +215,40 @@ const ProductList = () => {
                       <div
                         className={`relative space-y-1 ${viewMode === "list" ? "flex-1" : ""}`}
                       >
-                        {/* <div className="flex items-center gap-2">
-                          <span className="text-[1rem] font-medium uppercase  ">
-                            {prod.category?.name}
-                          </span>
-                        </div> */}
-                        <h3 className="text-[1rem] font-medium text-gray-900 uppercase">
-                          <Link to={`/products/${prod.slug}`}>{prod.name}</Link>
-                        </h3>
-                        <div className="flex items-baseline gap-3">
-                          <span className="text-sm text-gray-800">
-                            {formatPrice(prod.price)}
-                          </span>
+                        <div className="flex justify-between items-center">
+                          <Link to={`/products/${prod.slug}`}>
+                            <h3 className="text-[1rem] font-medium text-gray-900 uppercase">
+                              {prod.name}
+                            </h3>
+                          </Link>
+                          {prod.review_count > 0 && (
+                            <div className="flex items-center">
+                              <div className="flex items-center   ">
+                                <StarRating
+                                  rating={prod.average_rating}
+                                  size={15}
+                                />
+                                <span className="text-[1rem] font-medium ml-1">
+                                  ({Number(prod.average_rating || 0).toFixed(1)}
+                                  )
+                                </span>
+                              </div>
+                            </div>
+                          )}
                         </div>
+                        <div className="flex justify-between items-center ">
+                          <div className="flex items-baseline gap-3">
+                            <span className="text-[1.2rem] text-gray-900">
+                              {formatPrice(prod.price)}
+                            </span>
+                          </div>
+                          <div className="pt-1">
+                            <span className="text-[1rem] text-gray-500 ">
+                              {prod.review_count || 0} Đánh giá
+                            </span>
+                          </div>
+                        </div>
+
                         {viewMode === "list" && (
                           <p className="text-gray-500 text-sm line-clamp-2 mb-6">
                             {prod.description}
