@@ -14,6 +14,10 @@ use App\Services\PromotionService;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use \Illuminate\Http\Request;
+use App\Models\User;
+use App\Events\OrderPlaced;
+use App\Notifications\OrderPlacedNotification;
+use Illuminate\Support\Facades\Notification;
 
 
 class CheckoutRepository implements CheckoutRepositoryInterface
@@ -183,6 +187,20 @@ class CheckoutRepository implements CheckoutRepositoryInterface
                 CustomerProfile::where('user_id', $customerId)
                     ->increment('total_spent', $finalAmount);
             }
+
+            // --- Realtime Notifications ---
+            // 1. Dispatch event for instant Toast on Admin Dashboard
+            OrderPlaced::dispatch($order);
+
+            // 2. Send notification to Customer
+            if ($order->customer) {
+                $order->customer->notify(new \App\Notifications\OrderStatusNotification($order));
+            }
+
+            // 3. Send notification to all Admins for database storage & bell icon
+            $admins = User::whereHas('role', function($q) { $q->where('code', 'admin'); })->get();
+            Notification::send($admins, new \App\Notifications\OrderPlacedNotification($order));
+            // ------------------------------
 
             return $order->load(['items', 'shippingMethod', 'paymentMethod']);
         });

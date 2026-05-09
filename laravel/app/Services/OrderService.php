@@ -14,6 +14,11 @@ use App\Models\TaxRate;
 use Illuminate\Support\Facades\DB;
 use \Illuminate\Support\Str;
 use App\Models\User;
+use App\Events\OrderPlaced;
+use App\Events\OrderStatusUpdated;
+use App\Notifications\OrderPlacedNotification;
+use App\Notifications\OrderStatusNotification;
+use Illuminate\Support\Facades\Notification;
 
 class OrderService
 {
@@ -119,7 +124,7 @@ class OrderService
             }
 
             $isPickup = ($data['fulfillment_type'] ?? null) === 'pickup';
-            
+
             // Tìm code của phương thức thanh toán để xác định xem có phải trả sau/online không
             $paymentMethod = \App\Models\PaymentMethod::find($data['payment_method_id']);
             $isOnlinePayment = $paymentMethod && in_array($paymentMethod->code, ['bank_transfer', 'vnpay']);
@@ -197,7 +202,16 @@ class OrderService
                 CustomerProfile::where('user_id', $customerId)->increment('total_spent', $finalAmount);
             }
 
-            return $order->load(['paymentMethod', 'shippingMethod', 'staff', 'items']);
+            $order->load(['paymentMethod', 'shippingMethod', 'staff', 'items']);
+
+            // Notify Admin about new POS/Admin order
+            OrderPlaced::dispatch($order);
+            $admins = User::whereHas('role', function ($q) {
+                $q->where('code', 'admin');
+            })->get();
+            Notification::send($admins, new OrderPlacedNotification($order));
+
+            return $order;
         });
     }
 
@@ -308,6 +322,18 @@ class OrderService
                 }
             }
 
+            // Realtime Status Notification
+            OrderStatusUpdated::dispatch($order);
+            
+            // Notify Customer
+            if ($order->customer) {
+                $order->customer->notify(new OrderStatusNotification($order));
+            }
+
+            // Notify Admins (Database)
+            $admins = User::whereHas('role', function($q) { $q->where('code', 'admin'); })->get();
+            Notification::send($admins, new OrderStatusNotification($order));
+
             return $updated;
         });
     }
@@ -390,6 +416,17 @@ class OrderService
             }
 
             $order->update(['payment_status' => 'refunded']);
+
+            // Realtime & Database Notification
+            OrderStatusUpdated::dispatch($order);
+            
+            if ($order->customer) {
+                $order->customer->notify(new OrderStatusNotification($order));
+            }
+
+            $admins = User::whereHas('role', function($q) { $q->where('code', 'admin'); })->get();
+            Notification::send($admins, new OrderStatusNotification($order));
+
             return $order;
         });
     }
@@ -446,12 +483,21 @@ class OrderService
 
             $order->update(['status' => 'cancelled']);
 
-            if ($order->customer_id) {
-                CustomerProfile::where('user_id', $order->customer_id)
-                    ->decrement('total_orders');
-                CustomerProfile::where('user_id', $order->customer_id)
-                    ->decrement('total_spent', max(0, $order->final_amount));
+            CustomerProfile::where('user_id', $order->customer_id)
+                ->decrement('total_spent', max(0, $order->final_amount));
+
+
+            // Realtime & Database Notification
+            OrderStatusUpdated::dispatch($order);
+
+            // Notify Customer
+            if ($order->customer) {
+                $order->customer->notify(new OrderStatusNotification($order));
             }
+
+            // Notify Admins
+            $admins = User::whereHas('role', function($q) { $q->where('code', 'admin'); })->get();
+            Notification::send($admins, new OrderStatusNotification($order));
 
             return $order;
         });

@@ -108,4 +108,12 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     {
         return $this->hasMany(Comment::class);
     }
+
+    /**
+     * Route notifications for the broadcast channel.
+     */
+    public function receivesBroadcastNotificationsOn(): string
+    {
+        return 'user.'.$this->id;
+    }
 }

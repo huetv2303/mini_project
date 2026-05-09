@@ -8,6 +8,9 @@ use App\Http\Resources\OrderReturnResource;
 use App\Services\OrderService;
 use App\Services\OrderReturnService;
 use Illuminate\Http\Request;
+use App\Events\OrderReturnRequested;
+use App\Models\User;
+use Illuminate\Support\Facades\Notification;
 
 class OrderController extends Controller
 {
@@ -108,6 +111,12 @@ class OrderController extends Controller
             $data['order_id'] = $order->id;
 
             $orderReturn = $this->orderReturnService->processReturn($data, auth()->id());
+
+            // Realtime notification to Admin
+            OrderReturnRequested::dispatch($orderReturn);
+
+            $admins = User::whereHas('role', function($q) { $q->where('code', 'admin'); })->get();
+            Notification::send($admins, new \App\Notifications\OrderReturnNotification($orderReturn));
 
             return response()->json([
                 'status'  => 'success',

@@ -23,6 +23,7 @@ use App\Http\Controllers\api\v1\DashboardController;
 use App\Http\Controllers\api\v1\PaymentController;
 use App\Http\Controllers\api\v1\SepayController;
 use App\Http\Controllers\api\v1\CommentController;
+use App\Http\Controllers\api\v1\NotificationController;
 
 use App\Http\Controllers\api\v1\PromotionController;
 use App\Http\Controllers\api\v1\Storefront\CouponController;
@@ -34,6 +35,9 @@ use App\Http\Resources\UserResource;
 Route::group(['prefix' => 'v1'], function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
+
+    // Broadcasting Auth
+    Broadcast::routes(['middleware' => ['auth:api']]);
 
     // Google OAuth
     Route::get('/auth/google/redirect', [SocialAuthController::class, 'redirectToGoogle']);
@@ -221,6 +225,14 @@ Route::group(['prefix' => 'v1'], function () {
             Route::post('/', [CommentController::class, 'store']);
             Route::delete('/{id}', [CommentController::class, 'destroy']);
             Route::get('/can-review/{productId}', [CommentController::class, 'checkCanReview']);
+        });
+
+        // Notification routes
+        Route::prefix('notifications')->group(function () {
+            Route::get('/', [NotificationController::class, 'index']);
+            Route::get('/unread-count', [NotificationController::class, 'unreadCount']);
+            Route::post('/mark-read', [NotificationController::class, 'markAsRead']);
+            Route::delete('/{id}', [NotificationController::class, 'destroy']);
         });
     });
 
