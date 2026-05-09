@@ -464,7 +464,7 @@ const ProductDetail = () => {
                       ])
                     }
                     disabled={isApplying}
-                    className="p-3 right-0 h-full bg-black text-white rounded-xl text-xs font-bold hover:bg-gray-800 transition-colors absolute flex items-center justify-center min-w-[50px]"
+                    className="p-3 right-0 h-full bg-blue-500 text-white rounded-xl text-xs font-bold hover:bg-blue-400 transition-colors absolute flex items-center justify-center min-w-[50px]"
                   >
                     {isApplying ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
@@ -525,37 +525,23 @@ const ProductDetail = () => {
               <div className="space-y-8 pt-4">
                 {/* Color Selector */}
                 <div className="space-y-4 flex items-center gap-4">
-                  <h4 className="text-[1rem] font-medium text-gray-900">
+                  <h4 className="text-sm font-medium text-gray-900">
                     Màu sắc:
                   </h4>
-                  <div className="flex items-center flex-wrap gap-4 min-w-12  px-3 border rounded-lg font-bold text-xs transition-all bg-black text-white border-black shadow-md ">
+                  <div className="flex flex-wrap gap-3">
                     {availableColors.map((color, i) => {
                       const isAvailable = isColorAvailable(color, selectedSize);
                       return (
                         <button
                           key={i}
                           onClick={() => handleColorChange(color)}
-                          className={`w-10 h-10 rounded-md p-0.5 transition-all ${
+                          className={`min-w-12 h-10 px-3 border rounded-lg font-bold text-xs transition-all ${
                             selectedColor === color
-                              ? "bg-black text-white"
-                              : "border-transparent"
-                          } ${!isAvailable ? "opacity-20 grayscale" : ""}`}
+                              ? "bg-blue-500 text-white border-blue-500 shadow-md"
+                              : "bg-white text-gray-500 border-gray-200 hover:border-gray-900"
+                          } ${!isAvailable ? "opacity-20 bg-gray-50 border-dashed" : ""}`}
                         >
-                          <div
-                            className={`w-full h-full rounded flex items-center justify-center `}
-                            style={{
-                              backgroundColor: color.startsWith("#")
-                                ? color
-                                : "transparent",
-                            }}
-                            title={color}
-                          >
-                            {!color.startsWith("#") && (
-                              <span className="text-[1rem] truncate ">
-                                {color}
-                              </span>
-                            )}
-                          </div>
+                          {color}
                         </button>
                       );
                     })}
@@ -577,7 +563,7 @@ const ProductDetail = () => {
                           onClick={() => handleSizeChange(size)}
                           className={`min-w-12 h-10 px-3 border rounded-lg font-bold text-xs transition-all ${
                             selectedSize === size
-                              ? "bg-black text-white border-black shadow-md"
+                              ? "bg-blue-500 text-white border-blue-500 shadow-md"
                               : "bg-white text-gray-500 border-gray-200 hover:border-gray-900"
                           } ${!isAvailable ? "opacity-20 bg-gray-50 border-dashed" : ""}`}
                         >

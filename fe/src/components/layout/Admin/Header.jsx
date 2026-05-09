@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useAuth } from "../../../context/AuthContext";
 import { User, Key, LogOut, ChevronDown, Menu } from "lucide-react";
 import { Link } from "react-router-dom";
+import NotificationBell from "../../common/NotificationBell";
 
 const Header = ({ toggleSidebar }) => {
   const { logout, user } = useAuth();
@@ -38,6 +39,7 @@ const Header = ({ toggleSidebar }) => {
             </div>
           </div>
           <div className="flex items-center space-x-4">
+            <NotificationBell />
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setIsOpen(!isOpen)}

@@ -91,6 +91,7 @@ export const AuthProvider = ({ children }) => {
         resendVerification,
         hasPermission,
         fetchUser,
+        token: getToken(),
       }}
     >
       {children}

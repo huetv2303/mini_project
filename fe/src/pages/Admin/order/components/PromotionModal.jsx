@@ -36,7 +36,7 @@ const PromotionModal = ({ isOpen, onClose, promotions = [], onSelect }) => {
                 {item.is_eligible ? (
                   <button
                     onClick={() => onSelect(item.promotion)}
-                    className="px-4 py-1.5 bg-indigo-600 text-white text-xs font-bold rounded-lg hover:bg-indigo-700 transition shadow-lg shadow-indigo-600/20"
+                    className="px-4 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-lg hover:bg-blue-700 transition shadow-lg shadow-blue-600/20"
                   >
                     Áp dụng
                   </button>

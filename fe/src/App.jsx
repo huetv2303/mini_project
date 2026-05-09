@@ -51,13 +51,16 @@ import PromotionPage from "./pages/Admin/promotion/PromotionPage";
 import PromotionFormPage from "./pages/Admin/promotion/PromotionFormPage";
 import CustomerListPage from "./pages/Admin/customer/CustomerListPage";
 import { AuthProvider } from "./context/AuthContext";
+import { NotificationProvider } from "./context/NotificationContext";
 
 const App = () => {
   return (
     <AuthProvider>
-      <CartProvider>
-        <WishlistProvider>
-          <BuyNowProvider>
+      <NotificationProvider>
+        <CartProvider>
+          <WishlistProvider>
+            <BuyNowProvider>
+              {/* ... existing code ... */}
 
           <Toaster
             position="top-right"
@@ -473,9 +476,10 @@ const App = () => {
               />
             </Routes>
           </Router>
-          </BuyNowProvider>
-        </WishlistProvider>
-      </CartProvider>
+            </BuyNowProvider>
+          </WishlistProvider>
+        </CartProvider>
+      </NotificationProvider>
     </AuthProvider>
   );
 };

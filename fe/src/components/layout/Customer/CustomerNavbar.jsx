@@ -23,6 +23,7 @@ import { getImageUrl } from "../../../helper/helper";
 import { fetchCategoriesRequest } from "../../../services/CategoryService";
 import CartDrawer from "./CartDrawer";
 import { usePromotion } from "../../../hooks/usePromotion";
+import NotificationBell from "../../common/NotificationBell";
 
 const CustomerNavbar = () => {
   const { user, logout } = useAuth();
@@ -186,6 +187,7 @@ const CustomerNavbar = () => {
                   </span>
                 )}
               </button>
+              {user && <NotificationBell />}
               {/* User Account */}
               {user ? (
                 <div className="relative">
