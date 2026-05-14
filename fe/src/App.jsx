@@ -52,6 +52,7 @@ import PromotionFormPage from "./pages/Admin/promotion/PromotionFormPage";
 import CustomerListPage from "./pages/Admin/customer/CustomerListPage";
 import { AuthProvider } from "./context/AuthContext";
 import { NotificationProvider } from "./context/NotificationContext";
+import ChatbotWidget from "./components/common/ChatbotWidget";
 
 const App = () => {
   return (
@@ -475,6 +476,7 @@ const App = () => {
                 }
               />
             </Routes>
+            <ChatbotWidget />
           </Router>
             </BuyNowProvider>
           </WishlistProvider>
