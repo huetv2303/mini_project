@@ -47,6 +47,9 @@ Route::group(['prefix' => 'v1'], function () {
     Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verify'])->name('verification.verify');
     Route::post('/email/resend', [AuthController::class, 'resendVerificationEmail'])->name('verification.send');
 
+    // Chat AI Public
+    Route::post('/chat', [\App\Http\Controllers\api\v1\ChatbotController::class, 'chat']);
+
     // Public routes for browsing
     Route::prefix('categories')->group(function () {
         Route::get('/', [CategoryController::class, 'index']);
@@ -233,6 +236,12 @@ Route::group(['prefix' => 'v1'], function () {
             Route::get('/unread-count', [NotificationController::class, 'unreadCount']);
             Route::post('/mark-read', [NotificationController::class, 'markAsRead']);
             Route::delete('/{id}', [NotificationController::class, 'destroy']);
+        });
+
+        // Chat AI routes (Auth required)
+        Route::prefix('chat')->group(function () {
+            Route::get('/history', [\App\Http\Controllers\api\v1\ChatbotController::class, 'history']);
+            Route::delete('/history', [\App\Http\Controllers\api\v1\ChatbotController::class, 'clearHistory']);
         });
     });
 

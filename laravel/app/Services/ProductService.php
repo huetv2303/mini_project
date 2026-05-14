@@ -111,6 +111,8 @@ class ProductService
                 }
             }
 
+            \App\Jobs\GenerateProductEmbedding::dispatch($product);
+
             return $product;
         });
     }
@@ -289,6 +291,8 @@ class ProductService
                 }
                 $varToDelete->delete();
             }
+
+            \App\Jobs\GenerateProductEmbedding::dispatch($product);
 
             return $product;
         });
