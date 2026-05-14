@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\api\v1;
 
 use App\Http\Controllers\Controller;
+use App\Models\ChatMessage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use App\Services\Chatbot\ChatbotService;
 use App\Services\Chatbot\ChatHistoryService;
@@ -29,15 +31,35 @@ class ChatbotController extends Controller
 
         $message = $request->input('message');
         $sessionId = $request->input('session_id') ?: Str::uuid()->toString();
-        $user = Auth::guard('api')->user(); // Do gọi chung public route, cần check guard
-
+        // 1. Kiểm tra user từ Guard (Token API hoặc Session Web)
+        $user = auth()->user() ?: Auth::guard('api')->user();
         $userId = $user ? $user->id : null;
-        
-        // Xác định vai trò (Giả sử role_id = 1 là Admin)
+
+        // 2. Xác định vai trò mặc định từ User
         $role = 'guest';
         if ($user) {
-            $role = ($user->role_id == 1 || $user->hasPermission('admin.manage')) ? 'admin' : 'customer';
+            $isAdmin = ($user->role_id == 1 || (isset($user->role) && $user->role == 'admin'));
+            $role = $isAdmin ? 'admin' : 'customer';
         }
+
+        // 3. CƠ CHẾ ƯU TIÊN CHO ADMIN TRÊN WEB (LOCAL DEBUG)
+        $origin = $request->header('Origin', '');
+        $currentPath = $request->input('current_path', $request->header('Referer', ''));
+
+        if (config('app.debug')) {
+            // Nếu gửi từ localhost:3001 VÀ đường dẫn có chứa /admin
+            if (str_contains($origin, 'localhost:3001') && str_contains($currentPath, '/admin')) {
+                $role = 'admin';
+            }
+        }
+
+        Log::info("Chatbot Request Debug:", [
+            'origin' => $origin,
+            'current_path' => $currentPath,
+            'detected_role' => $role,
+            'user_id' => $userId,
+            'message' => $message
+        ]);
 
         $result = $this->chatbotService->chat($message, $sessionId, $userId, $role);
 
@@ -58,7 +80,7 @@ class ChatbotController extends Controller
         }
 
         // Lấy lịch sử từ DB
-        $messages = \App\Models\ChatMessage::where('user_id', $user->id)
+        $messages = ChatMessage::where('user_id', $user->id)
             ->orderBy('created_at', 'asc')
             ->take(20)
             ->get(['role', 'content']);
@@ -70,9 +92,9 @@ class ChatbotController extends Controller
     {
         $sessionId = $request->input('session_id');
         $userId = Auth::id();
-        
+
         $this->historyService->clearHistory((string)$sessionId, $userId);
-        
+
         return response()->json(['message' => 'Đã xóa lịch sử trò chuyện.']);
     }
 }

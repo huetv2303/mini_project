@@ -130,17 +130,66 @@ class SearchProductsFunction implements ChatFunctionInterface
 
     private function getEmbedding($text)
     {
-        $apiKey = config('gemini.api_key');
-        $model = config('gemini.embedding_model');
-        $baseUrl = config('gemini.base_url');
-        
-        $response = Http::withHeaders(['Content-Type' => 'application/json'])
-            ->post("{$baseUrl}/{$model}:embedContent?key={$apiKey}", [
-                'model' => 'models/' . $model,
-                'content' => ['parts' => [['text' => $text]]]
+        $useVertex = config('gemini.use_vertex', false);
+        $model = config('gemini.embedding_model', 'text-embedding-004'); // Vertex thường dùng text-embedding-004
+
+        if ($useVertex) {
+            $projectId = config('gemini.vertex.project_id');
+            $location = config('gemini.vertex.location');
+            $url = "https://{$location}-aiplatform.googleapis.com/v1/projects/{$projectId}/locations/{$location}/publishers/google/models/{$model}:predict";
+            
+            // Lấy token (tạm thời copy logic từ ChatbotService hoặc dùng helper)
+            // Để đơn giản tôi sẽ dùng trực tiếp logic token ở đây
+            $token = $this->getVertexAccessToken();
+            
+            $response = Http::withToken($token)
+                ->post($url, [
+                    'instances' => [['content' => $text]]
+                ]);
+            
+            return $response->json()['predictions'][0]['embeddings']['values'] ?? null;
+        } else {
+            $apiKey = config('gemini.api_key');
+            $baseUrl = config('gemini.base_url');
+            $response = Http::withHeaders(['Content-Type' => 'application/json'])
+                ->post("{$baseUrl}/{$model}:embedContent?key={$apiKey}", [
+                    'model' => 'models/' . $model,
+                    'content' => ['parts' => [['text' => $text]]]
+                ]);
+
+            return $response->json()['embedding']['values'] ?? null;
+        }
+    }
+
+    private function getVertexAccessToken(): string
+    {
+        return \Illuminate\Support\Facades\Cache::remember('vertex_access_token', 3500, function () {
+            $keyPath = config('gemini.vertex.credentials_path');
+            $keyData = json_decode(file_get_contents($keyPath), true);
+            $clientEmail = $keyData['client_email'];
+            $privateKey = $keyData['private_key'];
+
+            $now = time();
+            $header = base64_encode(json_encode(['alg' => 'RS256', 'typ' => 'JWT']));
+            $payload = base64_encode(json_encode([
+                'iss' => $clientEmail,
+                'scope' => 'https://www.googleapis.com/auth/cloud-platform',
+                'aud' => 'https://oauth2.googleapis.com/token',
+                'iat' => $now,
+                'exp' => $now + 3600
+            ]));
+
+            $signature = '';
+            openssl_sign("$header.$payload", $signature, $privateKey, OPENSSL_ALGO_SHA256);
+            $jwt = "$header.$payload." . base64_encode($signature);
+
+            $response = Http::asForm()->post('https://oauth2.googleapis.com/token', [
+                'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+                'assertion' => $jwt
             ]);
 
-        return $response->json()['embedding']['values'] ?? null;
+            return $response->json()['access_token'];
+        });
     }
 
     private function cosineSimilarity($vecA, $vecB)

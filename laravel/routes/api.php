@@ -47,8 +47,8 @@ Route::group(['prefix' => 'v1'], function () {
     Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verify'])->name('verification.verify');
     Route::post('/email/resend', [AuthController::class, 'resendVerificationEmail'])->name('verification.send');
 
-    // Chat AI Public
-    Route::post('/chat', [\App\Http\Controllers\api\v1\ChatbotController::class, 'chat']);
+    // Chat AI Public (Thêm middleware web để đọc được session/cookie từ trình duyệt)
+    Route::post('/chat', [\App\Http\Controllers\api\v1\ChatbotController::class, 'chat'])->middleware(['web']);
 
     // Public routes for browsing
     Route::prefix('categories')->group(function () {
