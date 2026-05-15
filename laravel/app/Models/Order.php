@@ -34,6 +34,7 @@ class Order extends Model
         'promotion_code_snapshot',
         'customer_id',
         'source',
+        'wallet_amount_used',
     ];
 
     protected $casts = [

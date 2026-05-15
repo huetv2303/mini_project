@@ -64,7 +64,7 @@ const OrderDetailsPage = () => {
         try {
           const resp = await checkSepayStatusRequest(
             order.code,
-            order.final_amount,
+            order.final_amount - (order.wallet_amount_used || 0),
           );
 
           if (resp && resp.paid) {
@@ -96,6 +96,7 @@ const OrderDetailsPage = () => {
 
   const paymentStatusOptions = [
     { value: "unpaid", label: "Chưa thanh toán" },
+    { value: "partially_paid", label: "Thanh toán một phần" },
     { value: "paid", label: "Đã thanh toán" },
     { value: "refunded", label: "Đã hoàn tiền" },
     { value: "partially_refunded", label: "Hoàn tiền một phần" },
@@ -506,19 +507,43 @@ const OrderDetailsPage = () => {
                         </span>
                       </div>
                     )}
-                    <div className="pt-4 border-t border-gray-200">
-                      <div className="flex justify-between items-center mb-4">
-                        <span className="text-black font-bold uppercase text-[0.8rem]">
-                          Tổng thanh toán thực tế
+                    <div className="pt-4 border-t border-gray-200 space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-500 font-bold uppercase text-[12px]">
+                          Tổng cộng
                         </span>
-                        <span className="text-2xl font-bold ">
+                        <span className="font-bold text-gray-900">
                           {formatPrice(finalKeptAmount)}
                         </span>
                       </div>
+
+                      {order.wallet_amount_used > 0 && (
+                        <div className="flex justify-between items-center p-3 bg-indigo-50 rounded-xl border border-indigo-100">
+                          <span className="text-indigo-600 font-bold uppercase text-[12px] flex items-center gap-2">
+                            <RotateCcw className="w-3 h-3 rotate-180" />
+                            Đã trừ từ ví
+                          </span>
+                          <span className="font-bold text-indigo-700">
+                            -{formatPrice(order.wallet_amount_used)}
+                          </span>
+                        </div>
+                      )}
+
+                      <div className="flex justify-between items-center py-2">
+                        <span className="text-black font-bold uppercase text-[0.8rem]">
+                          {order.wallet_amount_used > 0 ? "Còn lại cần thu" : "Tổng thanh toán"}
+                        </span>
+                        <span className="text-2xl font-black text-black">
+                          {formatPrice(Math.max(0, finalKeptAmount - (order.wallet_amount_used || 0)))}
+                        </span>
+                      </div>
+
+                      <div className="h-px bg-gray-200 w-full my-2"></div>
+
                       <div className="flex justify-between items-center text-[0.8rem] text-gray-600 font-bold uppercase">
                         <div className="flex items-center gap-2">
                           <CreditCard className="w-3 h-3" />
-                          Thanh toán
+                          Phương thức
                         </div>
                         <span>
                           <div className="flex items-center gap-2">
@@ -755,7 +780,11 @@ const OrderDetailsPage = () => {
         onClose={() => setShowPaymentModal(false)}
         bankInfo={
           bankConfig
-            ? { ...bankConfig, amount: order?.final_amount, order_code: order?.code }
+            ? {
+                ...bankConfig,
+                amount: order?.final_amount - (order?.wallet_amount_used || 0),
+                order_code: order?.code,
+              }
             : null
         }
       />

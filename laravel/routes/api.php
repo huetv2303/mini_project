@@ -230,6 +230,8 @@ Route::group(['prefix' => 'v1'], function () {
         // Storefront Checkout (Cart + Buy Now)
         Route::post('/checkout', [CheckoutController::class, 'checkout']);
 
+        Route::get('/user/wallet-transactions', [UserController::class, 'walletTransactions']);
+
         Route::get('/user', function (Request $request) {
             $user = $request->user()->load(['role.permissions', 'customerProfile']);
             return new UserResource($user);

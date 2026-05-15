@@ -21,6 +21,7 @@ class OrderResource extends JsonResource
             'shipping_address' => $this->shipping_address,
             'expected_delivery_date' => $this->expected_delivery_date?->format('Y-m-d'),
             'final_amount'     => $this->final_amount,
+            'wallet_amount_used' => (float) $this->wallet_amount_used,
             'tax_amount'       => $this->tax_amount,
             'tax_rate_snapshot' => $this->tax_rate_snapshot,
             'tax_rate'         => $this->whenLoaded('taxRate', fn() => [

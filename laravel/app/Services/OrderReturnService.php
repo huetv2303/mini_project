@@ -13,15 +13,18 @@ class OrderReturnService
     protected $orderRepo;
     protected $orderReturnRepo;
     protected $inventoryService;
+    protected $walletService;
 
     public function __construct(
         OrderRepositoryInterface $orderRepo,
         OrderReturnRepositoryInterface $orderReturnRepo,
-        InventoryService $inventoryService
+        InventoryService $inventoryService,
+        WalletService $walletService
     ) {
         $this->orderRepo = $orderRepo;
         $this->orderReturnRepo = $orderReturnRepo;
         $this->inventoryService = $inventoryService;
+        $this->walletService = $walletService;
     }
 
     public function getAll($request = null)
@@ -155,6 +158,17 @@ class OrderReturnService
             }
 
             $orderReturn->update(['refund_status' => 'refunded']);
+
+            // Hoàn tiền vào ví khách hàng nếu đơn hàng có customer_id
+            if ($orderReturn->order->customer_id) {
+                $this->walletService->deposit(
+                    $orderReturn->order->customer,
+                    $orderReturn->total_return_amount,
+                    'order_return',
+                    $orderReturn->id,
+                    "Hoàn tiền cho phiếu trả hàng: " . $orderReturn->return_code
+                );
+            }
 
             if ($orderReturn->receive_status === 'received') {
                 $orderReturn->update(['status' => 'completed']);

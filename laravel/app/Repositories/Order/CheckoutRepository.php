@@ -160,6 +160,25 @@ class CheckoutRepository implements CheckoutRepositoryInterface
                 'source'                  => 'web',
             ]);
 
+            // Xử lý thanh toán qua ví
+            $useWallet = $request->boolean('use_wallet');
+            $walletAmountUsed = 0;
+            if ($useWallet && $user && $user->wallet_balance > 0) {
+                $walletAmountUsed = min($user->wallet_balance, $finalAmount);
+                app(\App\Services\WalletService::class)->withdraw(
+                    $user,
+                    $walletAmountUsed,
+                    'order',
+                    $order->id,
+                    "Thanh toán đơn hàng: " . $order->code
+                );
+
+                $order->update([
+                    'wallet_amount_used' => $walletAmountUsed,
+                    'payment_status' => ($walletAmountUsed >= $finalAmount) ? 'paid' : 'partially_paid'
+                ]);
+            }
+
 
             $inventoryService = app(InventoryService::class);
 

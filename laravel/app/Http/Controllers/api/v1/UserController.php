@@ -7,6 +7,7 @@ use App\Interfaces\UserRepositoryInterface;
 use Illuminate\Http\Request;
 
 use App\Http\Resources\UserResource;
+use App\Http\Resources\WalletTransactionResource;
 
 class UserController extends Controller
 {
@@ -133,5 +134,20 @@ class UserController extends Controller
                 'message' => 'Cập nhật thất bại: ' . $e->getMessage()
             ], 422);
         }
+    }
+
+    public function walletTransactions(Request $request)
+    {
+        $user = auth('api')->user();
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $transactions = $user->walletTransactions()
+            ->latest()
+            ->paginate($request->input('per_page', 10));
+
+        return WalletTransactionResource::collection($transactions)
+            ->additional(['status' => 'success']);
     }
 }

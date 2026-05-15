@@ -14,6 +14,7 @@ import {
   Tag,
   X,
   Copy,
+  Wallet,
 } from "lucide-react";
 
 import { useCart } from "../../context/CartContext";
@@ -25,7 +26,10 @@ import ShippingMethodService from "../../services/ShippingMethodService";
 import { fetchPaymentMethodsRequest } from "../../services/PaymentMethodService";
 import { storefrontCheckoutRequest } from "../../services/CheckoutService";
 import { usePromotion } from "../../hooks/usePromotion";
-import { fetchBankConfigRequest, checkSepayStatusRequest } from "../../services/PaymentService";
+import {
+  fetchBankConfigRequest,
+  checkSepayStatusRequest,
+} from "../../services/PaymentService";
 
 import toast from "react-hot-toast";
 import { format } from "date-fns";
@@ -185,6 +189,8 @@ const Checkout = () => {
     payment_method_id: "",
   });
 
+  const [useWallet, setUseWallet] = useState(false);
+
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -214,7 +220,10 @@ const Checkout = () => {
 
   const handleSubmit = async (evt) => {
     evt.preventDefault();
-    console.log(">>> Checkout Submit - Payment Method:", formData.payment_method_id);
+    console.log(
+      ">>> Checkout Submit - Payment Method:",
+      formData.payment_method_id,
+    );
     if (!validate()) {
       toast.error("Vui lòng điền đầy đủ thông tin");
       return;
@@ -235,6 +244,7 @@ const Checkout = () => {
           activePromotion?.promotion?.id || activePromotion?.id || null,
         promotion_code_snapshot:
           activePromotion?.promotion?.code || activePromotion?.code || null,
+        use_wallet: useWallet,
       };
 
       const payload =
@@ -259,11 +269,11 @@ const Checkout = () => {
       // Nếu là chuyển khoản ngân hàng, tạo đơn hàng trước để lấy mã ORD thật
       if (paymentMethod?.code === "bank_transfer") {
         const response = await storefrontCheckoutRequest(payload);
-        
+
         if (response.status === "success") {
           const orderData = response.data;
           toast.success("Đặt hàng thành công!");
-          
+
           // Xóa giỏ hàng sau khi đã tạo đơn thành công
           if (mode === "cart") clearCart();
           else clearBuyNowItem();
@@ -274,7 +284,6 @@ const Checkout = () => {
         setIsSubmitting(false);
         return;
       }
-
 
       // Xử lý ví điện tử VNPay (Vẫn giữ logic cũ vì backend đã xử lý session)
       const response = await storefrontCheckoutRequest(payload);
@@ -305,7 +314,6 @@ const Checkout = () => {
     }
   };
 
-
   const selectedShipping = shippingMethods.find(
     (m) => m.id === parseInt(formData.shipping_method_id),
   );
@@ -323,7 +331,7 @@ const Checkout = () => {
         try {
           const resp = await checkSepayStatusRequest(
             currentBankInfo.order_code,
-            currentBankInfo.amount
+            currentBankInfo.amount,
           );
 
           if (resp && resp.paid) {
@@ -558,6 +566,54 @@ const Checkout = () => {
                 </div>
               </section>
 
+              {/* Wallet Payment Option */}
+              {user && user.wallet_balance > 0 && (
+                <section className="bg-gradient-to-r from-slate-900 to-indigo-950 rounded-3xl p-8 shadow-xl text-white">
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2.5 bg-white/10 rounded-xl backdrop-blur-md">
+                        <Wallet className="text-white" size={20} />
+                      </div>
+                      <div>
+                        <h2 className="text-xl font-bold">Ví Trendora</h2>
+                        <p className="text-xs text-white/60">
+                          Sử dụng số dư ví để thanh toán
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-white/60 uppercase font-bold tracking-wider">
+                        Số dư khả dụng
+                      </p>
+                      <p className="text-xl font-black">
+                        {formatPrice(user.wallet_balance)}
+                      </p>
+                    </div>
+                  </div>
+
+                  <label className="flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-2xl cursor-pointer hover:bg-white/10 transition-all">
+                    <div className="relative flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={useWallet}
+                        onChange={(e) => setUseWallet(e.target.checked)}
+                        className="w-6 h-6 rounded-lg accent-indigo-500 cursor-pointer"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-bold text-sm">
+                        Dùng số dư ví cho đơn hàng này
+                      </p>
+                      <p className="text-[10px] text-white/50">
+                        {user.wallet_balance >= total
+                          ? "Số dư đủ để thanh toán toàn bộ đơn hàng"
+                          : `Sẽ trừ ${formatPrice(Math.min(user.wallet_balance, total))} từ ví của bạn`}
+                      </p>
+                    </div>
+                  </label>
+                </section>
+              )}
+
               {/* Payment Method */}
               <section className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
                 <div className="flex items-center gap-3 mb-6">
@@ -617,8 +673,6 @@ const Checkout = () => {
                   )}
                 </div>
               </section>
-
-              {/* Promo Code Section */}
             </div>
 
             {/* ── Right Column: Order Summary ── */}
@@ -817,6 +871,17 @@ const Checkout = () => {
                       <span className="">{formatPrice(shippingFee)}</span>
                     </div>
 
+                    {useWallet && user && user.wallet_balance > 0 && (
+                      <div className="flex justify-between text-sm text-indigo-600 font-bold bg-indigo-50 p-2 rounded-lg border border-indigo-100">
+                        <span className="flex items-center gap-1">
+                          <Wallet size={14} /> Trừ từ ví
+                        </span>
+                        <span>
+                          -{formatPrice(Math.min(user.wallet_balance, total))}
+                        </span>
+                      </div>
+                    )}
+
                     {selectedShipping && (
                       <div className="flex justify-between text-[10px] text-blue-600 font-medium italic pt-1">
                         <span className="flex items-center gap-1">
@@ -840,13 +905,23 @@ const Checkout = () => {
                       <p className="text-[1rem] font-medium text-gray-400 ">
                         Tổng thanh toán
                       </p>
-                      <p className="text-3xl  ">{formatPrice(total)}</p>
+                      <p className="text-3xl  ">
+                        {formatPrice(
+                          Math.max(
+                            0,
+                            total -
+                              (useWallet
+                                ? Math.min(user.wallet_balance, total)
+                                : 0),
+                          ),
+                        )}
+                      </p>
                     </div>
 
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="w-full bg-black text-white py-5 rounded-lg fonr-medium  text-sm uppercase hover:bg-gray-900 hover:shadow-2xl hover:shadow-black/20 hover:-translate-y-1 active:scale-[0.98] transition-all disabled:bg-gray-200 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-lg shadow-black/10"
+                      className="w-full bg-black text-white py-5 rounded-lg font-medium  text-sm uppercase hover:bg-gray-900 hover:shadow-2xl hover:shadow-black/20 hover:-translate-y-1 active:scale-[0.98] transition-all disabled:bg-gray-200 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-lg shadow-black/10"
                     >
                       {isSubmitting ? (
                         <>
@@ -954,7 +1029,9 @@ const BankPaymentModal = ({
             {/* Status Indicator */}
             <div className="mb-6 flex items-center gap-3 px-5 py-2.5 bg-orange-50 text-orange-600 rounded-full border border-orange-100 animate-pulse">
               <Loader2 className="w-4 h-4 animate-spin" />
-              <span className="text-[11px] font-black uppercase tracking-widest">Đang chờ bạn thanh toán...</span>
+              <span className="text-[11px] font-black uppercase tracking-widest">
+                Đang chờ bạn thanh toán...
+              </span>
             </div>
 
             {/* QR Code Container */}
@@ -971,12 +1048,16 @@ const BankPaymentModal = ({
             <div className="w-full space-y-4 bg-gray-50 rounded-2xl p-6 mb-8 border border-gray-100 text-left">
               <div className="flex justify-between items-center text-sm">
                 <span className="text-gray-400 font-medium">Ngân hàng</span>
-                <span className="font-bold text-gray-900 uppercase">MB Bank</span>
+                <span className="font-bold text-gray-900 uppercase">
+                  MB Bank
+                </span>
               </div>
               <div className="flex justify-between items-center text-sm">
                 <span className="text-gray-400 font-medium">Số tài khoản</span>
                 <div className="flex items-center gap-2">
-                  <span className="text-gray-900 font-mono font-bold tracking-wider">{bankInfo.account_no}</span>
+                  <span className="text-gray-900 font-mono font-bold tracking-wider">
+                    {bankInfo.account_no}
+                  </span>
                   <button
                     onClick={() => {
                       navigator.clipboard.writeText(bankInfo.account_no);
@@ -990,11 +1071,15 @@ const BankPaymentModal = ({
               </div>
               <div className="flex justify-between items-center text-sm">
                 <span className="text-gray-400 font-medium">Chủ tài khoản</span>
-                <span className="text-gray-800 font-bold">{bankInfo.account_name}</span>
+                <span className="text-gray-800 font-bold">
+                  {bankInfo.account_name}
+                </span>
               </div>
               <div className="h-px bg-gray-100 w-full my-2"></div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-400 font-medium text-sm">Số tiền</span>
+                <span className="text-gray-400 font-medium text-sm">
+                  Số tiền
+                </span>
                 <span className="text-2xl font-black text-gray-900">
                   {formatPrice(bankInfo.amount)}
                 </span>
@@ -1029,12 +1114,13 @@ const BankPaymentModal = ({
                     Hệ thống sẽ tự động xác nhận đơn hàng
                   </p>
                   <p className="text-[10px] text-green-600 mt-1">
-                    Bạn vui lòng giữ nguyên màn hình này, đơn hàng sẽ được xử lý ngay sau khi tiền vào tài khoản.
+                    Bạn vui lòng giữ nguyên màn hình này, đơn hàng sẽ được xử lý
+                    ngay sau khi tiền vào tài khoản.
                   </p>
                 </div>
               </div>
             </div>
-            
+
             {/* Minimal secondary fallback */}
             <button
               onClick={onClose}
@@ -1048,6 +1134,5 @@ const BankPaymentModal = ({
     </div>
   );
 };
-
 
 export default Checkout;

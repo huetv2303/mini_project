@@ -25,15 +25,18 @@ class OrderService
     protected $orderRepo;
     protected $inventoryService;
     protected $promotionService;
+    protected $walletService;
 
     public function __construct(
         OrderRepositoryInterface $orderRepo,
         InventoryService $inventoryService,
-        PromotionService $promotionService
+        PromotionService $promotionService,
+        \App\Services\WalletService $walletService
     ) {
         $this->orderRepo = $orderRepo;
         $this->inventoryService = $inventoryService;
         $this->promotionService = $promotionService;
+        $this->walletService = $walletService;
     }
 
     public function getAll($request = null)
@@ -319,6 +322,19 @@ class OrderService
                         ->decrement('total_orders');
                     CustomerProfile::where('user_id', $order->customer_id)
                         ->decrement('total_spent', max(0, $order->final_amount));
+
+                    // Nếu đơn hàng có dùng ví, hoàn trả tiền ví ngay khi hủy
+                    if ($order->wallet_amount_used > 0 && $order->customer) {
+                        $this->walletService->deposit(
+                            $order->customer,
+                            $order->wallet_amount_used,
+                            'refund',
+                            $order->id,
+                            "Hoàn trả tiền ví do hủy đơn hàng (cập nhật trạng thái): " . $order->code
+                        );
+
+                        $order->update(['payment_status' => 'partially_refunded']);
+                    }
                 }
             }
 
@@ -417,6 +433,21 @@ class OrderService
 
             $order->update(['payment_status' => 'refunded']);
 
+            // Hoàn tiền vào ví cho khách hàng (Chỉ hoàn phần tiền khách thực trả, trừ đi phần tiền ví đã được hoàn tự động nếu có)
+            if ($order->customer) {
+                $amountToRefund = $order->final_amount - ($order->status === 'cancelled' ? $order->wallet_amount_used : 0);
+                
+                if ($amountToRefund > 0) {
+                    $this->walletService->deposit(
+                        $order->customer,
+                        $amountToRefund,
+                        'refund',
+                        $order->id,
+                        "Hoàn tiền cho đơn hàng (phần còn lại): " . $order->code
+                    );
+                }
+            }
+
             // Realtime & Database Notification
             OrderStatusUpdated::dispatch($order);
             
@@ -485,6 +516,20 @@ class OrderService
 
             CustomerProfile::where('user_id', $order->customer_id)
                 ->decrement('total_spent', max(0, $order->final_amount));
+
+            // Nếu đơn hàng có dùng ví, hoàn trả tiền ví ngay khi hủy
+            if ($order->wallet_amount_used > 0 && $order->customer) {
+                $this->walletService->deposit(
+                    $order->customer,
+                    $order->wallet_amount_used,
+                    'refund',
+                    $order->id,
+                    "Hoàn trả tiền ví do hủy đơn hàng: " . $order->code
+                );
+                
+                // Cập nhật trạng thái thanh toán để Admin biết phần ví đã được hoàn
+                $order->update(['payment_status' => 'partially_refunded']);
+            }
 
 
             // Realtime & Database Notification

@@ -26,6 +26,7 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
         'role_id',
         'google_id',
         'avatar',
+        'wallet_balance',
     ];
 
     /**
@@ -115,5 +116,10 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     public function receivesBroadcastNotificationsOn(): string
     {
         return 'user.'.$this->id;
+    }
+
+    public function walletTransactions()
+    {
+        return $this->hasMany(WalletTransaction::class);
     }
 }

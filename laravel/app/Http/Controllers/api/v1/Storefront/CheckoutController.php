@@ -38,6 +38,7 @@ class CheckoutController extends Controller
             'discount_amount'   => 'nullable|numeric|min:0',
             'promotion_id'      => 'nullable|exists:promotions,id',
             'note'              => 'nullable|string|max:500',
+            'use_wallet'        => 'nullable|boolean',
         ];
 
         $modeRules = $mode === 'buynow'

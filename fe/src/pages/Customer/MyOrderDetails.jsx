@@ -68,7 +68,7 @@ const MyOrderDetails = () => {
         try {
           const resp = await checkSepayStatusRequest(
             order.code,
-            order.final_amount,
+            order.final_amount - (order.wallet_amount_used || 0),
           );
           if (resp && resp.paid) {
             clearInterval(pollingInterval);
@@ -590,16 +590,37 @@ const MyOrderDetails = () => {
                     </span>
                   </div>
                   <div className="flex justify-between text-sm pt-4 border-t border-white/10">
-                    <span className="text-gray-700 font-medium ">
-                      THÀNH TIỀN
+                    <span className="text-gray-700 font-medium">
+                      TỔNG GIÁ TRỊ
                     </span>
                     <span className="text-xl">
-                      {new Intl.NumberFormat("vi-VN").format(
-                        order.final_amount,
-                      )}
-                      ₫
+                      {new Intl.NumberFormat("vi-VN").format(order.final_amount)}₫
                     </span>
                   </div>
+
+                  {order.wallet_amount_used > 0 && (
+                    <>
+                      <div className="flex justify-between text-sm text-indigo-600 font-bold bg-indigo-50 p-3 rounded-xl border border-indigo-100">
+                        <span className="flex items-center gap-2">
+                          <RotateCcw size={14} className="rotate-180" />
+                          ĐÃ TRỪ TỪ VÍ
+                        </span>
+                        <span>
+                          -{new Intl.NumberFormat("vi-VN").format(order.wallet_amount_used)}₫
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-sm pt-2">
+                        <span className="text-slate-900 font-black uppercase">
+                          CẦN THANH TOÁN THÊM
+                        </span>
+                        <span className="text-xl font-black text-rose-600">
+                          {new Intl.NumberFormat("vi-VN").format(
+                            Math.max(0, order.final_amount - (order.wallet_amount_used || 0))
+                          )}₫
+                        </span>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -683,7 +704,7 @@ const MyOrderDetails = () => {
           bankConfig
             ? {
                 ...bankConfig,
-                amount: order?.final_amount,
+                amount: order?.final_amount - (order?.wallet_amount_used || 0),
                 order_code: order?.code,
               }
             : null

@@ -18,6 +18,7 @@ import MyOrders from "./pages/Customer/MyOrders";
 import MyOrderDetails from "./pages/Customer/MyOrderDetails";
 import OrderSuccess from "./pages/Customer/OrderSuccess";
 import VNPayCallback from "./pages/Customer/VNPayCallback";
+import WalletPage from "./pages/Customer/WalletPage";
 
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import AdminProfile from "./pages/Admin/AdminProfile";
@@ -134,6 +135,15 @@ const App = () => {
                       </AuthGuard>
                     }
                   />
+                    <Route
+                    path="/my-wallet"
+                    element={
+                      <AuthGuard>
+                        <WalletPage />
+                      </AuthGuard>
+                    }
+                  />
+
                   <Route
                     path="/my-reviews"
                     element={
