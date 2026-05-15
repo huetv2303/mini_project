@@ -103,6 +103,26 @@ services:
     networks:
       - laravel-network
 
+  # Laravel Reverb (WebSocket Server)
+  reverb:
+    image: laravel-app
+    container_name: laravel-reverb
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./laravel:/var/www
+      - vendor-data:/var/www/vendor
+    depends_on:
+      - app
+      - redis
+    networks:
+      - laravel-network
+    env_file:
+      - ./laravel/.env
+    ports:
+      - "6001:6001"
+    command: php artisan reverb:start --host=0.0.0.0 --port=6001 --debug
+
 networks:
   laravel-network:
     driver: bridge
