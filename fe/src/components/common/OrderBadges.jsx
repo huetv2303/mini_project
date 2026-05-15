@@ -1,5 +1,13 @@
 import React from "react";
-import { Loader2, Truck, CheckCircle, XCircle, RotateCcw, Clock } from "lucide-react";
+import {
+  Loader2,
+  Truck,
+  CheckCircle,
+  XCircle,
+  RotateCcw,
+  Clock,
+  Globe,
+} from "lucide-react";
 
 export const getOrderStatusStyle = (status) => {
   switch (status) {
@@ -259,8 +267,10 @@ export const OrderSourceBadge = ({ source, className = "" }) => {
   const style = getOrderSourceStyle(source);
   return (
     <div
-      className={`inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border ${style.bg} ${style.text} ${style.border} ${className}`}
+      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider border ${style.bg} ${style.text} ${style.border} ${className}`}
     >
+      {style.label === "Website" && <Globe size={13} />}
+      {style.label === "Tại quầy (POS)" && <Shop size={13} />}
       {style.label}
     </div>
   );

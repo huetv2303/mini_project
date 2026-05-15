@@ -46,7 +46,7 @@ class OrderController extends Controller
     {
         try {
             $order = $this->orderService->findById($id);
-            $order->load(['paymentMethod', 'shippingMethod', 'items']);
+            $order->load(['paymentMethod', 'shippingMethod', 'items', 'statusLogs', 'statusLogs.user']);
             return response()->json([
                 'status' => 'success',
                 'data'   => new OrderResource($order),
@@ -63,7 +63,7 @@ class OrderController extends Controller
     {
         try {
             $order = $this->orderService->updateOrder($id, $request->validated());
-            $order->load(['paymentMethod', 'shippingMethod', 'staff', 'items']);
+            $order->load(['paymentMethod', 'shippingMethod', 'staff', 'items', 'statusLogs', 'statusLogs.user']);
             return response()->json([
                 'status'  => 'success',
                 'message' => 'Cập nhật đơn hàng thành công.',

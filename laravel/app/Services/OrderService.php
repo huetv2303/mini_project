@@ -214,6 +214,8 @@ class OrderService
             })->get();
             Notification::send($admins, new OrderPlacedNotification($order));
 
+            $this->logStatus($order, "Đơn hàng đã được tạo");
+
             return $order;
         });
     }
@@ -350,6 +352,10 @@ class OrderService
             $admins = User::whereHas('role', function($q) { $q->where('code', 'admin'); })->get();
             Notification::send($admins, new OrderStatusNotification($order));
 
+            if ($oldStatus !== $newStatus) {
+                $this->logStatus($order, "Trạng thái đổi từ " . $oldStatus . " sang " . $newStatus);
+            }
+
             return $updated;
         });
     }
@@ -458,6 +464,8 @@ class OrderService
             $admins = User::whereHas('role', function($q) { $q->where('code', 'admin'); })->get();
             Notification::send($admins, new OrderStatusNotification($order));
 
+            $this->logStatus($order, "Đã hoàn tiền đơn hàng");
+
             return $order;
         });
     }
@@ -544,6 +552,8 @@ class OrderService
             $admins = User::whereHas('role', function($q) { $q->where('code', 'admin'); })->get();
             Notification::send($admins, new OrderStatusNotification($order));
 
+            $this->logStatus($order, "Đơn hàng đã bị hủy");
+
             return $order;
         });
     }
@@ -583,5 +593,32 @@ class OrderService
         }
 
         return null;
+    }
+
+    private function logStatus($order, $note = null)
+    {
+        $statusLabels = [
+            'pending' => 'Chờ xử lý',
+            'processing' => 'Đang đóng gói',
+            'shipped' => 'Đang giao',
+            'delivered' => 'Đã giao',
+            'cancelled' => 'Đã hủy',
+            'returned' => 'Đã trả hàng',
+            'partially_returned' => 'Trả hàng một phần',
+        ];
+
+        // Nếu note chứa tên trạng thái tiếng Anh, hãy dịch chúng
+        if ($note) {
+            foreach ($statusLabels as $en => $vi) {
+                $note = str_ireplace($en, $vi, $note);
+            }
+        }
+
+        $order->statusLogs()->create([
+            'user_id' => auth()->id() ?? $order->created_by,
+            'status' => $order->status,
+            'payment_status' => $order->payment_status,
+            'note' => $note,
+        ]);
     }
 }

@@ -97,6 +97,19 @@ class OrderResource extends JsonResource
                     ]),
                 ])
             ),
+            'status_logs'      => $this->whenLoaded('statusLogs', fn() =>
+                $this->statusLogs->map(fn($log) => [
+                    'id'             => $log->id,
+                    'status'         => $log->status,
+                    'payment_status' => $log->payment_status,
+                    'note'           => $log->note,
+                    'user'           => $log->user ? [
+                        'id'   => $log->user->id,
+                        'name' => $log->user->name,
+                    ] : null,
+                    'created_at'     => $log->created_at?->format('Y-m-d H:i:s'),
+                ])
+            ),
         ];
     }
 }

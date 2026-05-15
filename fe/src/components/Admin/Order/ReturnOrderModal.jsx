@@ -84,11 +84,13 @@ const ReturnOrderModal = ({ isOpen, onClose, order, onRefresh }) => {
               <RotateCcw className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg flex gap-2 text-gray-900  ">
+              <h2 className="text-lg font-semibold text-black flex gap-2">
                 Trả hàng đơn{" "}
-                <p className="text-black font-medium">#{order.code}</p>
+                <span className="text-white text-xs font-bold bg-blue-500 px-2 rounded-md flex items-center">
+                  #{order.code}
+                </span>
               </h2>
-              <p className="text-[10px] text-gray-400 font-bold uppercase ">
+              <p className="text-slate-600">
                 Chọn sản phẩm và số lượng muốn hoàn trả
               </p>
             </div>
@@ -114,10 +116,10 @@ const ReturnOrderModal = ({ isOpen, onClose, order, onRefresh }) => {
               >
                 <div className="flex items-center gap-4">
                   <div className="flex-1">
-                    <h4 className="text-sm text-blue-500 font-bold">
+                    <h4 className="font-medium text-slate-900 text-sm">
                       {item.product_name}
                     </h4>
-                    <p className="text-[11px] text-gray-400 font-medium">
+                    <p className="text-[12px] text-gray-600 mt-0.5">
                       Biến thể: {item.variant_name} | Đã mua: {item.quantity}
                     </p>
                     <p className="text-xs font-bold mt-1">
@@ -132,7 +134,7 @@ const ReturnOrderModal = ({ isOpen, onClose, order, onRefresh }) => {
                     >
                       <Minus className="w-4 h-4" />
                     </button>
-                    <span className="w-8 text-center font-black text-sm">
+                    <span className="w-8 text-center text-sm font-medium">
                       {Math.floor(item.returnQuantity || 0)}
                     </span>
                     <button
@@ -149,14 +151,14 @@ const ReturnOrderModal = ({ isOpen, onClose, order, onRefresh }) => {
           </div>
 
           <div className="mt-8">
-            <label className="text-[10px] font-bold text-gray-400 uppercase  mb-3 block">
+            <label className="text-slate-600 pb-3 font-medium block">
               Lý do trả hàng
             </label>
             <textarea
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="VD: Sản phẩm lỗi, sai màu sắc..."
-              className="w-full p-4 bg-gray-50 rounded-2xl border-none text-sm min-h-[100px] outline-none focus:ring-4 focus:ring-black/5 transition-all"
+              className="w-full p-4 bg-gray-50 rounded-2xl border-none text-sm min-h-[100px] outline-none transition-all"
             />
           </div>
         </div>
@@ -176,7 +178,7 @@ const ReturnOrderModal = ({ isOpen, onClose, order, onRefresh }) => {
           <button
             onClick={handleReturn}
             disabled={loading || totalRefund === 0}
-            className="px-8 py-4 bg-black text-white text-xs font-bold rounded-xl hover:bg-gray-900 transition-all flex items-center gap-2 disabled:opacity-50 shadow-xl shadow-black/10  "
+            className="px-8 py-4 bg-blue-500 text-white text-xs font-bold rounded-[5px] hover:bg-blue-600 transition-all flex items-center gap-2 disabled:opacity-50 shadow-xl  "
           >
             {loading ? (
               <Loader2 className="w-4 h-4 animate-spin" />

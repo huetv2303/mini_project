@@ -85,4 +85,9 @@ class Order extends Model
     {
         return $this->belongsTo(Promotion::class);
     }
+
+    public function statusLogs()
+    {
+        return $this->hasMany(OrderStatusLog::class)->orderBy('created_at', 'desc');
+    }
 }
