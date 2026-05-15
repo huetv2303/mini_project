@@ -33,7 +33,12 @@ const debounce = (func, delay) => {
   };
 };
 
+import { useAuth } from "../../../context/AuthContext";
+
 const SupplierListPage = () => {
+  const { hasPermission } = useAuth();
+  const canManage = hasPermission("suppliers.manage");
+  
   const [suppliers, setSuppliers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -155,7 +160,7 @@ const SupplierListPage = () => {
             </h1>
           </div>
           <div className="flex items-center gap-3">
-            {selectedIds.size > 0 && (
+            {canManage && selectedIds.size > 0 && (
               <button
                 onClick={openBulkDeleteModal}
                 className="inline-flex items-center px-6 py-3 bg-red-500 text-white text-sm font-bold rounded-2xl hover:bg-red-600 transition-all shadow-lg active:scale-95 animate-in slide-in-from-right-4"
@@ -163,12 +168,14 @@ const SupplierListPage = () => {
                 <Trash2 className="w-5 h-5 mr-2" /> Xóa {selectedIds.size}
               </button>
             )}
-            <Link
-              to="/admin/suppliers/create"
-              className="inline-flex items-center px-4 py-3 bg-black text-white text-sm font-bold rounded-lg hover:bg-black/90 transition-all shadow-lg active:scale-95"
-            >
-              <Plus className="w-5 h-5 mr-2" /> Thêm NCC
-            </Link>
+            {canManage && (
+              <Link
+                to="/admin/suppliers/create"
+                className="inline-flex items-center px-4 py-3 bg-black text-white text-sm font-bold rounded-lg hover:bg-black/90 transition-all shadow-lg active:scale-95"
+              >
+                <Plus className="w-5 h-5 mr-2" /> Thêm NCC
+              </Link>
+            )}
           </div>
         </div>
 
@@ -195,19 +202,21 @@ const SupplierListPage = () => {
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-gray-50/50">
-                  <th className="w-16 px-8 py-6">
-                    <button
-                      onClick={selectAllOnPage}
-                      className="text-gray-400 hover:text-indigo-500 transition-colors"
-                    >
-                      {selectedIds.size === suppliers.length &&
-                      suppliers.length > 0 ? (
-                        <CheckSquare className="w-6 h-6 text-indigo-500" />
-                      ) : (
-                        <Square className="w-6 h-6" />
-                      )}
-                    </button>
-                  </th>
+                  {canManage && (
+                    <th className="w-16 px-8 py-6">
+                      <button
+                        onClick={selectAllOnPage}
+                        className="text-gray-400 hover:text-indigo-500 transition-colors"
+                      >
+                        {selectedIds.size === suppliers.length &&
+                        suppliers.length > 0 ? (
+                          <CheckSquare className="w-6 h-6 text-indigo-500" />
+                        ) : (
+                          <Square className="w-6 h-6" />
+                        )}
+                      </button>
+                    </th>
+                  )}
                   <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase    ">
                     Nhà cung cấp
                   </th>
@@ -217,9 +226,11 @@ const SupplierListPage = () => {
                   <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase   ">
                     Trạng thái
                   </th>
-                  <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase  ">
-                    Thao tác
-                  </th>
+                  {canManage && (
+                    <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase  ">
+                      Thao tác
+                    </th>
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -238,18 +249,20 @@ const SupplierListPage = () => {
                       key={sup.id}
                       className={`border-b border-gray-50 transition-all group ${selectedIds.has(sup.id) ? "bg-indigo-50/40" : "hover:bg-gray-50/50"}`}
                     >
-                      <td className="px-8 py-5">
-                        <button
-                          onClick={() => toggleSelect(sup.id)}
-                          className="text-indigo-500"
-                        >
-                          {selectedIds.has(sup.id) ? (
-                            <CheckSquare className="w-6 h-6" />
-                          ) : (
-                            <Square className="w-6 h-6 text-gray-200" />
-                          )}
-                        </button>
-                      </td>
+                        {canManage && (
+                          <td className="px-8 py-5">
+                            <button
+                              onClick={() => toggleSelect(sup.id)}
+                              className="text-indigo-500"
+                            >
+                              {selectedIds.has(sup.id) ? (
+                                <CheckSquare className="w-6 h-6" />
+                              ) : (
+                                <Square className="w-6 h-6 text-gray-200" />
+                              )}
+                            </button>
+                          </td>
+                        )}
                       <td className="px-6 py-5">
                         <div className="flex items-center gap-4">
                           <img
@@ -290,22 +303,24 @@ const SupplierListPage = () => {
                           {sup.status === 1 ? "Hoạt động" : "Tạm ngưng"}
                         </span>
                       </td>
-                      <td className="px-6 py-5">
-                        <div className="flex justify-end gap-2">
-                          <Link
-                            to={`/admin/suppliers/edit/${sup.slug}`}
-                            className="p-2.5 text-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-2xl transition-all"
-                          >
-                            <Edit2 className="w-5 h-5" />
-                          </Link>
-                          <button
-                            onClick={() => openDeleteModal(sup.slug, sup.name)}
-                            className="p-2.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all"
-                          >
-                            <Trash2 className="w-5 h-5" />
-                          </button>
-                        </div>
-                      </td>
+                        {canManage && (
+                          <td className="px-6 py-5">
+                            <div className="flex justify-end gap-2">
+                              <Link
+                                to={`/admin/suppliers/edit/${sup.slug}`}
+                                className="p-2.5 text-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-2xl transition-all"
+                              >
+                                <Edit2 className="w-5 h-5" />
+                              </Link>
+                              <button
+                                onClick={() => openDeleteModal(sup.slug, sup.name)}
+                                className="p-2.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all"
+                              >
+                                <Trash2 className="w-5 h-5" />
+                              </button>
+                            </div>
+                          </td>
+                        )}
                     </tr>
                   ))
                 ) : (

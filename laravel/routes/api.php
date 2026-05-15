@@ -79,6 +79,10 @@ Route::group(['prefix' => 'v1'], function () {
 
             Route::prefix('users')->group(function () {
                 Route::get('/', [UserController::class, 'index']);
+                Route::post('/', [UserController::class, 'store']);
+                Route::get('/{id}', [UserController::class, 'show']);
+                Route::put('/{id}', [UserController::class, 'update']);
+                Route::delete('/{id}', [UserController::class, 'destroy']);
                 Route::put('/{id}/role', [UserController::class, 'updateRole']);
             });
         });
@@ -93,25 +97,33 @@ Route::group(['prefix' => 'v1'], function () {
         });
 
         Route::prefix('categories')->group(function () {
-            Route::post('/bulk-delete', [CategoryController::class, 'bulkDelete']);
-            Route::post('/', [CategoryController::class, 'store']);
-            Route::put('/{slug}', [CategoryController::class, 'update']);
-            Route::delete('/{slug}', [CategoryController::class, 'destroy']);
+            Route::get('/', [CategoryController::class, 'index']); // Public/Staff can view
+            Route::middleware('permission:categories.manage')->group(function () {
+                Route::post('/bulk-delete', [CategoryController::class, 'bulkDelete']);
+                Route::post('/', [CategoryController::class, 'store']);
+                Route::put('/{slug}', [CategoryController::class, 'update']);
+                Route::delete('/{slug}', [CategoryController::class, 'destroy']);
+            });
         });
 
         Route::prefix('suppliers')->group(function () {
-            Route::get('/', [SupplierController::class, 'index']);
+            Route::get('/', [SupplierController::class, 'index']); // Public/Staff can view
             Route::get('/{slug}', [SupplierController::class, 'show']);
-            Route::post('/', [SupplierController::class, 'store']);
-            Route::put('/{slug}', [SupplierController::class, 'update']);
-            Route::delete('/{slug}', [SupplierController::class, 'destroy']);
+            Route::middleware('permission:suppliers.manage')->group(function () {
+                Route::post('/', [SupplierController::class, 'store']);
+                Route::put('/{slug}', [SupplierController::class, 'update']);
+                Route::delete('/{slug}', [SupplierController::class, 'destroy']);
+            });
         });
 
         Route::prefix('products')->group(function () {
-            Route::post('/bulk-delete', [ProductController::class, 'bulkDelete']);
-            Route::post('/', [ProductController::class, 'store']);
-            Route::put('/{slug}', [ProductController::class, 'update']);
-            Route::delete('/{slug}', [ProductController::class, 'destroy']);
+            Route::get('/', [ProductController::class, 'index']); // Public/Staff can view
+            Route::middleware('permission:products.create')->post('/', [ProductController::class, 'store']);
+            Route::middleware('permission:products.edit')->put('/{slug}', [ProductController::class, 'update']);
+            Route::middleware('permission:products.delete')->group(function () {
+                Route::post('/bulk-delete', [ProductController::class, 'bulkDelete']);
+                Route::delete('/{slug}', [ProductController::class, 'destroy']);
+            });
         });
 
         Route::prefix('orders')->group(function () {

@@ -140,6 +140,22 @@
       <path value="$PROJECT_DIR$/laravel/vendor/laravel/socialite" />
       <path value="$PROJECT_DIR$/laravel/vendor/lcobucci/jwt" />
       <path value="$PROJECT_DIR$/laravel/vendor/firebase/php-jwt" />
+      <path value="$PROJECT_DIR$/laravel/vendor/symfony/http-client" />
+      <path value="$PROJECT_DIR$/laravel/vendor/symfony/http-client-contracts" />
+      <path value="$PROJECT_DIR$/laravel/vendor/clue/redis-protocol" />
+      <path value="$PROJECT_DIR$/laravel/vendor/clue/redis-react" />
+      <path value="$PROJECT_DIR$/laravel/vendor/laravel/reverb" />
+      <path value="$PROJECT_DIR$/laravel/vendor/paragonie/sodium_compat" />
+      <path value="$PROJECT_DIR$/laravel/vendor/evenement/evenement" />
+      <path value="$PROJECT_DIR$/laravel/vendor/pusher/pusher-php-server" />
+      <path value="$PROJECT_DIR$/laravel/vendor/ratchet/rfc6455" />
+      <path value="$PROJECT_DIR$/laravel/vendor/react/cache" />
+      <path value="$PROJECT_DIR$/laravel/vendor/react/dns" />
+      <path value="$PROJECT_DIR$/laravel/vendor/react/event-loop" />
+      <path value="$PROJECT_DIR$/laravel/vendor/react/promise" />
+      <path value="$PROJECT_DIR$/laravel/vendor/react/promise-timer" />
+      <path value="$PROJECT_DIR$/laravel/vendor/react/socket" />
+      <path value="$PROJECT_DIR$/laravel/vendor/react/stream" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.2">

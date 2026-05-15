@@ -31,7 +31,12 @@ const debounce = (func, delay) => {
   };
 };
 
+import { useAuth } from "../../../context/AuthContext";
+
 const CategoryListPage = () => {
+  const { hasPermission } = useAuth();
+  const canManage = hasPermission("categories.manage");
+  
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedRows, setExpandedRows] = useState(new Set());
@@ -207,21 +212,23 @@ const CategoryListPage = () => {
         <tr
           className={`border-b border-gray-50 transition-all group ${isSelected ? "bg-indigo-50/30" : "hover:bg-gray-50/50"}`}
         >
-          <td className="w-12 px-6 py-4">
-            <button
-              onClick={() => toggleSelect(category.id, hasChildren)}
-              className={`transition-colors ${hasChildren ? "opacity-20 cursor-not-allowed" : "text-indigo-500 hover:text-indigo-600"}`}
-              title={
-                hasChildren ? "Không thể xóa danh mục có con" : "Chọn để xóa"
-              }
-            >
-              {isSelected ? (
-                <CheckSquare className="w-5 h-5" />
-              ) : (
-                <Square className="w-5 h-5 text-gray-300" />
-              )}
-            </button>
-          </td>
+          {canManage && (
+            <td className="w-12 px-6 py-4">
+              <button
+                onClick={() => toggleSelect(category.id, hasChildren)}
+                className={`transition-colors ${hasChildren ? "opacity-20 cursor-not-allowed" : "text-indigo-500 hover:text-indigo-600"}`}
+                title={
+                  hasChildren ? "Không thể xóa danh mục có con" : "Chọn để xóa"
+                }
+              >
+                {isSelected ? (
+                  <CheckSquare className="w-5 h-5" />
+                ) : (
+                  <Square className="w-5 h-5 text-gray-300" />
+                )}
+              </button>
+            </td>
+          )}
           <td className="px-6 py-4">
             <div
               className="flex items-center"
@@ -284,33 +291,35 @@ const CategoryListPage = () => {
               <div></div>
             )}
           </td>
-          <td className="px-6 py-4">
-            <div className="flex justify-end items-center gap-2">
-              <Link
-                to={`/admin/categories/create?parent_id=${category.id}`}
-                className="p-2 text-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
-                title="Thêm con"
-              >
-                <Plus className="w-5 h-5" />
-              </Link>
-              <Link
-                to={`/admin/categories/edit/${category.slug}`}
-                className="p-2 text-green-400 hover:text-green-600 hover:bg-green-50 rounded-xl transition-all"
-                title="Sửa"
-              >
-                <Edit2 className="w-5 h-5" />
-              </Link>
-              <button
-                onClick={() =>
-                  openDeleteModal(category.slug, category.name, hasChildren)
-                }
-                className={`p-2 rounded-xl transition-all ${hasChildren ? "text-gray-200 cursor-not-allowed" : "text-red-400 hover:text-red-600 hover:bg-red-50"}`}
-                title="Xóa"
-              >
-                <Trash2 className="w-5 h-5" />
-              </button>
-            </div>
-          </td>
+          {canManage && (
+            <td className="px-6 py-4">
+              <div className="flex justify-end items-center gap-2">
+                <Link
+                  to={`/admin/categories/create?parent_id=${category.id}`}
+                  className="p-2 text-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
+                  title="Thêm con"
+                >
+                  <Plus className="w-5 h-5" />
+                </Link>
+                <Link
+                  to={`/admin/categories/edit/${category.slug}`}
+                  className="p-2 text-green-400 hover:text-green-600 hover:bg-green-50 rounded-xl transition-all"
+                  title="Sửa"
+                >
+                  <Edit2 className="w-5 h-5" />
+                </Link>
+                <button
+                  onClick={() =>
+                    openDeleteModal(category.slug, category.name, hasChildren)
+                  }
+                  className={`p-2 rounded-xl transition-all ${hasChildren ? "text-gray-200 cursor-not-allowed" : "text-red-400 hover:text-red-600 hover:bg-red-50"}`}
+                  title="Xóa"
+                >
+                  <Trash2 className="w-5 h-5" />
+                </button>
+              </div>
+            </td>
+          )}
         </tr>
         {isExpanded &&
           category.children &&
@@ -332,7 +341,7 @@ const CategoryListPage = () => {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            {selectedIds.size > 0 && (
+            {canManage && selectedIds.size > 0 && (
               <button
                 onClick={openBulkDeleteModal}
                 className="inline-flex items-center justify-center px-6 py-3 bg-red-500 text-white text-sm font-bold rounded-2xl hover:bg-red-600 transition-all shadow-lg active:scale-95 animate-in slide-in-from-right-4"
@@ -341,12 +350,14 @@ const CategoryListPage = () => {
                 Xóa {selectedIds.size} mục đã chọn
               </button>
             )}
-            <Link
-              to="/admin/categories/create"
-              className="inline-flex items-center justify-center px-4 py-3 bg-black text-white text-sm font-bold rounded-lg hover:bg-black/90 transition-all shadow-lg active:scale-95"
-            >
-              <Plus className="w-5 h-5 mr-2" /> Thêm danh mục
-            </Link>
+            {canManage && (
+              <Link
+                to="/admin/categories/create"
+                className="inline-flex items-center justify-center px-4 py-3 bg-black text-white text-sm font-bold rounded-lg hover:bg-black/90 transition-all shadow-lg active:scale-95"
+              >
+                <Plus className="w-5 h-5 mr-2" /> Thêm danh mục
+              </Link>
+            )}
           </div>
         </div>
 
@@ -373,19 +384,21 @@ const CategoryListPage = () => {
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-gray-50/50">
-                  <th className="w-12 px-6 py-5">
-                    <button
-                      onClick={selectAllOnPage}
-                      className="text-gray-400 hover:text-indigo-500 transition-colors"
-                    >
-                      {selectedIds.size === deletableIdsOnPage.length &&
-                      deletableIdsOnPage.length > 0 ? (
-                        <CheckSquare className="w-5 h-5 text-indigo-500" />
-                      ) : (
-                        <Square className="w-5 h-5" />
-                      )}
-                    </button>
-                  </th>
+                  {canManage && (
+                    <th className="w-12 px-6 py-5">
+                      <button
+                        onClick={selectAllOnPage}
+                        className="text-gray-400 hover:text-indigo-500 transition-colors"
+                      >
+                        {selectedIds.size === deletableIdsOnPage.length &&
+                        deletableIdsOnPage.length > 0 ? (
+                          <CheckSquare className="w-5 h-5 text-indigo-500" />
+                        ) : (
+                          <Square className="w-5 h-5" />
+                        )}
+                      </button>
+                    </th>
+                  )}
                   <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase    ">
                     Tên danh mục
                   </th>
@@ -398,9 +411,11 @@ const CategoryListPage = () => {
                   <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase   text-center  ">
                     Ảnh
                   </th>
-                  <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase   text-center ">
-                    Thao tác
-                  </th>
+                  {canManage && (
+                    <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase   text-center ">
+                      Thao tác
+                    </th>
+                  )}
                 </tr>
               </thead>
               <tbody>

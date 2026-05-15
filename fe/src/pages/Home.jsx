@@ -60,10 +60,10 @@ const Home = () => {
     loadHomeData();
   }, []);
 
-  // Automatically redirect Admin to dashboard if they land on Home
+  // Automatically redirect Admin and Staff to dashboard if they land on Home
   if (!authLoading && isAuthenticated) {
-    const isAdmin = user?.role?.code === "admin" || user?.role_id === 1;
-    if (isAdmin) {
+    const isAdminOrStaff = user?.role?.code === "admin" || user?.role?.code === "staff";
+    if (isAdminOrStaff) {
       return <Navigate to="/admin/dashboard" replace />;
     }
   }

@@ -132,6 +132,22 @@
       <excludeFolder url="file://$MODULE_DIR$/laravel/vendor/paragonie/random_compat" />
       <excludeFolder url="file://$MODULE_DIR$/laravel/vendor/phpseclib/phpseclib" />
       <excludeFolder url="file://$MODULE_DIR$/laravel/vendor/tymon/jwt-auth" />
+      <excludeFolder url="file://$MODULE_DIR$/laravel/vendor/clue/redis-protocol" />
+      <excludeFolder url="file://$MODULE_DIR$/laravel/vendor/clue/redis-react" />
+      <excludeFolder url="file://$MODULE_DIR$/laravel/vendor/evenement/evenement" />
+      <excludeFolder url="file://$MODULE_DIR$/laravel/vendor/laravel/reverb" />
+      <excludeFolder url="file://$MODULE_DIR$/laravel/vendor/paragonie/sodium_compat" />
+      <excludeFolder url="file://$MODULE_DIR$/laravel/vendor/pusher/pusher-php-server" />
+      <excludeFolder url="file://$MODULE_DIR$/laravel/vendor/ratchet/rfc6455" />
+      <excludeFolder url="file://$MODULE_DIR$/laravel/vendor/react/cache" />
+      <excludeFolder url="file://$MODULE_DIR$/laravel/vendor/react/dns" />
+      <excludeFolder url="file://$MODULE_DIR$/laravel/vendor/react/event-loop" />
+      <excludeFolder url="file://$MODULE_DIR$/laravel/vendor/react/promise" />
+      <excludeFolder url="file://$MODULE_DIR$/laravel/vendor/react/promise-timer" />
+      <excludeFolder url="file://$MODULE_DIR$/laravel/vendor/react/socket" />
+      <excludeFolder url="file://$MODULE_DIR$/laravel/vendor/react/stream" />
+      <excludeFolder url="file://$MODULE_DIR$/laravel/vendor/symfony/http-client" />
+      <excludeFolder url="file://$MODULE_DIR$/laravel/vendor/symfony/http-client-contracts" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

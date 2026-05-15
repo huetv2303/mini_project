@@ -34,6 +34,10 @@ class SearchProductsFunction implements ChatFunctionInterface
                 'limit' => [
                     'type' => 'integer',
                     'description' => 'Số lượng sản phẩm trả về (mặc định 3).'
+                ],
+                'sort' => [
+                    'type' => 'string',
+                    'description' => 'Sắp xếp theo: "price_asc" (giá tăng dần - rẻ nhất), "price_desc" (giá giảm dần - đắt nhất).'
                 ]
             ],
             'required' => ['keyword']
@@ -85,12 +89,14 @@ class SearchProductsFunction implements ChatFunctionInterface
 
         // 3. Fallback LIKE query
         if ($products->isEmpty()) {
-            $query = Product::where('status', 'active')
+            $query = Product::where('products.status', 'active')
                 ->where(function($q) use ($keyword) {
-                    $q->where('name', 'like', "%{$keyword}%")
-                      ->orWhereHas('variants', function($vq) use ($keyword) {
-                          $vq->where('name', 'like', "%{$keyword}%");
-                      });
+                    if ($keyword) {
+                        $q->where('products.name', 'like', "%{$keyword}%")
+                          ->orWhereHas('variants', function($vq) use ($keyword) {
+                              $vq->where('name', 'like', "%{$keyword}%");
+                          });
+                    }
                 })
                 ->with(['variants.attributes', 'variants.inventories', 'category']);
                 
@@ -99,7 +105,20 @@ class SearchProductsFunction implements ChatFunctionInterface
                     $q->where('price', '<=', $maxPrice);
                 });
             }
-            $products = $query->take($limit)->get();
+
+            // Xử lý sắp xếp
+            $sort = $args['sort'] ?? null;
+            if ($sort === 'price_asc') {
+                $query->join('product_variants', 'products.id', '=', 'product_variants.product_id')
+                      ->select('products.*', 'product_variants.price as sort_price')
+                      ->orderBy('product_variants.price', 'asc');
+            } elseif ($sort === 'price_desc') {
+                $query->join('product_variants', 'products.id', '=', 'product_variants.product_id')
+                      ->select('products.*', 'product_variants.price as sort_price')
+                      ->orderBy('product_variants.price', 'desc');
+            }
+
+            $products = $query->distinct()->take($limit)->get();
         }
 
         // 4. Format kết quả trả về cho AI
@@ -109,6 +128,7 @@ class SearchProductsFunction implements ChatFunctionInterface
 
         $result = [];
         foreach ($products as $p) {
+            // Đảm bảo lấy giá từ variants nếu có, tránh n+1
             $minPrice = $p->variants->min('price') ?? 0;
             $result[] = [
                 'id' => $p->id,

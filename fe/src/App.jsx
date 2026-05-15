@@ -52,6 +52,7 @@ import PaymentMethodPage from "./pages/Admin/payment/PaymentMethodPage";
 import PromotionPage from "./pages/Admin/promotion/PromotionPage";
 import PromotionFormPage from "./pages/Admin/promotion/PromotionFormPage";
 import CustomerListPage from "./pages/Admin/customer/CustomerListPage";
+import StaffListPage from "./pages/Admin/staff/StaffListPage";
 import { AuthProvider } from "./context/AuthContext";
 import { NotificationProvider } from "./context/NotificationContext";
 import ChatbotWidget from "./components/common/ChatbotWidget";
@@ -65,439 +66,431 @@ const App = () => {
             <BuyNowProvider>
               {/* ... existing code ... */}
 
-          <Toaster
-            position="top-right"
-            reverseOrder={false}
-            toastOptions={{
-              style: {
-                borderRadius: "24px",
-                background: "#111",
-                color: "#fff",
-                padding: "12px 24px",
-                fontSize: "14px",
-                fontWeight: "600",
-                letterSpacing: "-0.2px",
-                boxShadow: "0 10px 30px -10px rgba(0,0,0,0.3)",
-                border: "1px solid rgba(255,255,255,0.05)",
-              },
-              success: {
-                iconTheme: {
-                  primary: "#22c55e",
-                  secondary: "#fff",
-                },
-              },
-              error: {
-                iconTheme: {
-                  primary: "#ef4444",
-                  secondary: "#fff",
-                },
-              },
-            }}
-          />
-          <Router>
-            <Routes>
-              {/* ... routes ... */}
-              <Route
-                path="/login"
-                element={
-                  <GuestGuard>
-                    <Login />
-                  </GuestGuard>
-                }
+              <Toaster
+                position="top-right"
+                reverseOrder={false}
+                toastOptions={{
+                  style: {
+                    borderRadius: "24px",
+                    background: "#111",
+                    color: "#fff",
+                    padding: "12px 24px",
+                    fontSize: "14px",
+                    fontWeight: "600",
+                    letterSpacing: "-0.2px",
+                    boxShadow: "0 10px 30px -10px rgba(0,0,0,0.3)",
+                    border: "1px solid rgba(255,255,255,0.05)",
+                  },
+                  success: {
+                    iconTheme: {
+                      primary: "#22c55e",
+                      secondary: "#fff",
+                    },
+                  },
+                  error: {
+                    iconTheme: {
+                      primary: "#ef4444",
+                      secondary: "#fff",
+                    },
+                  },
+                }}
               />
-              <Route
-                path="/register"
-                element={
-                  <GuestGuard>
-                    <Register />
-                  </GuestGuard>
-                }
-              />
-              <Route
-                path="/verify-email"
-                element={
-                  <GuestGuard>
-                    <VerifyEmail />
-                  </GuestGuard>
-                }
-              />
-              <Route path="/" element={<Home />} />
-              <Route path="/products" element={<ProductList />} />
-              <Route path="/products/:slug" element={<ProductDetail />} />
-              <Route path="/categories" element={<ProductList />} />
-              <Route
-                path="/profile"
-                element={
-                  <AuthGuard>
-                    <Profile />
-                  </AuthGuard>
-                }
-              />
-              <Route
-                path="/my-reviews"
-                element={
-                  <AuthGuard>
-                    <MyReviews />
-                  </AuthGuard>
-                }
-              />
+              <Router>
+                <Routes>
+                  {/* ... routes ... */}
+                  <Route
+                    path="/login"
+                    element={
+                      <GuestGuard>
+                        <Login />
+                      </GuestGuard>
+                    }
+                  />
+                  <Route
+                    path="/register"
+                    element={
+                      <GuestGuard>
+                        <Register />
+                      </GuestGuard>
+                    }
+                  />
+                  <Route
+                    path="/verify-email"
+                    element={
+                      <GuestGuard>
+                        <VerifyEmail />
+                      </GuestGuard>
+                    }
+                  />
+                  <Route path="/" element={<Home />} />
+                  <Route path="/products" element={<ProductList />} />
+                  <Route path="/products/:slug" element={<ProductDetail />} />
+                  <Route path="/categories" element={<ProductList />} />
+                  <Route
+                    path="/profile"
+                    element={
+                      <AuthGuard>
+                        <Profile />
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/my-reviews"
+                    element={
+                      <AuthGuard>
+                        <MyReviews />
+                      </AuthGuard>
+                    }
+                  />
 
-              <Route
-                path="/wishlist"
-                element={
-                  <Wishlist />
-                }
-              />
+                  <Route path="/wishlist" element={<Wishlist />} />
 
-              <Route
-                path="/promotions"
-                element={
-                  <Promotions />
-                }
-              />
+                  <Route path="/promotions" element={<Promotions />} />
 
-              <Route
-                path="/checkout"
-                element={
-                  <Checkout />
-                }
-              />
+                  <Route path="/checkout" element={<Checkout />} />
 
-              <Route
-                path="/orders"
-                element={
-                  <AuthGuard>
-                    <MyOrders />
-                  </AuthGuard>
-                }
-              />
+                  <Route
+                    path="/orders"
+                    element={
+                      <AuthGuard>
+                        <MyOrders />
+                      </AuthGuard>
+                    }
+                  />
 
-              <Route
-                path="/orders/:id"
-                element={
-                  <AuthGuard>
-                    <MyOrderDetails />
-                  </AuthGuard>
-                }
-              />
+                  <Route
+                    path="/orders/:id"
+                    element={
+                      <AuthGuard>
+                        <MyOrderDetails />
+                      </AuthGuard>
+                    }
+                  />
 
-              <Route
-                path="/orders/:id/success"
-                element={
-                  <OrderSuccess />
-                }
-              />
-              
-              <Route
-                path="/checkout/vnpay-callback"
-                element={
-                  <VNPayCallback />
-                }
-              />
+                  <Route
+                    path="/orders/:id/success"
+                    element={<OrderSuccess />}
+                  />
 
+                  <Route
+                    path="/checkout/vnpay-callback"
+                    element={<VNPayCallback />}
+                  />
 
-              <Route
-                path="/admin/dashboard"
-                element={
-                  <AuthGuard>
-                    <RoleGuard permission="admin.manage">
-                      <AdminDashboard />
-                    </RoleGuard>
-                  </AuthGuard>
-                }
-              />
-              <Route
-                path="/admin/profile"
-                element={
-                  <AuthGuard>
-                    <RoleGuard permission="admin.manage">
-                      <AdminProfile />
-                    </RoleGuard>
-                  </AuthGuard>
-                }
-              />
-              <Route
-                path="/admin/change-password"
-                element={
-                  <AuthGuard>
-                    <RoleGuard permission="admin.manage">
-                      <AdminProfile />
-                    </RoleGuard>
-                  </AuthGuard>
-                }
-              />
+                  <Route
+                    path="/admin/dashboard"
+                    element={
+                      <AuthGuard>
+                        <RoleGuard permission="dashboard.view">
+                          <AdminDashboard />
+                        </RoleGuard>
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/admin/profile"
+                    element={
+                      <AuthGuard>
+                        <RoleGuard permission="dashboard.view">
+                          <AdminProfile />
+                        </RoleGuard>
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/admin/change-password"
+                    element={
+                      <AuthGuard>
+                        <RoleGuard permission="dashboard.view">
+                          <AdminProfile />
+                        </RoleGuard>
+                      </AuthGuard>
+                    }
+                  />
 
-              <Route
-                path="/admin/categories"
-                element={
-                  <AuthGuard>
-                    <RoleGuard permission="admin.manage">
-                      <CategoryListPage />
-                    </RoleGuard>
-                  </AuthGuard>
-                }
-              />
+                  <Route
+                    path="/admin/categories"
+                    element={
+                      <AuthGuard>
+                        <RoleGuard permission="categories.view">
+                          <CategoryListPage />
+                        </RoleGuard>
+                      </AuthGuard>
+                    }
+                  />
 
-              <Route
-                path="/admin/categories/create"
-                element={
-                  <AuthGuard>
-                    <RoleGuard permission="admin.manage">
-                      <CategoryForm />
-                    </RoleGuard>
-                  </AuthGuard>
-                }
-              />
+                  <Route
+                    path="/admin/categories/create"
+                    element={
+                      <AuthGuard>
+                        <RoleGuard permission="categories.manage">
+                          <CategoryForm />
+                        </RoleGuard>
+                      </AuthGuard>
+                    }
+                  />
 
-              <Route
-                path="/admin/categories/edit/:slug"
-                element={
-                  <AuthGuard>
-                    <RoleGuard permission="admin.manage">
-                      <CategoryForm />
-                    </RoleGuard>
-                  </AuthGuard>
-                }
-              />
+                  <Route
+                    path="/admin/categories/edit/:slug"
+                    element={
+                      <AuthGuard>
+                        <RoleGuard permission="categories.manage">
+                          <CategoryForm />
+                        </RoleGuard>
+                      </AuthGuard>
+                    }
+                  />
 
-              {/* Customers */}
-              <Route
-                path="/admin/customers"
-                element={
-                  <AuthGuard>
-                    <RoleGuard permission="admin.manage">
-                      <CustomerListPage />
-                    </RoleGuard>
-                  </AuthGuard>
-                }
-              />
+                  {/* Customers */}
+                  <Route
+                    path="/admin/customers"
+                    element={
+                      <AuthGuard>
+                        <RoleGuard permission="users.view">
+                          <CustomerListPage />
+                        </RoleGuard>
+                      </AuthGuard>
+                    }
+                  />
 
-              {/* Suppliers */}
-              <Route
-                path="/admin/suppliers"
-                element={
-                  <AuthGuard>
-                    <RoleGuard permission="admin.manage">
-                      <SupplierListPage />
-                    </RoleGuard>
-                  </AuthGuard>
-                }
-              />
+                  {/* Staff */}
+                  <Route
+                    path="/admin/staff"
+                    element={
+                      <AuthGuard>
+                        <RoleGuard permission="admin.manage">
+                          <StaffListPage />
+                        </RoleGuard>
+                      </AuthGuard>
+                    }
+                  />
 
-              <Route
-                path="/admin/suppliers/create"
-                element={
-                  <AuthGuard>
-                    <RoleGuard permission="admin.manage">
-                      <SupplierForm />
-                    </RoleGuard>
-                  </AuthGuard>
-                }
-              />
+                  {/* Suppliers */}
+                  <Route
+                    path="/admin/suppliers"
+                    element={
+                      <AuthGuard>
+                        <RoleGuard permission="suppliers.view">
+                          <SupplierListPage />
+                        </RoleGuard>
+                      </AuthGuard>
+                    }
+                  />
 
-              <Route
-                path="/admin/suppliers/edit/:slug"
-                element={
-                  <AuthGuard>
-                    <RoleGuard permission="admin.manage">
-                      <SupplierForm />
-                    </RoleGuard>
-                  </AuthGuard>
-                }
-              />
+                  <Route
+                    path="/admin/suppliers/create"
+                    element={
+                      <AuthGuard>
+                        <RoleGuard permission="suppliers.manage">
+                          <SupplierForm />
+                        </RoleGuard>
+                      </AuthGuard>
+                    }
+                  />
 
-              {/* Products */}
-              <Route
-                path="/admin/products"
-                element={
-                  <AuthGuard>
-                    <RoleGuard permission="admin.manage">
-                      <ProductListPage />
-                    </RoleGuard>
-                  </AuthGuard>
-                }
-              />
+                  <Route
+                    path="/admin/suppliers/edit/:slug"
+                    element={
+                      <AuthGuard>
+                        <RoleGuard permission="suppliers.manage">
+                          <SupplierForm />
+                        </RoleGuard>
+                      </AuthGuard>
+                    }
+                  />
 
-              <Route
-                path="/admin/products/create"
-                element={
-                  <AuthGuard>
-                    <RoleGuard permission="admin.manage">
-                      <ProductForm />
-                    </RoleGuard>
-                  </AuthGuard>
-                }
-              />
+                  {/* Products */}
+                  <Route
+                    path="/admin/products"
+                    element={
+                      <AuthGuard>
+                        <RoleGuard permission="products.view">
+                          <ProductListPage />
+                        </RoleGuard>
+                      </AuthGuard>
+                    }
+                  />
 
-              <Route
-                path="/admin/products/edit/:slug"
-                element={
-                  <AuthGuard>
-                    <RoleGuard permission="admin.manage">
-                      <ProductForm />
-                    </RoleGuard>
-                  </AuthGuard>
-                }
-              />
+                  <Route
+                    path="/admin/products/create"
+                    element={
+                      <AuthGuard>
+                        <RoleGuard permission="products.create">
+                          <ProductForm />
+                        </RoleGuard>
+                      </AuthGuard>
+                    }
+                  />
 
-              {/* Orders */}
-              <Route
-                path="/admin/orders"
-                element={
-                  <AuthGuard>
-                    <RoleGuard permission="admin.manage">
-                      <OrderListPage />
-                    </RoleGuard>
-                  </AuthGuard>
-                }
-              />
+                  <Route
+                    path="/admin/products/edit/:slug"
+                    element={
+                      <AuthGuard>
+                        <RoleGuard permission="products.edit">
+                          <ProductForm />
+                        </RoleGuard>
+                      </AuthGuard>
+                    }
+                  />
 
-              <Route
-                path="/admin/orders/create"
-                element={
-                  <AuthGuard>
-                    <RoleGuard permission="admin.manage">
-                      <OrderCreatePage />
-                    </RoleGuard>
-                  </AuthGuard>
-                }
-              />
+                  {/* Orders */}
+                  <Route
+                    path="/admin/orders"
+                    element={
+                      <AuthGuard>
+                        <RoleGuard permission="orders.view">
+                          <OrderListPage />
+                        </RoleGuard>
+                      </AuthGuard>
+                    }
+                  />
 
-              <Route
-                path="/admin/orders/:id"
-                element={
-                  <AuthGuard>
-                    <RoleGuard permission="admin.manage">
-                      <OrderDetailsPage />
-                    </RoleGuard>
-                  </AuthGuard>
-                }
-              />
+                  <Route
+                    path="/admin/orders/create"
+                    element={
+                      <AuthGuard>
+                        <RoleGuard permission="orders.edit">
+                          <OrderCreatePage />
+                        </RoleGuard>
+                      </AuthGuard>
+                    }
+                  />
 
-              <Route
-                path="/admin/payment-result"
-                element={
-                  <AuthGuard>
-                    <RoleGuard permission="admin.manage">
-                      <PaymentResultPage />
-                    </RoleGuard>
-                  </AuthGuard>
-                }
-              />
+                  <Route
+                    path="/admin/orders/:id"
+                    element={
+                      <AuthGuard>
+                        <RoleGuard permission="orders.view">
+                          <OrderDetailsPage />
+                        </RoleGuard>
+                      </AuthGuard>
+                    }
+                  />
 
-              <Route
-                path="/admin/order-returns"
-                element={
-                  <AuthGuard>
-                    <RoleGuard permission="admin.manage">
-                      <OrderReturnListPage />
-                    </RoleGuard>
-                  </AuthGuard>
-                }
-              />
+                  <Route
+                    path="/admin/payment-result"
+                    element={
+                      <AuthGuard>
+                        <RoleGuard permission="admin.manage">
+                          <PaymentResultPage />
+                        </RoleGuard>
+                      </AuthGuard>
+                    }
+                  />
 
-              <Route
-                path="/admin/order-returns/:id"
-                element={
-                  <AuthGuard>
-                    <RoleGuard permission="admin.manage">
-                      <OrderReturnDetailsPage />
-                    </RoleGuard>
-                  </AuthGuard>
-                }
-              />
+                  <Route
+                    path="/admin/order-returns"
+                    element={
+                      <AuthGuard>
+                        <RoleGuard permission="orders.view">
+                          <OrderReturnListPage />
+                        </RoleGuard>
+                      </AuthGuard>
+                    }
+                  />
 
-              {/* Inventory / Warehouse */}
-              <Route
-                path="/admin/inventory"
-                element={
-                  <AuthGuard>
-                    <RoleGuard permission="admin.manage">
-                      <InventoryListPage />
-                    </RoleGuard>
-                  </AuthGuard>
-                }
-              />
+                  <Route
+                    path="/admin/order-returns/:id"
+                    element={
+                      <AuthGuard>
+                        <RoleGuard permission="orders.view">
+                          <OrderReturnDetailsPage />
+                        </RoleGuard>
+                      </AuthGuard>
+                    }
+                  />
 
-              {/* Shipping Methods */}
-              <Route
-                path="/admin/shipping-methods"
-                element={
-                  <AuthGuard>
-                    <RoleGuard permission="admin.manage">
-                      <ShippingMethodPage />
-                    </RoleGuard>
-                  </AuthGuard>
-                }
-              />
-              {/* Tax Rates */}
-              <Route
-                path="/admin/tax-rates"
-                element={
-                  <AuthGuard>
-                    <RoleGuard permission="admin.manage">
-                      <TaxRatePage />
-                    </RoleGuard>
-                  </AuthGuard>
-                }
-              />
+                  {/* Inventory / Warehouse */}
+                  <Route
+                    path="/admin/inventory"
+                    element={
+                      <AuthGuard>
+                        <RoleGuard permission="inventory.manage">
+                          <InventoryListPage />
+                        </RoleGuard>
+                      </AuthGuard>
+                    }
+                  />
 
-              {/* Payment Methods */}
-              <Route
-                path="/admin/payment-methods"
-                element={
-                  <AuthGuard>
-                    <RoleGuard permission="admin.manage">
-                      <PaymentMethodPage />
-                    </RoleGuard>
-                  </AuthGuard>
-                }
-              />
+                  {/* Shipping Methods */}
+                  <Route
+                    path="/admin/shipping-methods"
+                    element={
+                      <AuthGuard>
+                        <RoleGuard permission="admin.manage">
+                          <ShippingMethodPage />
+                        </RoleGuard>
+                      </AuthGuard>
+                    }
+                  />
+                  {/* Tax Rates */}
+                  <Route
+                    path="/admin/tax-rates"
+                    element={
+                      <AuthGuard>
+                        <RoleGuard permission="admin.manage">
+                          <TaxRatePage />
+                        </RoleGuard>
+                      </AuthGuard>
+                    }
+                  />
 
-              {/* Promotions */}
-              <Route
-                path="/admin/promotions"
-                element={
-                  <AuthGuard>
-                    <RoleGuard permission="admin.manage">
-                      <PromotionPage />
-                    </RoleGuard>
-                  </AuthGuard>
-                }
-              />
-              <Route
-                path="/admin/promotions/create"
-                element={
-                  <AuthGuard>
-                    <RoleGuard permission="admin.manage">
-                      <PromotionFormPage />
-                    </RoleGuard>
-                  </AuthGuard>
-                }
-              />
-              <Route
-                path="/admin/promotions/edit/:id"
-                element={
-                  <AuthGuard>
-                    <RoleGuard permission="admin.manage">
-                      <PromotionFormPage />
-                    </RoleGuard>
-                  </AuthGuard>
-                }
-              />
-              <Route
-                path="/admin/reviews"
-                element={
-                  <AuthGuard>
-                    <RoleGuard permission="admin.manage">
-                      <ReviewManagement />
-                    </RoleGuard>
-                  </AuthGuard>
-                }
-              />
-            </Routes>
-            <ChatbotWidget />
-          </Router>
+                  {/* Payment Methods */}
+                  <Route
+                    path="/admin/payment-methods"
+                    element={
+                      <AuthGuard>
+                        <RoleGuard permission="admin.manage">
+                          <PaymentMethodPage />
+                        </RoleGuard>
+                      </AuthGuard>
+                    }
+                  />
+
+                  {/* Promotions */}
+                  <Route
+                    path="/admin/promotions"
+                    element={
+                      <AuthGuard>
+                        <RoleGuard permission="admin.manage">
+                          <PromotionPage />
+                        </RoleGuard>
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/admin/promotions/create"
+                    element={
+                      <AuthGuard>
+                        <RoleGuard permission="admin.manage">
+                          <PromotionFormPage />
+                        </RoleGuard>
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/admin/promotions/edit/:id"
+                    element={
+                      <AuthGuard>
+                        <RoleGuard permission="admin.manage">
+                          <PromotionFormPage />
+                        </RoleGuard>
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/admin/reviews"
+                    element={
+                      <AuthGuard>
+                        <RoleGuard permission="admin.manage">
+                          <ReviewManagement />
+                        </RoleGuard>
+                      </AuthGuard>
+                    }
+                  />
+                </Routes>
+                <ChatbotWidget />
+              </Router>
             </BuyNowProvider>
           </WishlistProvider>
         </CartProvider>

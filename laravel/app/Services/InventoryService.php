@@ -57,6 +57,7 @@ class InventoryService
                 'variant_id'      => $variantId,
                 'user_id'         => $userId,
                 'type'            => 'adjustment',
+                'reference_type'  => 'manual',
                 'quantity_before' => $before,
                 'quantity_change' => $change,
                 'quantity_after'  => $newQuantity,
@@ -80,7 +81,7 @@ class InventoryService
                 'variant_id'      => $variantId,
                 'user_id'         => $userId,
                 'type'            => $type,
-                'reference_type'  => $referenceType,
+                'reference_type'  => $referenceType ?? 'manual',
                 'reference_id'    => $referenceId,
                 'quantity_before' => $before,
                 'quantity_change' => $quantity,
@@ -110,7 +111,7 @@ class InventoryService
                 'variant_id'      => $variantId,
                 'user_id'         => $userId,
                 'type'            => $type,
-                'reference_type'  => $referenceType,
+                'reference_type'  => $referenceType ?? 'manual',
                 'reference_id'    => $referenceId,
                 'quantity_before' => $before,
                 'quantity_change' => -$quantity,
@@ -236,10 +237,15 @@ class InventoryService
 
             if (isset($transactionsInMonthRaw[$inv->variant_id])) {
                 foreach ($transactionsInMonthRaw[$inv->variant_id] as $t) {
-                    if ($t->type === 'in') $totalImportCount += $t->total;
-                    elseif ($t->type === 'out') $totalExportCount += abs($t->total);
-                    elseif ($t->type === 'adjustment') $totalAdjustCount += $t->total;
-                    elseif ($t->type === 'return') $totalReturnCount += $t->total;
+                    if (in_array($t->type, ['in', 'stock_receipt', 'manual']) && $t->total > 0) {
+                        $totalImportCount += $t->total;
+                    } elseif (in_array($t->type, ['out', 'order']) || ($t->type === 'manual' && $t->total < 0)) {
+                        $totalExportCount += abs($t->total);
+                    } elseif ($t->type === 'adjustment') {
+                        $totalAdjustCount += $t->total;
+                    } elseif (in_array($t->type, ['return', 'order_cancel'])) {
+                        $totalReturnCount += $t->total;
+                    }
                 }
             }
         }
@@ -279,10 +285,15 @@ class InventoryService
 
             if ($id && isset($transactionsInMonthRaw[$id])) {
                 foreach ($transactionsInMonthRaw[$id] as $t) {
-                    if ($t->type === 'in') $importQty += $t->total;
-                    elseif ($t->type === 'out') $exportQty += abs($t->total);
-                    elseif ($t->type === 'adjustment') $adjustQty += $t->total;
-                    elseif ($t->type === 'return') $returnQty += $t->total;
+                    if (in_array($t->type, ['in', 'stock_receipt', 'manual']) && $t->total > 0) {
+                        $importQty += $t->total;
+                    } elseif (in_array($t->type, ['out', 'order']) || ($t->type === 'manual' && $t->total < 0)) {
+                        $exportQty += abs($t->total);
+                    } elseif ($t->type === 'adjustment') {
+                        $adjustQty += $t->total;
+                    } elseif (in_array($t->type, ['return', 'order_cancel'])) {
+                        $returnQty += $t->total;
+                    }
                 }
             }
 

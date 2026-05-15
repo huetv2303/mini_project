@@ -29,7 +29,9 @@ const Login = () => {
       setToken({ access_token: token });
       fetchUser()
         .then((userData) => {
-          if (userData?.role?.code === "admin") {
+          console.log("Google Login User Data:", userData);
+          console.log("Role Code:", userData?.role?.code);
+          if (userData?.role?.code === "admin" || userData?.role?.code === "staff") {
             navigate("/admin/dashboard");
           } else {
             navigate("/");
@@ -75,7 +77,9 @@ const Login = () => {
       const data = await login(email, password);
       toast.success("Đăng nhập thành công!");
       const user = data.user.data || data.user;
-      if (user.role?.code === "admin") {
+      console.log("Normal Login User Data:", user);
+      console.log("Role Code:", user.role?.code);
+      if (user.role?.code === "admin" || user.role?.code === "staff") {
         navigate("/admin/dashboard");
       } else {
         navigate("/");
@@ -138,7 +142,7 @@ const Login = () => {
             )}
 
             {successMessage && (
-              <div className="mb-6 p-4 bg-green-500/20 border border-green-500/50 rounded-xl text-green-200 text-sm">
+              <div className="mb-6 p-4 bg-green-500/20 border border-green-500/50 rounded-xl text-black text-sm">
                 {successMessage}
               </div>
             )}

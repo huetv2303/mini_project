@@ -29,7 +29,14 @@ const debounce = (func, delay) => {
 };
 
 
+import { useAuth } from "../../../context/AuthContext";
+
 const ProductListPage = () => {
+  const { hasPermission } = useAuth();
+  const canManage = hasPermission("products.create");
+  const canEdit = hasPermission("products.edit");
+  const canDelete = hasPermission("products.delete");
+  
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -154,12 +161,14 @@ const ProductListPage = () => {
               Quản lý định danh & tồn kho
             </p>
           </div>
-          <Link
-            to="/admin/products/create"
-            className="inline-flex items-center px-4 py-3 bg-black text-white text-sm font-bold rounded-lg hover:bg-black/90 transition-all shadow-lg active:scale-95"
-          >
-            <Plus className="w-5 h-5 mr-2" /> Thêm sản phẩm
-          </Link>
+          {canManage && (
+            <Link
+              to="/admin/products/create"
+              className="inline-flex items-center px-4 py-3 bg-black text-white text-sm font-bold rounded-lg hover:bg-black/90 transition-all shadow-lg active:scale-95"
+            >
+              <Plus className="w-5 h-5 mr-2" /> Thêm sản phẩm
+            </Link>
+          )}
         </div>
 
         <div className="bg-white rounded-lg border border-gray-100 shadow-2xl shadow-black/5 overflow-hidden">
@@ -189,17 +198,19 @@ const ProductListPage = () => {
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-gray-50/50">
-                  <th className="px-8 py-6 text-xs font-semibold text-gray-500 uppercase tracking-wider w-10">
-                    <input
-                      type="checkbox"
-                      checked={
-                        products.length > 0 &&
-                        products.every((p) => selectedIds.includes(p.id))
-                      }
-                      onChange={handleSelectAll}
-                      className="w-4 h-4 rounded border-gray-300 text-black focus:ring-black"
-                    />
-                  </th>
+                  {canDelete && (
+                    <th className="px-8 py-6 text-xs font-semibold text-gray-500 uppercase tracking-wider w-10">
+                      <input
+                        type="checkbox"
+                        checked={
+                          products.length > 0 &&
+                          products.every((p) => selectedIds.includes(p.id))
+                        }
+                        onChange={handleSelectAll}
+                        className="w-4 h-4 rounded border-gray-300 text-black focus:ring-black"
+                      />
+                    </th>
+                  )}
                   <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase text-left">
                     Sản phẩm
                   </th>
@@ -215,9 +226,11 @@ const ProductListPage = () => {
                   <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase">
                     Trạng thái
                   </th>
-                  <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase text-right">
-                    Thao tác
-                  </th>
+                  {(canEdit || canDelete) && (
+                    <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase text-right">
+                      Thao tác
+                    </th>
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -240,14 +253,16 @@ const ProductListPage = () => {
                         key={product.id}
                         className={` border-b border-gray-50 transition-all group hover:bg-gray-50/50 hover:cursor-pointer ${selectedIds.includes(product.id) ? "bg-indigo-50/30" : ""}`}
                       >
-                        <td className="px-8 py-5">
-                          <input
-                            type="checkbox"
-                            checked={selectedIds.includes(product.id)}
-                            onChange={() => handleSelectOne(product.id)}
-                            className="w-4 h-4 rounded border-gray-300 text-black focus:ring-black hover:cursor-pointer"
-                          />
-                        </td>
+                        {canDelete && (
+                          <td className="px-8 py-5">
+                            <input
+                              type="checkbox"
+                              checked={selectedIds.includes(product.id)}
+                              onChange={() => handleSelectOne(product.id)}
+                              className="w-4 h-4 rounded border-gray-300 text-black focus:ring-black hover:cursor-pointer"
+                            />
+                          </td>
+                        )}
                         <td className="px-6 py-5">
                           <div className="flex items-center gap-5">
                             <div className="relative group/img">
@@ -313,27 +328,30 @@ const ProductListPage = () => {
                               : "Ngừng bán"}
                           </div>
                         </td>
-                        <td className="px-6 py-5">
-                          <div className="flex justify-end gap-2">
-                            {/* <button className="p-2.5 text-gray-400 hover:text-black hover:bg-white rounded-2xl transition-all">
-                              <Eye className="w-5 h-5" />
-                            </button> */}
-                            <Link
-                              to={`/admin/products/edit/${product.slug}`}
-                              className="p-2.5 text-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-2xl transition-all"
-                            >
-                              <Edit2 className="w-5 h-5" />
-                            </Link>
-                            <button
-                              onClick={() =>
-                                openDeleteModal(product.slug, product.name)
-                              }
-                              className="p-2.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all"
-                            >
-                              <Trash2 className="w-5 h-5" />
-                            </button>
-                          </div>
-                        </td>
+                        {(canEdit || canDelete) && (
+                          <td className="px-6 py-5">
+                            <div className="flex justify-end gap-2">
+                              {canEdit && (
+                                <Link
+                                  to={`/admin/products/edit/${product.slug}`}
+                                  className="p-2.5 text-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-2xl transition-all"
+                                >
+                                  <Edit2 className="w-5 h-5" />
+                                </Link>
+                              )}
+                              {canDelete && (
+                                <button
+                                  onClick={() =>
+                                    openDeleteModal(product.slug, product.name)
+                                  }
+                                  className="p-2.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all"
+                                >
+                                  <Trash2 className="w-5 h-5" />
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        )}
                       </tr>
                     );
                   })

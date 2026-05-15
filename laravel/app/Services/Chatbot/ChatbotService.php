@@ -43,6 +43,7 @@ QUY TẮC TRÌNH BÀY:
 - Link sản phẩm PHẢI đúng định dạng: [Tên sản phẩm](/products/{slug}).
 - KHÔNG dùng bảng Markdown. Hãy trình bày bằng danh sách gạch đầu dòng (-).
 - KHÔNG dùng markdown heading (#), chỉ dùng **bold**.
+6. Tìm sản phẩm theo giá: Khi khách hỏi về sản phẩm "đắt nhất", hãy dùng 'searchProducts' với 'sort'='price_desc' và 'limit'=1. Khi hỏi "rẻ nhất", hãy dùng 'sort'='price_asc' và 'limit'=1.
 PROMPT;
 
     private const ADMIN_PROMPT = <<<PROMPT

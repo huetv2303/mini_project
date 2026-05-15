@@ -43,10 +43,60 @@ class UserRepository implements UserRepositoryInterface
         return $user;
     }
 
+    public function getUserById($id)
+    {
+        return User::with('role', 'customerProfile')->findOrFail($id);
+    }
+
+    public function updateUser($id, array $data)
+    {
+        $user = User::findOrFail($id);
+        
+        $updateData = [
+            'name' => $data['name'] ?? $user->name,
+            'email' => $data['email'] ?? $user->email,
+        ];
+
+        if (!empty($data['password'])) {
+            $updateData['password'] = Hash::make($data['password']);
+        }
+
+        if (isset($data['role_id'])) {
+            $updateData['role_id'] = $data['role_id'];
+        }
+
+        $user->update($updateData);
+
+        // Nếu chuyển sang role customer mà chưa có profile thì tạo mới
+        $customerRole = Role::where('code', 'customer')->first();
+        if ($customerRole && $user->role_id == $customerRole->id) {
+            if (!$user->customerProfile) {
+                CustomerProfile::create(['user_id' => $user->id]);
+            }
+        }
+
+        return $user->load('role', 'customerProfile');
+    }
+
+    public function deleteUser($id)
+    {
+        $user = User::findOrFail($id);
+        return $user->delete();
+    }
+
     public function updateRole($userId, $roleId)
     {
         $user = User::findOrFail($userId);
         $user->update(['role_id' => $roleId]);
-        return $user->load('role');
+
+        // Nếu chuyển sang role customer mà chưa có profile thì tạo mới
+        $customerRole = Role::where('code', 'customer')->first();
+        if ($customerRole && $roleId == $customerRole->id) {
+            if (!$user->customerProfile) {
+                CustomerProfile::create(['user_id' => $user->id]);
+            }
+        }
+
+        return $user->load('role', 'customerProfile');
     }
 }

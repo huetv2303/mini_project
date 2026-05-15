@@ -15,9 +15,9 @@ const GuestGuard = ({ children }) => {
   }
 
   if (isAuthenticated) {
-    // Check if the user is an admin by role code or ID
-    const isAdmin = user?.role?.code === "admin" || user?.role_id === 1;
-    return <Navigate to={isAdmin ? "/admin/dashboard" : "/"} replace />;
+    // Check if the user is an admin/staff by role code or ID
+    const isStaffOrAdmin = user?.role?.code === "admin" || user?.role?.code === "staff" || user?.role_id === 1 || user?.role_id === 3;
+    return <Navigate to={isStaffOrAdmin ? "/admin/dashboard" : "/"} replace />;
   }
 
   return children;
