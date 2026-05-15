@@ -21,6 +21,8 @@ import VNPayCallback from "./pages/Customer/VNPayCallback";
 
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import AdminProfile from "./pages/Admin/AdminProfile";
+import ReviewManagement from "./pages/Admin/review/ReviewManagement";
+import MyReviews from "./pages/Customer/MyReviews";
 
 // Auth & Route Guards
 import RoleGuard from "./middleware/RoleGuard";
@@ -128,6 +130,14 @@ const App = () => {
                 element={
                   <AuthGuard>
                     <Profile />
+                  </AuthGuard>
+                }
+              />
+              <Route
+                path="/my-reviews"
+                element={
+                  <AuthGuard>
+                    <MyReviews />
                   </AuthGuard>
                 }
               />
@@ -471,6 +481,16 @@ const App = () => {
                   <AuthGuard>
                     <RoleGuard permission="admin.manage">
                       <PromotionFormPage />
+                    </RoleGuard>
+                  </AuthGuard>
+                }
+              />
+              <Route
+                path="/admin/reviews"
+                element={
+                  <AuthGuard>
+                    <RoleGuard permission="admin.manage">
+                      <ReviewManagement />
                     </RoleGuard>
                   </AuthGuard>
                 }

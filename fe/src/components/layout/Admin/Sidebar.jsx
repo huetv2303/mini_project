@@ -12,7 +12,8 @@ import {
   Truck,
   Percent,
   CreditCard,
-  Gift
+  Gift,
+  MessageSquare
 } from "lucide-react";
 
 const SidebarItem = ({ to, icon: Icon, label }) => (
@@ -101,6 +102,11 @@ const Sidebar = () => {
             to="/admin/customers"
             icon={Users}
             label="Khách hàng"
+          />
+          <SidebarItem
+            to="/admin/reviews"
+            icon={MessageSquare}
+            label="Đánh giá"
           />
           <SidebarItem
             to="/admin/inventory"

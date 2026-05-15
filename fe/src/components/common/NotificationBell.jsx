@@ -55,65 +55,73 @@ const NotificationBell = () => {
                             notifications.map((notification) => (
                                 <div
                                     key={notification.id}
-                                    className={`group relative p-4 border-b border-gray-50 transition-all duration-200 hover:bg-gray-50 ${
+                                    className={`group relative border-b border-gray-50 transition-all duration-200 hover:bg-gray-50 ${
                                         !notification.read_at ? 'bg-blue-50/30' : ''
                                     }`}
                                 >
-                                    <div className="flex gap-4">
-                                        <div className="flex-shrink-0 mt-1">
-                                            <div className={`h-11 w-11 rounded-2xl flex items-center justify-center text-xl shadow-sm ${
-                                                notification.data?.color === 'red' ? 'bg-red-50 text-red-500' :
-                                                notification.data?.color === 'green' ? 'bg-green-50 text-green-500' :
-                                                'bg-blue-50 text-blue-500'
-                                            }`}>
-                                                {notification.data?.icon || '🔔'}
-                                            </div>
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center justify-between gap-2">
-                                                <p className={`text-sm font-bold truncate ${!notification.read_at ? 'text-slate-900' : 'text-slate-500'}`}>
-                                                    {notification.data?.title}
-                                                </p>
-                                                {!notification.read_at && (
-                                                    <div className="h-2 w-2 rounded-full bg-blue-500 shrink-0" />
-                                                )}
-                                            </div>
-                                            <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
-                                                {notification.data?.message}
-                                            </p>
-                                            <div className="flex items-center justify-between mt-3">
-                                                <span className="text-[10px] text-slate-400 font-medium">
-                                                    {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true, locale: vi })}
-                                                </span>
-                                                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    {!notification.read_at && (
-                                                        <button
-                                                            onClick={() => markAsRead(notification.id)}
-                                                            className="p-1.5 text-slate-400 hover:text-green-500 hover:bg-green-50 rounded-lg transition-all"
-                                                        >
-                                                            <Check size={14} />
-                                                        </button>
-                                                    )}
-                                                    <button
-                                                        onClick={() => deleteNotification(notification.id)}
-                                                        className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
-                                                    >
-                                                        <Trash2 size={14} />
-                                                    </button>
-                                                    {notification.data?.action_url && (
-                                                        <Link
-                                                            to={notification.data.action_url}
-                                                            onClick={() => {
-                                                                markAsRead(notification.id);
-                                                                setIsOpen(false);
-                                                            }}
-                                                            className="p-1.5 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all"
-                                                        >
-                                                            <ExternalLink size={14} />
-                                                        </Link>
-                                                    )}
+                                    <div className="flex">
+                                        <Link
+                                            to={notification.data?.action_url || '#'}
+                                            onClick={(e) => {
+                                                if (!notification.data?.action_url) {
+                                                    e.preventDefault();
+                                                }
+                                                markAsRead(notification.id);
+                                                setIsOpen(false);
+                                            }}
+                                            className="flex-1 flex gap-4 p-4 min-w-0"
+                                        >
+                                            <div className="flex-shrink-0 mt-1">
+                                                <div className={`h-11 w-11 rounded-2xl flex items-center justify-center text-xl shadow-sm ${
+                                                    notification.data?.color === 'red' ? 'bg-red-50 text-red-500' :
+                                                    notification.data?.color === 'green' ? 'bg-green-50 text-green-500' :
+                                                    'bg-blue-50 text-blue-500'
+                                                }`}>
+                                                    {notification.data?.icon || (notification.data?.type === 'review_replied' ? '💬' : '🔔')}
                                                 </div>
                                             </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center justify-between gap-2">
+                                                    <p className={`text-sm font-bold truncate ${!notification.read_at ? 'text-slate-900' : 'text-slate-500'}`}>
+                                                        {notification.data?.title || (notification.data?.type === 'review_replied' ? 'Phản hồi đánh giá' : 'Thông báo')}
+                                                    </p>
+                                                    {!notification.read_at && (
+                                                        <div className="h-2 w-2 rounded-full bg-blue-500 shrink-0" />
+                                                    )}
+                                                </div>
+                                                <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                                                    {notification.data?.message}
+                                                </p>
+                                                <div className="flex items-center justify-between mt-3">
+                                                    <span className="text-[10px] text-slate-400 font-medium">
+                                                        {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true, locale: vi })}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </Link>
+
+                                        {/* Actions overlay */}
+                                        <div className="absolute right-4 bottom-4 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                                            {!notification.read_at && (
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        markAsRead(notification.id);
+                                                    }}
+                                                    className="p-1.5 text-slate-400 hover:text-green-500 hover:bg-green-50 rounded-lg transition-all bg-white shadow-sm border border-gray-100"
+                                                >
+                                                    <Check size={14} />
+                                                </button>
+                                            )}
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    deleteNotification(notification.id);
+                                                }}
+                                                className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all bg-white shadow-sm border border-gray-100"
+                                            >
+                                                <Trash2 size={14} />
+                                            </button>
                                         </div>
                                     </div>
                                 </div>

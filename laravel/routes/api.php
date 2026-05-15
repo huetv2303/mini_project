@@ -225,9 +225,18 @@ Route::group(['prefix' => 'v1'], function () {
 
         // Comment routes
         Route::prefix('comments')->group(function () {
+            Route::get('/my-comments', [CommentController::class, 'myComments']); // Lấy đánh giá cá nhân
             Route::post('/', [CommentController::class, 'store']);
+            Route::put('/{id}', [CommentController::class, 'update']); // Sửa đánh giá
             Route::delete('/{id}', [CommentController::class, 'destroy']);
             Route::get('/can-review/{productId}', [CommentController::class, 'checkCanReview']);
+            
+            // Admin management
+            Route::middleware('permission:admin.manage')->group(function () {
+                Route::get('/admin/all', [CommentController::class, 'adminIndex']); // Danh sách cho admin
+                Route::patch('/{id}/reply', [CommentController::class, 'adminReply']); // Admin phản hồi
+                Route::patch('/{id}/toggle-visibility', [CommentController::class, 'toggleVisibility']); // Ẩn/hiện
+            });
         });
 
         // Notification routes

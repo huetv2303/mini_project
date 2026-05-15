@@ -37,9 +37,25 @@ const CommentList = ({ comments }) => {
               </div>
             </div>
           </div>
-          <div className="mt-4 text-gray-700 leading-relaxed">
-            {comment.content}
+          <div className="mt-4 text-gray-700 leading-relaxed italic">
+            "{comment.content}"
           </div>
+          
+          {comment.admin_reply && (
+            <div className="mt-4 ml-8 p-4 bg-gray-50 border-l-4 border-indigo-500 rounded-r-xl">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">
+                  Phản hồi từ quản trị viên
+                </span>
+                <span className="text-[10px] text-gray-400">
+                  {format(new Date(comment.replied_at), 'dd/MM/yyyy', { locale: vi })}
+                </span>
+              </div>
+              <p className="text-sm text-gray-800 leading-relaxed">
+                {comment.admin_reply}
+              </p>
+            </div>
+          )}
         </div>
       ))}
     </div>

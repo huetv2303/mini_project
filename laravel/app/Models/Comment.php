@@ -12,6 +12,14 @@ class Comment extends Model
         'order_id',
         'content',
         'rating',
+        'admin_reply',
+        'replied_at',
+        'is_hidden',
+    ];
+
+    protected $casts = [
+        'replied_at' => 'datetime',
+        'is_hidden' => 'boolean',
     ];
 
     public function order()

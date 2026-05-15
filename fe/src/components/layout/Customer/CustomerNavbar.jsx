@@ -17,6 +17,7 @@ import {
   ChevronRight,
   Ticket,
   LayoutDashboard,
+  MessageSquare
 } from "lucide-react";
 import LogoTrendora from "../../../assets/LogoTrendora.png";
 import { getImageUrl } from "../../../helper/helper";
@@ -259,6 +260,13 @@ const CustomerNavbar = () => {
                         >
                           <Package size={18} />
                           Đơn hàng của tôi
+                        </Link>
+                        <Link
+                          to="/my-reviews"
+                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 rounded-xl transition-colors"
+                        >
+                          <MessageSquare size={18} />
+                          Đánh giá của tôi
                         </Link>
                         <Link
                           to="/wishlist"

@@ -13,6 +13,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/socialite": "^5.25",
         "laravel/tinker": "^2.10.1",
+        "pusher/pusher-php-server": "^7.2",
         "symfony/http-client": "^7.4",
         "tymon/jwt-auth": "^2.3"
     },
