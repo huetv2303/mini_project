@@ -27,6 +27,7 @@ import { formatPrice, getImageUrl } from "../../../helper/helper";
 import AdminLayout from "../../../components/layout/Admin/AdminLayout";
 import api from "../../../api/axios";
 import PromotionModal from "./components/PromotionModal";
+import OrderSuccessModal from "./components/OrderSuccessModal";
 import SelectSearch from "../../../components/common/SelectSearch";
 import { usePromotion } from "../../../hooks/usePromotion";
 import PaymentIntegration from "../../../components/common/PaymentIntegration";
@@ -236,14 +237,21 @@ const OrderCreatePage = () => {
     setTabCounter((prev) => prev + 1);
   };
 
-  const removeTab = (e, id) => {
+  const removeTab = (e, id, silent = false) => {
     if (e) e.stopPropagation();
     if (sessions.length === 1) {
-      setSessions([createEmptySession("tab-1")]);
+      const emptyTab = createEmptySession("tab-1");
+      const activeTax = taxRates.find(
+        (r) => r.is_active === 1 || r.is_active === true,
+      );
+      if (activeTax) {
+        emptyTab.selectedTaxRate = activeTax.id;
+      }
+      setSessions([emptyTab]);
       setActiveSessionId("tab-1");
       return;
     }
-    if (confirm("Bạn có chắc chắn muốn xóa tab này?")) {
+    if (silent || confirm("Bạn có chắc chắn muốn xóa tab này?")) {
       const newSessions = sessions.filter((s) => s.id !== id);
       setSessions(newSessions);
       if (activeSessionId === id) setActiveSessionId(newSessions[0].id);
@@ -282,6 +290,36 @@ const OrderCreatePage = () => {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [currentBankInfo, setCurrentBankInfo] = useState(null);
   const [createdOrderId, setCreatedOrderId] = useState(null);
+  const [successOrder, setSuccessOrder] = useState(null);
+  const [isFetchingSuccessOrder, setIsFetchingSuccessOrder] = useState(false);
+
+  const fetchAndShowSuccessModal = useCallback(async (orderId) => {
+    setIsFetchingSuccessOrder(true);
+    try {
+      const res = await api.get(`/orders/${orderId}`);
+      setSuccessOrder(res.data.data || res.data);
+    } catch (error) {
+      toast.error("Lỗi khi tải thông tin hóa đơn");
+      navigate(`/admin/orders/${orderId}`);
+    } finally {
+      setIsFetchingSuccessOrder(false);
+    }
+  }, [navigate]);
+
+  const handleCloseSuccessModal = (shouldCreateNew) => {
+    const orderId = successOrder?.id;
+    setSuccessOrder(null);
+    setCreatedOrderId(null);
+    setCurrentBankInfo(null);
+
+    // Silently remove the active session tab since it was successfully converted to an order
+    removeTab(null, activeSessionId, true);
+
+    if (!shouldCreateNew && orderId) {
+      // Navigate to the order detail page
+      navigate(`/admin/orders/${orderId}`);
+    }
+  };
 
   useEffect(() => {
     let pollingInterval;
@@ -298,9 +336,7 @@ const OrderCreatePage = () => {
             clearInterval(pollingInterval);
             toast.success("Thanh toán thành công! Đơn hàng đã được xác nhận.");
             setShowPaymentModal(false);
-            // Sau khi thanh toán thành công, xóa tab và chuyển hướng
-            removeTab(null, activeSessionId);
-            navigate(`/admin/orders/${createdOrderId}`);
+            fetchAndShowSuccessModal(createdOrderId);
           }
         } catch (error) {
           console.error("Polling failed:", error);
@@ -315,8 +351,7 @@ const OrderCreatePage = () => {
     showPaymentModal,
     currentBankInfo,
     createdOrderId,
-    navigate,
-    activeSessionId,
+    fetchAndShowSuccessModal,
   ]);
 
   const searchResultsRef = useRef(null);
@@ -642,8 +677,7 @@ const OrderCreatePage = () => {
         setShowPaymentModal(true);
       } else {
         toast.success("Tạo đơn hàng thành công!");
-        removeTab(null, activeSessionId);
-        navigate(`/admin/orders/${orderData.id}`);
+        fetchAndShowSuccessModal(orderData.id);
       }
     } catch (e) {
       toast.error(e.response?.data?.message || "Lỗi tạo đơn");
@@ -1291,6 +1325,12 @@ const OrderCreatePage = () => {
         isOpen={showPaymentModal}
         onClose={() => setShowPaymentModal(false)}
         bankInfo={currentBankInfo}
+      />
+
+      <OrderSuccessModal
+        isOpen={!!successOrder}
+        onClose={handleCloseSuccessModal}
+        order={successOrder}
       />
     </AdminLayout>
   );

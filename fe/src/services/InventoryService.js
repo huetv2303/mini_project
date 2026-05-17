@@ -20,3 +20,8 @@ export const fetchMonthlyReport = async (month, year, page = 1) => {
   const response = await api.get(`/inventory/report?month=${month}&year=${year}&page=${page}`);
   return response.data;
 };
+
+export const exportMonthlyReport = async (month, year) => {
+  const response = await api.get(`/inventory/report?month=${month}&year=${year}&export=true`);
+  return response.data;
+};

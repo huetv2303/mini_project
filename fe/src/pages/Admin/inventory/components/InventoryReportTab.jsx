@@ -11,7 +11,7 @@ import {
   RotateCcw,
 } from "lucide-react";
 
-import { fetchMonthlyReport } from "../../../../services/InventoryService";
+import { fetchMonthlyReport, exportMonthlyReport } from "../../../../services/InventoryService";
 import Pagination from "../../../../components/common/Pagination";
 import toast from "react-hot-toast";
 import { formatPrice } from "../../../../helper/helper";
@@ -75,6 +75,74 @@ const InventoryReportTab = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const handleExport = async () => {
+    try {
+      toast.loading("Đang chuẩn bị dữ liệu xuất báo cáo...", { id: "export-toast" });
+      
+      const res = await exportMonthlyReport(month, year);
+      const allItems = res?.data?.items?.data || [];
+      
+      if (allItems.length === 0) {
+        toast.error("Không có dữ liệu tồn kho để xuất", { id: "export-toast" });
+        return;
+      }
+
+      // Column headers
+      const headers = [
+        "Mã SKU",
+        "Tên Sản Phẩm",
+        "Biến Thể / Phân Loại",
+        "Đơn Giá (đ)",
+        "Tồn Đầu Kỳ",
+        "Tổng Nhập Kho",
+        "Tổng Xuất Kho",
+        "Điều Chỉnh Tồn",
+        "Hoàn Trả",
+        "Tồn Cuối Kỳ",
+        "Trạng Thái"
+      ];
+
+      // Format data rows
+      const rows = allItems.map(row => {
+        let statusText = "Còn hàng";
+        if (row.status === "out_of_stock") statusText = "Hết hàng";
+        else if (row.status === "low_stock") statusText = "Sắp hết hàng";
+        
+        return [
+          row.sku,
+          `"${row.productName.replace(/"/g, '""')}"`,
+          `"${row.variantDetails.replace(/"/g, '""')}"`,
+          row.price,
+          row.startStock,
+          row.importQty,
+          row.exportQty,
+          row.adjustQty,
+          row.returnQty,
+          row.endStock,
+          statusText
+        ];
+      });
+
+      // Construct CSV content with UTF-8 BOM
+      const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+      
+      // Create download link
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `Bao_Cao_Ton_Kho_Thang_${month}_${year}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast.success("Xuất báo cáo tồn kho thành công!", { id: "export-toast" });
+    } catch (error) {
+      console.error("Export monthly report error:", error);
+      toast.error("Gặp lỗi khi tải dữ liệu xuất", { id: "export-toast" });
+    }
+  };
+
   const renderStatus = (status) => {
     switch (status) {
       case "out_of_stock":
@@ -131,7 +199,10 @@ const InventoryReportTab = () => {
             ))}
           </select>
         </div>
-        <button className="flex items-center px-4 py-2 bg-emerald-500 text-white rounded-lg text-sm font-semibold hover:bg-emerald-600 transition-colors shadow-sm">
+        <button
+          onClick={handleExport}
+          className="flex items-center px-4 py-2 bg-emerald-500 text-white rounded-lg text-sm font-semibold hover:bg-emerald-600 transition-colors shadow-sm"
+        >
           <FileSpreadsheet className="w-4 h-4 mr-2" />
           Xuất Excel
         </button>

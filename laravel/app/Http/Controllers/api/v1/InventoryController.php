@@ -46,9 +46,10 @@ class InventoryController extends Controller
     {
         $month = $request->input('month', now()->month);
         $year = $request->input('year', now()->year);
+        $isExport = $request->boolean('export', false);
 
         try {
-            $data = $this->inventoryService->getMonthlyReport($month, $year);
+            $data = $this->inventoryService->getMonthlyReport($month, $year, $isExport);
             return response()->json([
                 'status' => 'success',
                 'data'   => $data,

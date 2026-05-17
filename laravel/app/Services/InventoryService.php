@@ -199,7 +199,7 @@ class InventoryService
         });
     }
 
-    public function getMonthlyReport($month, $year)
+    public function getMonthlyReport($month, $year, $isExport = false)
     {
         $startDate = \Carbon\Carbon::createFromDate($year, $month, 1)->startOfMonth();
         $endDate = $startDate->copy()->endOfMonth();
@@ -250,7 +250,8 @@ class InventoryService
             }
         }
 
-        $paginatedInventories = Inventory::with(['variant.product', 'variant.attributes'])->paginate(10);
+        $perPage = $isExport ? 10000 : 10;
+        $paginatedInventories = Inventory::with(['variant.product', 'variant.attributes'])->paginate($perPage);
 
         $transactionsAfter = DB::table('inventory_transactions')
             ->select('variant_id', DB::raw('SUM(quantity_change) as total'))
