@@ -150,36 +150,36 @@ const ProductListPage = () => {
   };
   return (
     <AdminLayout>
-      <div className="pb-10">
+      <div className="pb-10 animate-in fade-in duration-500">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+            <h1 className="text-3xl font-bold text-slate-800 tracking-tight">
               Quản lý sản phẩm
             </h1>
-            <p className="mt-1 text-xs text-gray-500 font-medium">
-              Quản lý định danh & tồn kho
+            <p className="mt-1 text-sm text-slate-500 font-medium italic">
+              Quản lý định danh & tồn kho cửa hàng.
             </p>
           </div>
           {canManage && (
             <Link
               to="/admin/products/create"
-              className="inline-flex items-center px-4 py-3 bg-black text-white text-sm font-bold rounded-lg hover:bg-black/90 transition-all shadow-lg active:scale-95"
+              className="inline-flex items-center justify-center px-5 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-extrabold uppercase rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md shadow-blue-500/20 active:scale-95"
             >
-              <Plus className="w-5 h-5 mr-2" /> Thêm sản phẩm
+              <Plus className="w-4 h-4 mr-2" /> Thêm sản phẩm
             </Link>
           )}
         </div>
 
-        <div className="bg-white rounded-lg border border-gray-100 shadow-2xl shadow-black/5 overflow-hidden">
-          <div className="p-8 border-b border-gray-50 bg-gray-50/20 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+          <div className="p-8 border-b border-slate-100 bg-slate-50/50 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={handleSearchChange}
                 placeholder="Tìm tên sản phẩm, SKU hoặc mô tả..."
-                className="w-full pl-12 pr-4 py-4 bg-white border border-gray-100 rounded-3xl text-sm outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all shadow-sm"
+                className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-3xl text-sm outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all shadow-sm"
               />
             </div>
             {selectedIds.length > 0 && (
@@ -196,9 +196,9 @@ const ProductListPage = () => {
           <div className="overflow-x-auto overflow-y-auto max-h-[700px]">
             <table className="w-full text-left">
               <thead>
-                <tr className="bg-gray-50/50">
+                <tr className="bg-slate-50/30">
                   {canDelete && (
-                    <th className="px-8 py-6 text-xs font-semibold text-gray-500 uppercase tracking-wider w-10">
+                    <th className="px-8 py-6 text-xs font-semibold text-slate-500 uppercase tracking-wider w-10">
                       <input
                         type="checkbox"
                         checked={
@@ -206,27 +206,27 @@ const ProductListPage = () => {
                           products.every((p) => selectedIds.includes(p.id))
                         }
                         onChange={handleSelectAll}
-                        className="w-4 h-4 rounded border-gray-300 text-black focus:ring-black"
+                        className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500/20 hover:cursor-pointer"
                       />
                     </th>
                   )}
-                  <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase text-left">
+                  <th className="px-6 py-6 text-[0.8rem] font-bold text-slate-500 uppercase text-left">
                     Sản phẩm
                   </th>
-                  <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase">
+                  <th className="px-6 py-6 text-[0.8rem] font-bold text-slate-500 uppercase">
                     Thông tin
                   </th>
-                  <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase">
+                  <th className="px-6 py-6 text-[0.8rem] font-bold text-slate-500 uppercase">
                     Giá bán (Đại diện)
                   </th>
-                  <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase">
+                  <th className="px-6 py-6 text-[0.8rem] font-bold text-slate-500 uppercase text-center">
                     Số lượng bán
                   </th>
-                  <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase">
+                  <th className="px-6 py-6 text-[0.8rem] font-bold text-slate-500 uppercase">
                     Trạng thái
                   </th>
                   {(canEdit || canDelete) && (
-                    <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase text-right">
+                    <th className="px-6 py-6 text-[0.8rem] font-bold text-slate-500 uppercase text-right">
                       Thao tác
                     </th>
                   )}
@@ -235,9 +235,9 @@ const ProductListPage = () => {
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan="5" className="px-6 py-24 text-center">
-                      <Loader2 className="w-12 h-12 text-black animate-spin mx-auto mb-4" />
-                      <span className="text-gray-400 font-bold text-[10px] uppercase ">
+                    <td colSpan="7" className="px-6 py-24 text-center">
+                      <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
+                      <span className="text-slate-400 font-bold text-[10px] uppercase animate-pulse">
                         Đang tải sản phẩm...
                       </span>
                     </td>
@@ -245,12 +245,11 @@ const ProductListPage = () => {
                 ) : products.length > 0 ? (
                   products.map((product) => {
                     const firstVariant = product.variants?.[0] || {};
-                    const variantsCount = product.variants?.length || 0;
 
                     return (
                       <tr
                         key={product.id}
-                        className={` border-b border-gray-50 transition-all group hover:bg-gray-50/50 hover:cursor-pointer ${selectedIds.includes(product.id) ? "bg-indigo-50/30" : ""}`}
+                        className={`border-b border-slate-100 transition-all group hover:bg-slate-50/50 hover:cursor-pointer ${selectedIds.includes(product.id) ? "bg-blue-50/20" : ""}`}
                       >
                         {canDelete && (
                           <td className="px-8 py-5">
@@ -258,7 +257,7 @@ const ProductListPage = () => {
                               type="checkbox"
                               checked={selectedIds.includes(product.id)}
                               onChange={() => handleSelectOne(product.id)}
-                              className="w-4 h-4 rounded border-gray-300 text-black focus:ring-black hover:cursor-pointer"
+                              className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500/20 hover:cursor-pointer"
                             />
                           </td>
                         )}
@@ -268,59 +267,53 @@ const ProductListPage = () => {
                               {product.images?.length > 0 ? (
                                 <img
                                   src={getImageUrl(product.images[0].url)}
-                                  className="w-16 h-16 rounded-2xl object-cover border border-gray-100 shadow-sm transition-transform group-hover:scale-105"
+                                  className="w-16 h-16 rounded-2xl object-cover border border-slate-100 shadow-sm transition-transform group-hover:scale-105"
                                   alt={product.name}
                                 />
                               ) : (
-                                <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center">
-                                  <span className="text-gray-400 text-xs font-bold">
+                                <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center border border-slate-200">
+                                  <span className="text-slate-400 text-xs font-bold">
                                     No Image
                                   </span>
                                 </div>
                               )}
-
-                              {/* {variantsCount > 1 && (
-                                <span className="absolute -top-2 -right-2 bg-indigo-500 text-white text-[10px] font-black w-6 h-6 flex items-center justify-center rounded-lg shadow-lg border-2 border-white">
-                                  {variantsCount}
-                                </span>
-                              )} */}
                             </div>
                             <div>
-                              <div className="font-medium text-gray-900 group-hover:text-indigo-600 transition-colors">
+                              <div className="font-semibold text-slate-800 group-hover:text-blue-600 transition-colors">
                                 {product.name}
                               </div>
-                              <div className="text-[0.7rem] text-gray-400   mt-1 uppercase">
+                              <div className="text-[0.7rem] text-slate-400 mt-1 uppercase font-semibold">
                                 Slug: {product.slug}
                               </div>
                             </div>
                           </div>
                         </td>
                         <td className="px-6 py-5 space-y-2">
-                          <div className="flex items-center text-[11px] text-gray-600">
-                            <Tag className="w-3.5 h-3.5 mr-2 text-indigo-400" />{" "}
+                          <div className="flex items-center text-[11px] font-semibold text-slate-600">
+                            <Tag className="w-3.5 h-3.5 mr-2 text-blue-500" />{" "}
                             {product.category?.name || "N/A"}
                           </div>
-                          <div className="flex items-center text-[11px] text-gray-600">
-                            <Building2 className="w-3.5 h-3.5 mr-2 text-emerald-400" />{" "}
+                          <div className="flex items-center text-[11px] font-semibold text-slate-600">
+                            <Building2 className="w-3.5 h-3.5 mr-2 text-emerald-500" />{" "}
                             {product.supplier?.name || "N/A"}
                           </div>
                         </td>
                         <td className="px-6 py-5">
-                          <div className=" text-sm  text-gray-900">
+                          <div className="text-sm font-semibold text-slate-800">
                             {formatPrice(firstVariant.price)}
                           </div>
-                          <div className="text-[0.7rem] text-gray-400 uppercase mt-1">
+                          <div className="text-[0.7rem] text-slate-400 font-semibold uppercase mt-1">
                             SKU: {firstVariant.sku || "N/A"}
                           </div>
                         </td>
-                        <td className="px-6 py-5">
-                          <div className=" text-sm text-gray-900 text-center">
+                        <td className="px-6 py-5 text-center">
+                          <div className="text-sm font-semibold text-slate-800">
                             {product.sold_count}
                           </div>
                         </td>
                         <td className="px-6 py-5">
                           <div
-                            className={`inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-semibold ${product.status === "active" ? "bg-emerald-50 text-emerald-600 border border-emerald-100" : "bg-red-50 text-red-600 border border-red-100"}`}
+                            className={`inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold ${product.status === "active" ? "bg-emerald-50 text-emerald-600 border border-emerald-100" : "bg-red-50 text-red-600 border border-red-100"}`}
                           >
                             {product.status === "active"
                               ? "Đang bán"
@@ -333,7 +326,7 @@ const ProductListPage = () => {
                               {canEdit && (
                                 <Link
                                   to={`/admin/products/edit/${product.slug}`}
-                                  className="p-2.5 text-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-2xl transition-all"
+                                  className="p-2.5 text-blue-500 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all"
                                 >
                                   <Edit2 className="w-5 h-5" />
                                 </Link>
@@ -343,7 +336,7 @@ const ProductListPage = () => {
                                   onClick={() =>
                                     openDeleteModal(product.slug, product.name)
                                   }
-                                  className="p-2.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all"
+                                  className="p-2.5 text-rose-500 hover:text-rose-600 hover:bg-rose-50 rounded-2xl transition-all"
                                 >
                                   <Trash2 className="w-5 h-5" />
                                 </button>
@@ -356,9 +349,9 @@ const ProductListPage = () => {
                   })
                 ) : (
                   <tr>
-                    <td colSpan="5" className="px-6 py-24 text-center">
-                      <AlertCircle className="w-16 h-16 text-gray-100 mx-auto mb-4" />
-                      <p className="text-gray-400 font-bold">
+                    <td colSpan="7" className="px-6 py-24 text-center">
+                      <AlertCircle className="w-16 h-16 text-slate-200 mx-auto mb-4" />
+                      <p className="text-slate-400 font-bold">
                         Bạn chưa có sản phẩm nào trong kho.
                       </p>
                     </td>

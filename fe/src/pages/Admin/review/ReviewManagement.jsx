@@ -122,30 +122,30 @@ const ReviewManagement = () => {
 
   return (
     <AdminLayout>
-      <div className="mb-6 flex flex-col gap-6">
+      <div className="mb-6 flex flex-col gap-6 animate-in fade-in duration-500">
         {/* Header and Filter */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
           <div>
-            <h1 className="text-xl font-bold text-gray-900">Quản lý đánh giá</h1>
-            <p className="text-xs text-gray-500 mt-1">
-              Theo dõi và phản hồi nhận xét từ khách hàng
+            <h1 className="text-xl font-bold text-slate-800">Quản lý đánh giá</h1>
+            <p className="text-xs text-slate-500 mt-1 italic">
+              Theo dõi và phản hồi nhận xét từ khách hàng.
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
             <div className="relative flex-1 min-w-[200px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="text"
                 placeholder="Tìm sản phẩm, khách hàng..."
-                className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-transparent rounded-xl text-sm focus:bg-white focus:border-indigo-500 outline-none transition-all"
+                className="w-full pl-10 pr-4 py-2 bg-slate-50/50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
 
             <select
-              className="px-4 py-2 bg-gray-50 border border-transparent rounded-xl text-sm outline-none focus:bg-white focus:border-indigo-500 transition-all"
+              className="px-4 py-2 bg-slate-50/50 border border-slate-200 rounded-xl text-sm outline-none focus:bg-white focus:border-blue-500 transition-all font-semibold text-slate-600"
               value={ratingFilter}
               onChange={(e) => setRatingFilter(e.target.value)}
             >
@@ -158,7 +158,7 @@ const ReviewManagement = () => {
             </select>
 
             <select
-              className="px-4 py-2 bg-gray-50 border border-transparent rounded-xl text-sm outline-none focus:bg-white focus:border-indigo-500 transition-all"
+              className="px-4 py-2 bg-slate-50/50 border border-slate-200 rounded-xl text-sm outline-none focus:bg-white focus:border-blue-500 transition-all font-semibold text-slate-600"
               value={visibilityFilter}
               onChange={(e) => setVisibilityFilter(e.target.value)}
             >
@@ -172,49 +172,49 @@ const ReviewManagement = () => {
         {/* Reviews List */}
         <div className="space-y-4">
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-dashed border-gray-200">
-              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600 mb-4"></div>
-              <p className="text-gray-500 text-sm">Đang tải dữ liệu...</p>
+            <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-dashed border-slate-200">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mb-4"></div>
+              <p className="text-slate-500 text-sm font-semibold animate-pulse">Đang tải dữ liệu...</p>
             </div>
           ) : reviews.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-dashed border-gray-200 text-center">
-              <MessageSquare className="w-12 h-12 text-gray-200 mb-3" />
-              <p className="text-gray-500 font-medium">Không tìm thấy đánh giá nào</p>
-              <p className="text-gray-400 text-xs mt-1">Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm</p>
+            <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-dashed border-slate-200 text-center">
+              <MessageSquare className="w-12 h-12 text-slate-200 mb-3" />
+              <p className="text-slate-500 font-bold">Không tìm thấy đánh giá nào</p>
+              <p className="text-slate-400 text-xs mt-1">Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm</p>
             </div>
           ) : (
             reviews.map((review) => (
               <div 
                 key={review.id} 
-                className={`bg-white rounded-2xl shadow-sm border p-5 transition-all ${
-                  review.is_hidden ? "border-red-100 bg-red-50/10" : "border-gray-100"
+                className={`bg-white rounded-2xl border p-5 transition-all shadow-sm ${
+                  review.is_hidden ? "border-rose-100 bg-rose-50/10" : "border-slate-100"
                 }`}
               >
                 <div className="flex flex-col md:flex-row gap-6">
                   {/* Customer & Product Info */}
-                  <div className="md:w-1/4 flex flex-col gap-3 border-r border-gray-50 pr-4">
+                  <div className="md:w-1/4 flex flex-col gap-3 border-r border-slate-100 pr-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center flex-shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-blue-50 border border-blue-100/50 flex items-center justify-center flex-shrink-0">
                         {review.user?.avatar ? (
                           <img src={review.user.avatar} alt="" className="w-full h-full rounded-full object-cover" />
                         ) : (
-                          <User className="w-5 h-5 text-indigo-600" />
+                          <User className="w-5 h-5 text-blue-600" />
                         )}
                       </div>
                       <div className="overflow-hidden">
-                        <p className="text-sm font-bold text-gray-900 truncate">{review.user?.name}</p>
-                        <p className="text-[10px] text-gray-400 flex items-center mt-0.5">
+                        <p className="text-sm font-bold text-slate-800 truncate">{review.user?.name}</p>
+                        <p className="text-[10px] text-slate-400 flex items-center mt-0.5 font-semibold">
                           <Calendar className="w-3 h-3 mr-1" />
                           {format(new Date(review.created_at), "HH:mm, dd/MM/yyyy", { locale: vi })}
                         </p>
                       </div>
                     </div>
 
-                    <div className="bg-gray-50 rounded-xl p-3">
-                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 flex items-center">
+                    <div className="bg-slate-50/50 rounded-xl p-3 border border-slate-100">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 flex items-center">
                         <Package className="w-3 h-3 mr-1" /> Sản phẩm
                       </p>
-                      <p className="text-xs font-semibold text-gray-700 line-clamp-2 leading-relaxed">
+                      <p className="text-xs font-bold text-slate-700 line-clamp-2 leading-relaxed">
                         {review.product?.name}
                       </p>
                     </div>
@@ -229,8 +229,8 @@ const ReviewManagement = () => {
                           onClick={() => handleToggleVisibility(review.id)}
                           className={`p-2 rounded-xl transition-all ${
                             review.is_hidden 
-                            ? "bg-red-100 text-red-600 hover:bg-red-200" 
-                            : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                            ? "bg-rose-100 text-rose-600 hover:bg-rose-200" 
+                            : "bg-slate-100 text-slate-500 hover:bg-slate-200"
                           }`}
                           title={review.is_hidden ? "Hiện đánh giá" : "Ẩn đánh giá"}
                         >
@@ -238,7 +238,7 @@ const ReviewManagement = () => {
                         </button>
                         <button 
                           onClick={() => handleDelete(review.id)}
-                          className="p-2 bg-gray-100 text-gray-500 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all"
+                          className="p-2 bg-slate-100 text-slate-500 hover:bg-rose-50 hover:text-rose-600 rounded-xl transition-all"
                           title="Xóa đánh giá"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -246,20 +246,20 @@ const ReviewManagement = () => {
                       </div>
                     </div>
                     
-                    <div className="text-sm text-gray-700 bg-gray-50/50 p-4 rounded-2xl italic leading-relaxed mb-4 border border-gray-100">
+                    <div className="text-sm text-slate-700 bg-slate-50/30 p-4 rounded-2xl italic leading-relaxed mb-4 border border-slate-100">
                       "{review.content}"
                     </div>
 
                     {/* Admin Reply Area */}
                     {review.admin_reply ? (
-                      <div className="bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100 relative">
-                        <div className="absolute -top-2 left-4 bg-indigo-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">
+                      <div className="bg-blue-50/30 p-4 rounded-2xl border border-blue-100 relative">
+                        <div className="absolute -top-2 left-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[9px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                           Phản hồi từ Admin
                         </div>
-                        <p className="text-sm text-indigo-900 leading-relaxed pt-1">
+                        <p className="text-sm text-blue-900 font-semibold leading-relaxed pt-1">
                           {review.admin_reply}
                         </p>
-                        <p className="text-[10px] text-indigo-400 mt-2 flex items-center">
+                        <p className="text-[10px] text-blue-400 font-semibold mt-2 flex items-center">
                           <Calendar className="w-3 h-3 mr-1" />
                           {format(new Date(review.replied_at), "dd/MM/yyyy", { locale: vi })}
                         </p>
@@ -269,14 +269,14 @@ const ReviewManagement = () => {
                         <input
                           type="text"
                           placeholder="Nhập phản hồi cho khách hàng..."
-                          className="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:border-indigo-500 transition-all shadow-sm"
+                          className="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all shadow-sm text-slate-800 font-semibold"
                           value={replyText[review.id] || ""}
                           onChange={(e) => setReplyText({ ...replyText, [review.id]: e.target.value })}
                         />
                         <button 
                           onClick={() => handleReply(review.id)}
                           disabled={replyingId === review.id}
-                          className="px-4 py-2 bg-black text-white rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-gray-800 transition active:scale-95 disabled:opacity-50"
+                          className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider flex items-center gap-2 hover:from-blue-700 hover:to-indigo-700 transition active:scale-95 disabled:opacity-50 shadow-md shadow-blue-500/20"
                         >
                           {replyingId === review.id ? (
                             <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
@@ -303,8 +303,8 @@ const ReviewManagement = () => {
                 onClick={() => fetchReviews(page)}
                 className={`w-10 h-10 rounded-xl text-sm font-bold transition-all ${
                   pagination.current_page === page
-                    ? "bg-black text-white shadow-lg"
-                    : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-100"
+                    ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20"
+                    : "bg-white text-slate-600 hover:bg-slate-50 border border-slate-200"
                 }`}
               >
                 {page}

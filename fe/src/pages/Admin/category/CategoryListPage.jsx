@@ -210,13 +210,13 @@ const CategoryListPage = () => {
     return (
       <React.Fragment key={category.id}>
         <tr
-          className={`border-b border-gray-50 transition-all group ${isSelected ? "bg-indigo-50/30" : "hover:bg-gray-50/50"}`}
+          className={`border-b border-slate-100 transition-all group ${isSelected ? "bg-blue-50/20" : "hover:bg-slate-50/50"}`}
         >
           {canManage && (
             <td className="w-12 px-6 py-4">
               <button
                 onClick={() => toggleSelect(category.id, hasChildren)}
-                className={`transition-colors ${hasChildren ? "opacity-20 cursor-not-allowed" : "text-indigo-500 hover:text-indigo-600"}`}
+                className={`transition-colors ${hasChildren ? "opacity-20 cursor-not-allowed" : "text-blue-500 hover:text-blue-600"}`}
                 title={
                   hasChildren ? "Không thể xóa danh mục có con" : "Chọn để xóa"
                 }
@@ -224,7 +224,7 @@ const CategoryListPage = () => {
                 {isSelected ? (
                   <CheckSquare className="w-5 h-5" />
                 ) : (
-                  <Square className="w-5 h-5 text-gray-300" />
+                  <Square className="w-5 h-5 text-slate-300" />
                 )}
               </button>
             </td>
@@ -238,7 +238,7 @@ const CategoryListPage = () => {
                 {category.children && category.children.length > 0 ? (
                   <button
                     onClick={() => toggleRow(category.id)}
-                    className="p-1 hover:bg-indigo-100 rounded-lg text-indigo-400"
+                    className="p-1 hover:bg-blue-100 rounded-lg text-blue-400"
                   >
                     {isExpanded ? (
                       <ChevronDown className="w-4 h-4" />
@@ -250,12 +250,12 @@ const CategoryListPage = () => {
                   <div className="w-6" />
                 )}
                 <span
-                  className={`font-semibold ${depth === 0 ? "text-gray-900" : "text-gray-600"} ${isSelected ? "text-indigo-700" : ""}`}
+                  className={`font-semibold ${depth === 0 ? "text-slate-800" : "text-slate-600"} ${isSelected ? "text-blue-700" : ""}`}
                 >
                   {category.name}
                 </span>
                 {depth === 0 && (
-                  <span className="px-2 py-0.5 bg-black/5 text-black text-[10px] font-bold uppercase rounded-md">
+                  <span className="px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-bold uppercase rounded-md border border-blue-100/50">
                     Gốc
                   </span>
                 )}
@@ -263,14 +263,14 @@ const CategoryListPage = () => {
             </div>
           </td>
           <td className="px-6 py-4">
-            <div className="text-sm text-gray-400 font-medium font-mono">
+            <div className="text-sm text-slate-400 font-semibold font-mono">
               /{category.slug}
             </div>
           </td>
           <td className="px-6 py-4">
             <div className="flex justify-center">
               <span
-                className={`px-3 py-1 rounded-full text-xs font-bold ${hasChildren ? "bg-indigo-100 text-indigo-600" : "bg-gray-100 text-gray-400"}`}
+                className={`px-3 py-1 rounded-full text-xs font-bold ${hasChildren ? "bg-blue-50 text-blue-600 border border-blue-100" : "bg-slate-100 text-slate-400"}`}
               >
                 {category.children_count || 0} mục con
               </span>
@@ -285,7 +285,7 @@ const CategoryListPage = () => {
                     : "/no-image.png"
                 }
                 alt={category.name}
-                className="w-10 h-10 rounded-xl object-cover shadow-sm mx-auto border border-gray-100 group-hover:scale-105 transition-transform"
+                className="w-10 h-10 rounded-xl object-cover shadow-sm mx-auto border border-slate-100 group-hover:scale-105 transition-transform"
               />
             ) : (
               <div></div>
@@ -296,14 +296,14 @@ const CategoryListPage = () => {
               <div className="flex justify-end items-center gap-2">
                 <Link
                   to={`/admin/categories/create?parent_id=${category.id}`}
-                  className="p-2 text-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
+                  className="p-2 text-blue-500 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
                   title="Thêm con"
                 >
                   <Plus className="w-5 h-5" />
                 </Link>
                 <Link
                   to={`/admin/categories/edit/${category.slug}`}
-                  className="p-2 text-green-400 hover:text-green-600 hover:bg-green-50 rounded-xl transition-all"
+                  className="p-2 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"
                   title="Sửa"
                 >
                   <Edit2 className="w-5 h-5" />
@@ -312,7 +312,7 @@ const CategoryListPage = () => {
                   onClick={() =>
                     openDeleteModal(category.slug, category.name, hasChildren)
                   }
-                  className={`p-2 rounded-xl transition-all ${hasChildren ? "text-gray-200 cursor-not-allowed" : "text-red-400 hover:text-red-600 hover:bg-red-50"}`}
+                  className={`p-2 rounded-xl transition-all ${hasChildren ? "text-slate-200 cursor-not-allowed" : "text-rose-500 hover:text-rose-600 hover:bg-rose-50"}`}
                   title="Xóa"
                 >
                   <Trash2 className="w-5 h-5" />
@@ -333,10 +333,10 @@ const CategoryListPage = () => {
       <div className="animate-in fade-in duration-500 pb-10">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+            <h1 className="text-3xl font-bold text-slate-800 tracking-tight">
               Danh mục sản phẩm
             </h1>
-            <p className="mt-1 text-sm text-gray-500 font-medium italic">
+            <p className="mt-1 text-sm text-slate-500 font-medium italic">
               Quản lý hệ thống phân tầng và thuộc tính cửa hàng.
             </p>
           </div>
@@ -344,7 +344,7 @@ const CategoryListPage = () => {
             {canManage && selectedIds.size > 0 && (
               <button
                 onClick={openBulkDeleteModal}
-                className="inline-flex items-center justify-center px-6 py-3 bg-red-500 text-white text-sm font-bold rounded-2xl hover:bg-red-600 transition-all shadow-lg active:scale-95 animate-in slide-in-from-right-4"
+                className="inline-flex items-center justify-center px-6 py-3 bg-red-500 text-white text-sm font-bold rounded-2xl hover:bg-red-600 transition-all shadow-lg shadow-red-500/20 active:scale-95 animate-in slide-in-from-right-4"
               >
                 <Trash2 className="w-5 h-5 mr-2" />
                 Xóa {selectedIds.size} mục đã chọn
@@ -353,28 +353,28 @@ const CategoryListPage = () => {
             {canManage && (
               <Link
                 to="/admin/categories/create"
-                className="inline-flex items-center justify-center px-4 py-3 bg-black text-white text-sm font-bold rounded-lg hover:bg-black/90 transition-all shadow-lg active:scale-95"
+                className="inline-flex items-center justify-center px-5 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-extrabold uppercase rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md shadow-blue-500/20 active:scale-95"
               >
-                <Plus className="w-5 h-5 mr-2" /> Thêm danh mục
+                <Plus className="w-4 h-4 mr-2" /> Thêm danh mục
               </Link>
             )}
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-gray-100 shadow-xl shadow-black/5 overflow-hidden">
-          <div className="p-6 border-b border-gray-50 bg-gray-50/30 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+          <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={handleSearchChange}
                 placeholder="Tìm kiếm theo tên hoặc đường dẫn..."
-                className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-black/5 focus:border-black transition-all shadow-sm"
+                className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all shadow-sm"
               />
             </div>
             {selectedIds.size > 0 && (
-              <div className="text-sm font-bold text-indigo-600 bg-indigo-50 px-4 py-2 rounded-full border border-indigo-100">
+              <div className="text-sm font-bold text-blue-600 bg-blue-50 px-4 py-2 rounded-full border border-blue-100">
                 Đang chọn {selectedIds.size} danh mục
               </div>
             )}
@@ -383,36 +383,36 @@ const CategoryListPage = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
-                <tr className="bg-gray-50/50">
+                <tr className="bg-slate-50/30">
                   {canManage && (
                     <th className="w-12 px-6 py-5">
                       <button
                         onClick={selectAllOnPage}
-                        className="text-gray-400 hover:text-indigo-500 transition-colors"
+                        className="text-slate-400 hover:text-blue-500 transition-colors"
                       >
                         {selectedIds.size === deletableIdsOnPage.length &&
                         deletableIdsOnPage.length > 0 ? (
-                          <CheckSquare className="w-5 h-5 text-indigo-500" />
+                          <CheckSquare className="w-5 h-5 text-blue-500" />
                         ) : (
                           <Square className="w-5 h-5" />
                         )}
                       </button>
                     </th>
                   )}
-                  <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase    ">
+                  <th className="px-6 py-6 text-[0.8rem] font-bold text-slate-500 uppercase">
                     Tên danh mục
                   </th>
-                  <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase    ">
+                  <th className="px-6 py-6 text-[0.8rem] font-bold text-slate-500 uppercase">
                     Đường dẫn
                   </th>
-                  <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase   text-center  ">
+                  <th className="px-6 py-6 text-[0.8rem] font-bold text-slate-500 uppercase text-center">
                     Cấu trúc
                   </th>
-                  <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase   text-center  ">
+                  <th className="px-6 py-6 text-[0.8rem] font-bold text-slate-500 uppercase text-center">
                     Ảnh
                   </th>
                   {canManage && (
-                    <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase   text-center ">
+                    <th className="px-6 py-6 text-[0.8rem] font-bold text-slate-500 uppercase text-center">
                       Thao tác
                     </th>
                   )}
@@ -422,8 +422,8 @@ const CategoryListPage = () => {
                 {loading ? (
                   <tr>
                     <td colSpan="6" className="px-6 py-20 text-center">
-                      <Loader2 className="w-10 h-10 text-black animate-spin mx-auto mb-2" />
-                      <span className="text-gray-400 font-bold text-xs uppercase ">
+                      <Loader2 className="w-10 h-10 text-blue-600 animate-spin mx-auto mb-2" />
+                      <span className="text-slate-400 font-bold text-xs uppercase animate-pulse">
                         Đang tải dữ liệu...
                       </span>
                     </td>
@@ -433,8 +433,8 @@ const CategoryListPage = () => {
                 ) : (
                   <tr>
                     <td colSpan="6" className="px-6 py-20 text-center">
-                      <AlertCircle className="w-12 h-12 text-gray-200 mx-auto mb-3" />
-                      <p className="text-gray-400 font-bold">
+                      <AlertCircle className="w-12 h-12 text-slate-200 mx-auto mb-3" />
+                      <p className="text-slate-400 font-bold">
                         Không có dữ liệu danh mục.
                       </p>
                     </td>
@@ -446,17 +446,14 @@ const CategoryListPage = () => {
 
           {/* Pagination Controls */}
           {!loading && categories.length > 0 && pagination.lastPage > 1 && (
-            <div className="p-6 border-t border-gray-50 flex items-center justify-between bg-gray-50/30">
-              <span className="text-sm text-gray-500 font-medium">
-                {/* Tổng số:{" "}
-                <span className="text-black font-bold">{pagination.total}</span>{" "}
-                danh mục cha */}
+            <div className="p-6 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
+              <span className="text-sm text-slate-500 font-medium">
               </span>
               <div className="flex items-center gap-2">
                 <button
                   disabled={currentPage === 1}
                   onClick={() => setCurrentPage((prev) => prev - 1)}
-                  className={`p-2 rounded-xl border border-gray-200 transition-all ${currentPage === 1 ? "opacity-50 cursor-not-allowed bg-gray-50" : "bg-white hover:bg-gray-50 active:scale-95"}`}
+                  className={`p-2 rounded-xl border border-slate-200 transition-all ${currentPage === 1 ? "opacity-50 cursor-not-allowed bg-slate-50" : "bg-white hover:bg-slate-50 active:scale-95"}`}
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
@@ -465,7 +462,7 @@ const CategoryListPage = () => {
                     <button
                       key={i}
                       onClick={() => setCurrentPage(i + 1)}
-                      className={`w-10 h-10 rounded-xl text-sm font-bold transition-all ${currentPage === i + 1 ? "bg-black text-white shadow-lg" : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"}`}
+                      className={`w-10 h-10 rounded-xl text-sm font-bold transition-all ${currentPage === i + 1 ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20" : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"}`}
                     >
                       {i + 1}
                     </button>
@@ -473,8 +470,8 @@ const CategoryListPage = () => {
                 </div>
                 <button
                   disabled={currentPage === pagination.lastPage}
-                  onClick={() => setCurrentPage((prev) => prev + 1)}
-                  className={`p-2 rounded-xl border border-gray-200 transition-all ${currentPage === pagination.lastPage ? "opacity-50 cursor-not-allowed bg-gray-50" : "bg-white hover:bg-gray-50 active:scale-95"}`}
+                  onClick={() => setCurrentPage((prev) => prev - 1)}
+                  className={`p-2 rounded-xl border border-slate-200 transition-all ${currentPage === pagination.lastPage ? "opacity-50 cursor-not-allowed bg-slate-50" : "bg-white hover:bg-slate-50 active:scale-95"}`}
                 >
                   <ChevronRight className="w-5 h-5" />
                 </button>

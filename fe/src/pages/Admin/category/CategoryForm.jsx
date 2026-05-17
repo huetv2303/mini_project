@@ -124,8 +124,8 @@ const CategoryForm = () => {
     return (
       <AdminLayout>
         <div className="flex flex-col items-center justify-center min-h-[60vh]">
-          <Loader2 className="w-10 h-10 text-black animate-spin mb-4" />
-          <p className="text-gray-500 font-medium italic">
+          <Loader2 className="w-10 h-10 text-blue-600 animate-spin mb-4" />
+          <p className="text-slate-500 font-medium italic animate-pulse">
             Đang chuẩn bị dữ liệu...
           </p>
         </div>
@@ -139,10 +139,10 @@ const CategoryForm = () => {
         {/* Header Section */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="md:text-3xl sm:text-2xl font-bold text-gray-900 tracking-tight">
+            <h1 className="md:text-3xl sm:text-2xl font-bold text-slate-800 tracking-tight">
               {isEdit ? "Chỉnh sửa danh mục" : "Tạo danh mục mới"}
             </h1>
-            <p className="mt-1 text-sm text-gray-500 font-medium">
+            <p className="mt-1 text-sm text-slate-500 font-medium">
               {isEdit
                 ? `Đang thay đổi thông tin: ${formData.name}`
                 : "Phân bổ cấu trúc và tối ưu hóa tìm kiếm sản phẩm."}
@@ -151,7 +151,7 @@ const CategoryForm = () => {
 
           <Link
             to="/admin/categories"
-            className="inline-flex items-center px-4 py-2 bg-white border border-gray-200 text-gray-700 text-sm font-semibold rounded-xl hover:bg-gray-50 transition-all shadow-sm active:scale-95"
+            className="inline-flex items-center px-4 py-2 bg-white border border-slate-200 text-slate-700 text-sm font-bold rounded-xl hover:bg-slate-50 hover:text-blue-600 hover:border-blue-300 transition-all shadow-sm active:scale-95"
           >
             <ArrowLeft className="md:w-5 md:h-5 sm:w-4 sm:h-4 mr-2" />
             <span className="md:block sm:hidden md:text-sm sm:text-xs">
@@ -166,17 +166,17 @@ const CategoryForm = () => {
           className="grid grid-cols-1 lg:grid-cols-3 gap-8"
         >
           <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-xl shadow-black/5 space-y-6">
+            <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm space-y-6">
               <div className="flex items-center space-x-3 mb-2">
-                <div className="w-2 h-8 bg-black rounded-full"></div>
-                <h2 className="text-xl font-bold text-gray-900">
+                <div className="w-2.5 h-8 bg-gradient-to-b from-blue-600 to-indigo-600 rounded-full"></div>
+                <h2 className="text-xl font-bold text-slate-800">
                   Thông tin cơ bản
                 </h2>
               </div>
 
               <div className="space-y-6">
                 <div className="flex flex-col space-y-2">
-                  <label className="text-sm font-bold text-gray-700 ml-1">
+                  <label className="text-sm font-bold text-slate-600 ml-1">
                     Tên danh mục *
                   </label>
                   <input
@@ -187,7 +187,7 @@ const CategoryForm = () => {
                       setFormData({ ...formData, name: e.target.value })
                     }
                     placeholder="Ví dụ: Điện tử, Thời trang..."
-                    className="w-full px-5 py-4 border border-gray-100 bg-gray-50/50 rounded-2xl outline-none focus:ring-4 focus:ring-black/5 focus:border-black focus:bg-white transition-all text-gray-900 font-medium"
+                    className="w-full px-5 py-4 border border-slate-200 bg-slate-50/50 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-800 font-semibold"
                   />
                 </div>
 
@@ -202,7 +202,7 @@ const CategoryForm = () => {
                 />
 
                 <div className="flex flex-col space-y-2">
-                  <label className="text-sm font-bold text-gray-700 ml-1">
+                  <label className="text-sm font-bold text-slate-600 ml-1">
                     Mô tả chi tiết
                   </label>
                   <textarea
@@ -212,7 +212,7 @@ const CategoryForm = () => {
                       setFormData({ ...formData, description: e.target.value })
                     }
                     placeholder="Mô tả giúp hệ thống nhận diện danh mục tốt hơn..."
-                    className="w-full px-5 py-4 border border-gray-100 bg-gray-50/50 rounded-2xl outline-none focus:ring-4 focus:ring-black/5 focus:border-black focus:bg-white transition-all text-gray-900 font-medium resize-none"
+                    className="w-full px-5 py-4 border border-slate-200 bg-slate-50/50 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-800 font-semibold resize-none"
                   />
                 </div>
               </div>
@@ -228,18 +228,18 @@ const CategoryForm = () => {
               multiple={false}
             />
 
-            <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-xl shadow-black/5">
+            <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`w-full flex items-center justify-center py-4 rounded-2xl font-bold text-lg transition-all shadow-lg active:scale-95 ${
+                className={`w-full flex items-center justify-center py-4 rounded-2xl font-extrabold text-sm uppercase tracking-wide transition-all shadow-md active:scale-95 ${
                   isSubmitting
-                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                    : "bg-black text-white hover:bg-black/90 shadow-black/10"
+                    ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                    : "bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 shadow-blue-500/20"
                 }`}
               >
                 {isSubmitting ? (
-                  <Loader2 className="w-6 h-6 animate-spin mr-2" />
+                  <Loader2 className="w-5 h-5 animate-spin mr-2" />
                 ) : isEdit ? (
                   <Save className="w-5 h-5 mr-2" />
                 ) : (

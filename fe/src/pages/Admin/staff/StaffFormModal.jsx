@@ -68,16 +68,16 @@ const StaffFormModal = ({ isOpen, onClose, onSuccess, staff, roles }) => {
             <div className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300" onClick={onClose} />
             
             <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 fade-in duration-300">
-                <div className="px-8 py-6 border-b border-gray-50 flex items-center justify-between">
+                <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between">
                     <div>
-                        <h2 className="text-xl font-bold text-slate-900">
+                        <h2 className="text-xl font-bold text-slate-800">
                             {staff ? "Sửa thông tin nhân viên" : "Thêm nhân viên mới"}
                         </h2>
-                        <p className="text-xs text-gray-500 font-medium mt-1">
+                        <p className="text-xs text-slate-500 font-medium mt-1">
                             Vui lòng điền đầy đủ các thông tin bên dưới.
                         </p>
                     </div>
-                    <button onClick={onClose} className="p-2 text-gray-400 hover:text-black hover:bg-gray-100 rounded-xl transition-all">
+                    <button onClick={onClose} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
                         <X size={20} />
                     </button>
                 </div>
@@ -85,13 +85,13 @@ const StaffFormModal = ({ isOpen, onClose, onSuccess, staff, roles }) => {
                 <form onSubmit={handleSubmit} className="p-8 space-y-6">
                     {/* Name */}
                     <div className="space-y-2">
-                        <label className="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
-                            <User size={14} /> Họ và tên
+                        <label className="text-xs font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                            <User size={14} className="text-blue-500" /> Họ và tên
                         </label>
                         <input
                             type="text"
                             required
-                            className={`w-full h-12 bg-gray-50 border-none rounded-xl px-4 text-sm focus:ring-2 focus:ring-black/5 transition-all outline-none ${errors.name ? 'ring-2 ring-red-100' : ''}`}
+                            className={`w-full h-12 bg-slate-50/50 border border-slate-200 rounded-xl px-4 text-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-semibold text-slate-800 ${errors.name ? 'ring-2 ring-red-100' : ''}`}
                             placeholder="Nhập họ tên nhân viên..."
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -101,13 +101,13 @@ const StaffFormModal = ({ isOpen, onClose, onSuccess, staff, roles }) => {
 
                     {/* Email */}
                     <div className="space-y-2">
-                        <label className="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
-                            <Mail size={14} /> Địa chỉ Email
+                        <label className="text-xs font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                            <Mail size={14} className="text-blue-500" /> Địa chỉ Email
                         </label>
                         <input
                             type="email"
                             required
-                            className={`w-full h-12 bg-gray-50 border-none rounded-xl px-4 text-sm focus:ring-2 focus:ring-black/5 transition-all outline-none ${errors.email ? 'ring-2 ring-red-100' : ''}`}
+                            className={`w-full h-12 bg-slate-50/50 border border-slate-200 rounded-xl px-4 text-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-semibold text-slate-800 ${errors.email ? 'ring-2 ring-red-100' : ''}`}
                             placeholder="email@example.com"
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -117,13 +117,13 @@ const StaffFormModal = ({ isOpen, onClose, onSuccess, staff, roles }) => {
 
                     {/* Password */}
                     <div className="space-y-2">
-                        <label className="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
-                            <Lock size={14} /> Mật khẩu
+                        <label className="text-xs font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                            <Lock size={14} className="text-blue-500" /> Mật khẩu
                         </label>
                         <input
                             type="password"
                             required={!staff}
-                            className={`w-full h-12 bg-gray-50 border-none rounded-xl px-4 text-sm focus:ring-2 focus:ring-black/5 transition-all outline-none ${errors.password ? 'ring-2 ring-red-100' : ''}`}
+                            className={`w-full h-12 bg-slate-50/50 border border-slate-200 rounded-xl px-4 text-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-semibold text-slate-800 ${errors.password ? 'ring-2 ring-red-100' : ''}`}
                             placeholder={staff ? "Để trống nếu không muốn đổi" : "Nhập mật khẩu ít nhất 8 ký tự..."}
                             value={formData.password}
                             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
@@ -133,12 +133,12 @@ const StaffFormModal = ({ isOpen, onClose, onSuccess, staff, roles }) => {
 
                     {/* Role */}
                     <div className="space-y-2">
-                        <label className="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
-                            <Shield size={14} /> Vai trò
+                        <label className="text-xs font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                            <Shield size={14} className="text-blue-500" /> Vai trò
                         </label>
                         <select
                             required
-                            className="w-full h-12 bg-gray-50 border-none rounded-xl px-4 text-sm focus:ring-2 focus:ring-black/5 transition-all outline-none appearance-none"
+                            className="w-full h-12 bg-slate-50/50 border border-slate-200 rounded-xl px-4 text-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-semibold text-slate-800"
                             value={formData.role_id}
                             onChange={(e) => setFormData({ ...formData, role_id: e.target.value })}
                         >
@@ -156,9 +156,9 @@ const StaffFormModal = ({ isOpen, onClose, onSuccess, staff, roles }) => {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full h-12 bg-black text-white rounded-xl text-sm font-bold hover:bg-slate-800 transition-all shadow-lg shadow-black/10 active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
+                            className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md shadow-blue-500/20 active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
                         >
-                            {loading && <Loader2 size={18} className="animate-spin" />}
+                            {loading && <Loader2 size={16} className="animate-spin" />}
                             {staff ? "Cập nhật nhân viên" : "Tạo tài khoản ngay"}
                         </button>
                     </div>

@@ -155,7 +155,7 @@ const SupplierListPage = () => {
       <div className="animate-in fade-in duration-500 pb-10">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+            <h1 className="text-3xl font-bold text-slate-800 tracking-tight">
               Đối tác Cung ứng
             </h1>
           </div>
@@ -163,7 +163,7 @@ const SupplierListPage = () => {
             {canManage && selectedIds.size > 0 && (
               <button
                 onClick={openBulkDeleteModal}
-                className="inline-flex items-center px-6 py-3 bg-red-500 text-white text-sm font-bold rounded-2xl hover:bg-red-600 transition-all shadow-lg active:scale-95 animate-in slide-in-from-right-4"
+                className="inline-flex items-center px-6 py-3 bg-rose-500 text-white text-sm font-bold rounded-2xl hover:bg-rose-600 transition-all shadow-md shadow-rose-500/20 active:scale-95 animate-in slide-in-from-right-4"
               >
                 <Trash2 className="w-5 h-5 mr-2" /> Xóa {selectedIds.size}
               </button>
@@ -171,7 +171,7 @@ const SupplierListPage = () => {
             {canManage && (
               <Link
                 to="/admin/suppliers/create"
-                className="inline-flex items-center px-4 py-3 bg-black text-white text-sm font-bold rounded-lg hover:bg-black/90 transition-all shadow-lg active:scale-95"
+                className="inline-flex items-center px-5 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-extrabold uppercase rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md shadow-blue-500/20 active:scale-95"
               >
                 <Plus className="w-5 h-5 mr-2" /> Thêm NCC
               </Link>
@@ -179,20 +179,20 @@ const SupplierListPage = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-gray-100 shadow-2xl shadow-black/5 overflow-hidden">
-          <div className="p-8 border-b border-gray-50 bg-gray-50/20 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+          <div className="p-8 border-b border-slate-100 bg-slate-50/50 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={handleSearchChange}
                 placeholder="Tìm tên, email hoặc mã số thuế..."
-                className="w-full pl-12 pr-4 py-4 bg-white border border-gray-100 rounded-3xl text-sm outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all shadow-sm"
+                className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all shadow-sm text-slate-800 font-semibold"
               />
             </div>
             {selectedIds.size > 0 && (
-              <div className="text-sm font-bold text-indigo-600 bg-indigo-50/50 px-6 py-3 rounded-2xl border border-indigo-100 animate-pulse">
+              <div className="text-xs font-extrabold uppercase tracking-wider text-blue-600 bg-blue-50 px-5 py-3 rounded-xl border border-blue-100 animate-pulse">
                 Đang chọn {selectedIds.size} nhà cung cấp
               </div>
             )}
@@ -201,33 +201,33 @@ const SupplierListPage = () => {
           <div className="overflow-x-auto overflow-y-auto max-h-[700px]">
             <table className="w-full text-left">
               <thead>
-                <tr className="bg-gray-50/50">
+                <tr className="bg-slate-50/30 border-b border-slate-100">
                   {canManage && (
                     <th className="w-16 px-8 py-6">
                       <button
                         onClick={selectAllOnPage}
-                        className="text-gray-400 hover:text-indigo-500 transition-colors"
+                        className="text-slate-400 hover:text-blue-600 transition-colors"
                       >
                         {selectedIds.size === suppliers.length &&
                         suppliers.length > 0 ? (
-                          <CheckSquare className="w-6 h-6 text-indigo-500" />
+                          <CheckSquare className="w-6 h-6 text-blue-600" />
                         ) : (
                           <Square className="w-6 h-6" />
                         )}
                       </button>
                     </th>
                   )}
-                  <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase    ">
+                  <th className="px-6 py-6 text-[0.8rem] text-slate-400 font-bold uppercase tracking-wider">
                     Nhà cung cấp
                   </th>
-                  <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase    ">
+                  <th className="px-6 py-6 text-[0.8rem] text-slate-400 font-bold uppercase tracking-wider">
                     Liên hệ
                   </th>
-                  <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase   ">
+                  <th className="px-6 py-6 text-[0.8rem] text-slate-400 font-bold uppercase tracking-wider">
                     Trạng thái
                   </th>
                   {canManage && (
-                    <th className="px-6 py-6 text-[0.8rem] text-gray-600 uppercase  ">
+                    <th className="px-6 py-6 text-[0.8rem] text-slate-400 font-bold uppercase tracking-wider text-right">
                       Thao tác
                     </th>
                   )}
@@ -237,8 +237,8 @@ const SupplierListPage = () => {
                 {loading ? (
                   <tr>
                     <td colSpan="5" className="px-6 py-24 text-center">
-                      <Loader2 className="w-12 h-12 text-black animate-spin mx-auto mb-4" />
-                      <span className="text-gray-400 font-bold text-[10px] uppercase ">
+                      <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
+                      <span className="text-slate-500 font-bold text-[10px] uppercase animate-pulse">
                         Đang tải nhà cung cấp...
                       </span>
                     </td>
@@ -247,18 +247,18 @@ const SupplierListPage = () => {
                   suppliers.map((sup) => (
                     <tr
                       key={sup.id}
-                      className={`border-b border-gray-50 transition-all group ${selectedIds.has(sup.id) ? "bg-indigo-50/40" : "hover:bg-gray-50/50"}`}
+                      className={`border-b border-slate-100 transition-all group ${selectedIds.has(sup.id) ? "bg-blue-50/20" : "hover:bg-slate-50/50"}`}
                     >
                       {canManage && (
                         <td className="px-8 py-5">
                           <button
                             onClick={() => toggleSelect(sup.id)}
-                            className="text-indigo-500"
+                            className="text-blue-600"
                           >
                             {selectedIds.has(sup.id) ? (
                               <CheckSquare className="w-6 h-6" />
                             ) : (
-                              <Square className="w-6 h-6 text-gray-200" />
+                              <Square className="w-6 h-6 text-slate-200" />
                             )}
                           </button>
                         </td>
@@ -271,14 +271,14 @@ const SupplierListPage = () => {
                                 ? `${import.meta.env.VITE_URL_IMAGE}/${sup.image}`
                                 : "/no-image.png"
                             }
-                            className="w-14 h-14 rounded-2xl object-cover border border-gray-100 shadow-sm transition-transform group-hover:scale-105"
+                            className="w-14 h-14 rounded-2xl object-cover border border-slate-200 shadow-sm transition-transform group-hover:scale-105"
                             alt={sup.name}
                           />
                           <div>
-                            <div className="font-medium text-gray-900 group-hover:text-indigo-600 transition-colors">
+                            <div className="font-bold text-slate-800 group-hover:text-blue-600 transition-colors">
                               {sup.name}
                             </div>
-                            <div className="text-[13px] text-gray-600  mt-1">
+                            <div className="text-[11px] text-slate-400 font-bold mt-1">
                               MST: {sup.tax_code || "N/A"}
                             </div>
                           </div>
@@ -286,29 +286,29 @@ const SupplierListPage = () => {
                       </td>
                       <td className="px-6 py-5">
                         <div className="space-y-1.5">
-                          <div className="flex items-center text-sm text-gray-600 ">
-                            <Mail className="w-3.5 h-3.5 mr-2 text-gray-400" />{" "}
+                          <div className="flex items-center text-sm text-slate-600 font-semibold">
+                            <Mail className="w-3.5 h-3.5 mr-2 text-slate-300" />{" "}
                             {sup.email}
                           </div>
-                          <div className="flex items-center text-sm text-gray-600 ">
-                            <Phone className="w-3.5 h-3.5 mr-2 text-gray-400" />{" "}
+                          <div className="flex items-center text-sm text-slate-600 font-semibold">
+                            <Phone className="w-3.5 h-3.5 mr-2 text-slate-300" />{" "}
                             {sup.phone || "N/A"}
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-5">
                         <span
-                          className={`px-3 py-1.5 rounded-xl text-[10px] font-medium uppercase  ${sup.status === 1 ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600"}`}
+                          className={`px-3 py-1.5 rounded-xl text-[10px] font-extrabold uppercase border ${sup.status === 1 ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-rose-50 text-rose-600 border-rose-100"}`}
                         >
                           {sup.status === 1 ? "Hoạt động" : "Tạm ngưng"}
                         </span>
                       </td>
                       {canManage && (
                         <td className="px-6 py-5">
-                          <div className="flex justify-end gap-2">
+                          <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                             <Link
                               to={`/admin/suppliers/edit/${sup.slug}`}
-                              className="p-2.5 text-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-2xl transition-all"
+                              className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
                             >
                               <Edit2 className="w-5 h-5" />
                             </Link>
@@ -316,7 +316,7 @@ const SupplierListPage = () => {
                               onClick={() =>
                                 openDeleteModal(sup.slug, sup.name)
                               }
-                              className="p-2.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all"
+                              className="p-2.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
                             >
                               <Trash2 className="w-5 h-5" />
                             </button>
@@ -328,8 +328,8 @@ const SupplierListPage = () => {
                 ) : (
                   <tr>
                     <td colSpan="5" className="px-6 py-24 text-center">
-                      <AlertCircle className="w-16 h-16 text-gray-100 mx-auto mb-4" />
-                      <p className="text-gray-400 font-bold">
+                      <AlertCircle className="w-16 h-16 text-slate-100 mx-auto mb-4" />
+                      <p className="text-slate-400 font-bold">
                         Không có nhà cung cấp nào.
                       </p>
                     </td>

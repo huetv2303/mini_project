@@ -429,8 +429,8 @@ const ProductForm = () => {
     return (
       <AdminLayout>
         <div className="flex flex-col items-center justify-center min-h-[60vh]">
-          <Loader2 className="w-10 h-10 text-indigo-500 animate-spin mb-4" />
-          <p className="text-gray-500 font-black uppercase text-[10px] ">
+          <Loader2 className="w-10 h-10 text-blue-600 animate-spin mb-4" />
+          <p className="text-slate-500 font-bold uppercase text-[10px] animate-pulse">
             Đang tải cấu trúc kho...
           </p>
         </div>
@@ -440,17 +440,17 @@ const ProductForm = () => {
 
   return (
     <AdminLayout>
-      <div className="max-w-[1200px] mx-auto pb-20">
+      <div className="max-w-[1200px] mx-auto pb-20 animate-in fade-in duration-500">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
           <div className="flex items-center gap-6">
             <Link
               to="/admin/products"
-              className="w-12 h-12 bg-white border border-gray-100 rounded-2xl flex items-center justify-center text-gray-400 hover:text-black hover:shadow-xl transition-all active:scale-90"
+              className="w-12 h-12 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-300 hover:shadow-sm transition-all active:scale-90"
             >
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div>
-              <h1 className="text-3xl font-black text-gray-900 tracking-tight">
+              <h1 className="text-3xl font-bold text-slate-800 tracking-tight">
                 {isEdit ? "Cập nhật sản phẩm" : "Thêm sản phẩm mới"}
               </h1>
             </div>
@@ -461,7 +461,7 @@ const ProductForm = () => {
               type="submit"
               form="product-form"
               disabled={isSubmitting}
-              className={`inline-flex items-center px-8 py-4 bg-black text-white text-sm font-bold rounded-2xl shadow-2xl transition-all active:scale-95 ${isSubmitting ? "opacity-50" : "hover:bg-black/80"}`}
+              className={`inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-extrabold uppercase rounded-2xl shadow-md shadow-blue-500/20 transition-all active:scale-95 ${isSubmitting ? "opacity-50 cursor-not-allowed" : "hover:from-blue-700 hover:to-indigo-700"}`}
             >
               {isSubmitting ? (
                 <Loader2 className="w-5 h-5 animate-spin mr-2" />

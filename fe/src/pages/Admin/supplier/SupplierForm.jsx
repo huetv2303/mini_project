@@ -119,8 +119,8 @@ const SupplierForm = () => {
     return (
       <AdminLayout>
         <div className="flex flex-col items-center justify-center min-h-[60vh]">
-          <Loader2 className="w-10 h-10 text-black animate-spin mb-4" />
-          <p className="text-gray-500 font-medium italic">
+          <Loader2 className="w-10 h-10 text-blue-600 animate-spin mb-4" />
+          <p className="text-slate-500 font-bold uppercase text-[10px] animate-pulse">
             Đang tải thông tin...
           </p>
         </div>
@@ -134,10 +134,10 @@ const SupplierForm = () => {
         {/* Header Section */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="lg:text-3xl sm:text-2xl font-bold text-gray-900 tracking-tight">
+            <h1 className="lg:text-3xl sm:text-2xl font-bold text-slate-800 tracking-tight">
               {isEdit ? "Sửa nhà cung cấp" : "Thêm nhà cung cấp mới"}
             </h1>
-            <p className="mt-1 text-sm text-gray-500 font-medium">
+            <p className="mt-1 text-sm text-slate-500 font-medium italic">
               {isEdit
                 ? `Đang chỉnh sửa: ${formData.name}`
                 : "Đăng ký đối tác cung ứng mới vào hệ thống."}
@@ -146,7 +146,7 @@ const SupplierForm = () => {
 
           <Link
             to="/admin/suppliers"
-            className="inline-flex items-center px-4 py-2 bg-white border border-gray-200 text-gray-700 text-sm font-semibold rounded-xl hover:bg-gray-50 transition-all shadow-sm active:scale-95"
+            className="inline-flex items-center px-4 py-2 bg-white border border-slate-200 text-slate-600 text-sm font-semibold rounded-xl hover:text-blue-600 hover:border-blue-300 hover:bg-blue-50/10 transition-all shadow-sm active:scale-95"
           >
             <ArrowLeft className="w-5 h-5 mr-2" />
             Danh sách
@@ -159,10 +159,10 @@ const SupplierForm = () => {
           className="grid grid-cols-1 lg:grid-cols-3 gap-8"
         >
           <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-xl shadow-black/5 space-y-6">
+            <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm space-y-6">
               <div className="flex items-center space-x-3 mb-2">
-                <div className="w-2 h-8 bg-indigo-500 rounded-full"></div>
-                <h2 className="text-xl font-bold text-gray-900">
+                <div className="w-2 h-8 bg-gradient-to-b from-blue-600 to-indigo-600 rounded-full"></div>
+                <h2 className="text-xl font-bold text-slate-800">
                   Thông tin đối tác
                 </h2>
               </div>
@@ -170,11 +170,11 @@ const SupplierForm = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Tên NCC */}
                 <div className="flex flex-col space-y-2">
-                  <label className="text-sm font-bold text-gray-700 ml-1">
+                  <label className="text-sm font-bold text-slate-700 ml-1">
                     Tên Nhà cung cấp *
                   </label>
                   <div className="relative">
-                    <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                     <input
                       type="text"
                       required
@@ -183,18 +183,18 @@ const SupplierForm = () => {
                         setFormData({ ...formData, name: e.target.value })
                       }
                       placeholder="Nhập tên NCC"
-                      className="w-full pl-11 pr-4 py-4 border border-gray-100 bg-gray-50/50 rounded-2xl outline-none focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500 focus:bg-white transition-all text-gray-900 font-medium"
+                      className="w-full pl-11 pr-4 py-4 border border-slate-200 bg-slate-50/50 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-800 font-semibold"
                     />
                   </div>
                 </div>
 
                 {/* Mã số thuế */}
                 <div className="flex flex-col space-y-2">
-                  <label className="text-sm font-bold text-gray-700 ml-1">
+                  <label className="text-sm font-bold text-slate-700 ml-1">
                     Mã số thuế
                   </label>
                   <div className="relative">
-                    <FileText className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <FileText className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                     <input
                       type="text"
                       value={formData.tax_code}
@@ -202,18 +202,18 @@ const SupplierForm = () => {
                         setFormData({ ...formData, tax_code: e.target.value })
                       }
                       placeholder="Mã số doanh nghiệp..."
-                      className="w-full pl-11 pr-4 py-4 border border-gray-100 bg-gray-50/50 rounded-2xl outline-none focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500 focus:bg-white transition-all text-gray-900 font-medium"
+                      className="w-full pl-11 pr-4 py-4 border border-slate-200 bg-slate-50/50 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-800 font-semibold"
                     />
                   </div>
                 </div>
 
                 {/* Email */}
                 <div className="flex flex-col space-y-2">
-                  <label className="text-sm font-bold text-gray-700 ml-1">
+                  <label className="text-sm font-bold text-slate-700 ml-1">
                     Email liên hệ *
                   </label>
                   <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                     <input
                       type="email"
                       value={formData.email}
@@ -221,18 +221,18 @@ const SupplierForm = () => {
                         setFormData({ ...formData, email: e.target.value })
                       }
                       placeholder="Nhập email..."
-                      className="w-full pl-11 pr-4 py-4 border border-gray-100 bg-gray-50/50 rounded-2xl outline-none focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500 focus:bg-white transition-all text-gray-900 font-medium font-mono"
+                      className="w-full pl-11 pr-4 py-4 border border-slate-200 bg-slate-50/50 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-800 font-semibold font-mono"
                     />
                   </div>
                 </div>
 
                 {/* SĐT */}
                 <div className="flex flex-col space-y-2">
-                  <label className="text-sm font-bold text-gray-700 ml-1">
+                  <label className="text-sm font-bold text-slate-700 ml-1">
                     Số điện thoại
                   </label>
                   <div className="relative">
-                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                     <input
                       type="text"
                       value={formData.phone}
@@ -240,18 +240,18 @@ const SupplierForm = () => {
                         setFormData({ ...formData, phone: e.target.value })
                       }
                       placeholder="Nhập số điện thoại..."
-                      className="w-full pl-11 pr-4 py-4 border border-gray-100 bg-gray-50/50 rounded-2xl outline-none focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500 focus:bg-white transition-all text-gray-900 font-medium"
+                      className="w-full pl-11 pr-4 py-4 border border-slate-200 bg-slate-50/50 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-800 font-semibold"
                     />
                   </div>
                 </div>
 
                 {/* Người liên hệ */}
                 <div className="flex flex-col space-y-2">
-                  <label className="text-sm font-bold text-gray-700 ml-1">
+                  <label className="text-sm font-bold text-slate-700 ml-1">
                     Người đại diện liên hệ
                   </label>
                   <div className="relative">
-                    <Contact className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Contact className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                     <input
                       type="text"
                       value={formData.contact_name}
@@ -262,18 +262,18 @@ const SupplierForm = () => {
                         })
                       }
                       placeholder="Họ và tên..."
-                      className="w-full pl-11 pr-4 py-4 border border-gray-100 bg-gray-50/50 rounded-2xl outline-none focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500 focus:bg-white transition-all text-gray-900 font-medium"
+                      className="w-full pl-11 pr-4 py-4 border border-slate-200 bg-slate-50/50 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-800 font-semibold"
                     />
                   </div>
                 </div>
 
                 {/* Địa chỉ x Chi tiết */}
                 <div className="flex flex-col space-y-2">
-                  <label className="text-sm font-bold text-gray-700 ml-1">
+                  <label className="text-sm font-bold text-slate-700 ml-1">
                     Địa chỉ trụ sở
                   </label>
                   <div className="relative">
-                    <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                     <input
                       type="text"
                       value={formData.address_detail}
@@ -284,7 +284,7 @@ const SupplierForm = () => {
                         })
                       }
                       placeholder="Số nhà, Tên đường, Quận/Huyện..."
-                      className="w-full pl-11 pr-4 py-4 border border-gray-100 bg-gray-50/50 rounded-2xl outline-none focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500 focus:bg-white transition-all text-gray-900 font-medium"
+                      className="w-full pl-11 pr-4 py-4 border border-slate-200 bg-slate-50/50 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-800 font-semibold"
                     />
                   </div>
                 </div>
@@ -292,7 +292,7 @@ const SupplierForm = () => {
 
               {/* Mô tả */}
               <div className="flex flex-col space-y-2 pt-2">
-                <label className="text-sm font-bold text-gray-700 ml-1">
+                <label className="text-sm font-bold text-slate-700 ml-1">
                   Mô tả hoặc Ghi chú
                 </label>
                 <textarea
@@ -302,7 +302,7 @@ const SupplierForm = () => {
                     setFormData({ ...formData, description: e.target.value })
                   }
                   placeholder="Ghi chú về thế mạnh sản phẩm, thời gian giao hàng..."
-                  className="w-full px-5 py-4 border border-gray-100 bg-gray-50/50 rounded-2xl outline-none focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500 focus:bg-white transition-all text-gray-900 font-medium resize-none"
+                  className="w-full px-5 py-4 border border-slate-200 bg-slate-50/50 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-800 font-semibold resize-none"
                 />
               </div>
             </div>
@@ -319,22 +319,22 @@ const SupplierForm = () => {
             />
 
             {/* Trạng thái hợp tác */}
-            <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-xl shadow-black/5 space-y-4">
-              <label className="text-sm font-bold text-gray-700 ml-1">
+            <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm space-y-4">
+              <label className="text-sm font-bold text-slate-700 ml-1">
                 Trạng thái hợp tác
               </label>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
                   onClick={() => setFormData({ ...formData, status: 1 })}
-                  className={`py-3 rounded-xl text-sm font-bold transition-all ${formData.status === 1 ? "bg-indigo-50 text-indigo-600 border-2 border-indigo-200" : "bg-gray-50 text-gray-400 border border-transparent hover:bg-gray-100"}`}
+                  className={`py-3 rounded-xl text-sm font-bold transition-all border ${formData.status === 1 ? "bg-blue-50 text-blue-600 border-blue-200" : "bg-slate-50 text-slate-400 border-transparent hover:bg-slate-100"}`}
                 >
                   Đang hoạt động
                 </button>
                 <button
                   type="button"
                   onClick={() => setFormData({ ...formData, status: 0 })}
-                  className={`py-3 rounded-xl text-sm font-bold transition-all ${formData.status === 0 ? "bg-red-50 text-red-600 border-2 border-red-200" : "bg-gray-50 text-gray-400 border border-transparent hover:bg-gray-100"}`}
+                  className={`py-3 rounded-xl text-sm font-bold transition-all border ${formData.status === 0 ? "bg-rose-50 text-rose-600 border-rose-200" : "bg-slate-50 text-slate-400 border-transparent hover:bg-slate-100"}`}
                 >
                   Tạm ngưng
                 </button>
@@ -342,14 +342,14 @@ const SupplierForm = () => {
             </div>
 
             {/* Submit Button */}
-            <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-xl shadow-black/5">
+            <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`w-full flex items-center justify-center py-4 rounded-2xl font-bold text-lg transition-all shadow-lg active:scale-95 ${
+                className={`w-full flex items-center justify-center py-4 rounded-2xl text-xs font-extrabold uppercase tracking-wider transition-all shadow-md active:scale-95 ${
                   isSubmitting
-                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                    : "bg-black text-white hover:bg-black/90 shadow-indigo-200"
+                    ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                    : "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-blue-500/20 hover:from-blue-700 hover:to-indigo-700"
                 }`}
               >
                 {isSubmitting ? (
