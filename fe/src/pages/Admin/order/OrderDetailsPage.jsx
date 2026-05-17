@@ -32,8 +32,10 @@ import {
   Trash2,
   AlertTriangle,
   RotateCcw,
+  Printer,
 } from "lucide-react";
 import { OrderSourceBadge } from "../../../components/common/OrderBadges";
+import POSReceipt from "./components/POSReceipt";
 import ReturnOrderModal from "../../../components/Admin/Order/ReturnOrderModal";
 import toast from "react-hot-toast";
 import { formatPrice, getImageUrl } from "../../../helper/helper";
@@ -55,6 +57,7 @@ const OrderDetailsPage = () => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
 
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
 
   useEffect(() => {
     let pollingInterval;
@@ -296,7 +299,15 @@ const OrderDetailsPage = () => {
                 Đặt ngày {new Date(order.created_at).toLocaleString("vi-VN")}
               </p>
             </div>
-            <div className="flex ">
+            <div className="flex gap-3 items-center">
+              <button
+                onClick={() => setShowInvoiceModal(true)}
+                className="w-full bg-sky-500 flex items-center justify-center gap-2 px-4 py-2 rounded-lg shadow-md shadow-sky-500/10 active:scale-95 transition-all duration-200 text-white text-xs font-medium"
+              >
+                <Printer className="w-4 h-4" />
+                <span>Xuất Hóa Đơn</span>
+              </button>
+
               {![
                 "cancelled",
                 "delivered",
@@ -307,7 +318,7 @@ const OrderDetailsPage = () => {
                 <button
                   onClick={handleCancelOrder}
                   disabled={updating}
-                  className="w-full p-2 rounded-lg text-[0.9rem] flex gap-2 hover:bg-gray-200 transition-all cursor-pointer"
+                  className="p-2 rounded-lg text-[0.9rem] flex gap-2 hover:bg-gray-200 transition-all cursor-pointer shrink-0"
                 >
                   <Trash2 className="w-4 h-4 text-rose-500" />
                   <p className="font-medium items-center">Hủy đơn</p>
@@ -479,12 +490,12 @@ const OrderDetailsPage = () => {
                         -{formatPrice(order.discount_amount)}
                       </span>
                     </div>
-                    {order.tax_amount > 0 && (
+                    {(Number(order.tax_amount) > 0 || Number(order.tax_rate_snapshot) > 0) && (
                       <div className="flex justify-between items-center text-sm">
                         <span className="text-gray-500 font-bold uppercase text-[12px]">
                           Thuế ({order.tax_rate_snapshot}%)
                         </span>
-                        <span>{formatPrice(order.tax_amount)}</span>
+                        <span>{formatPrice(taxOnKept)}</span>
                       </div>
                     )}
                     {order.expected_delivery_date && (
@@ -880,7 +891,112 @@ const OrderDetailsPage = () => {
             : null
         }
       />
+
+      <InvoiceModal
+        isOpen={showInvoiceModal}
+        onClose={() => setShowInvoiceModal(false)}
+        order={order}
+      />
     </AdminLayout>
+  );
+};
+
+const InvoiceModal = ({ isOpen, onClose, order }) => {
+  if (!isOpen || !order) return null;
+
+  const printFrameRef = React.useRef(null);
+
+  const handlePrint = () => {
+    const iframe = printFrameRef.current;
+    if (!iframe) return;
+
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+    const receiptHtml = document.getElementById(
+      "order-detail-receipt-print-area",
+    ).innerHTML;
+
+    iframeDoc.open();
+    iframeDoc.write(`
+      <html>
+        <head>
+          <title>In Hóa Đơn - ${order.code || order.id}</title>
+        </head>
+        <body style="margin: 0; padding: 0; background: #fff; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh;">
+          ${receiptHtml}
+          <script>
+            window.onload = function() {
+              window.focus();
+              window.print();
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    iframeDoc.close();
+  };
+
+  return (
+    <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        onClick={onClose}
+      />
+
+      {/* Main Container */}
+      <div className="relative bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200 border border-slate-100 max-h-[90vh]">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-5 text-white flex justify-between items-center shrink-0">
+          <div>
+            <h3 className="text-base font-extrabold flex items-center gap-2">
+              <Printer className="w-5 h-5 text-white" />
+              XUẤT HÓA ĐƠN BÁN LẺ
+            </h3>
+            <p className="text-[10px] text-blue-100 font-medium mt-0.5">
+              Mã hóa đơn: #{order.code || order.id}
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-lg text-blue-200 hover:text-white hover:bg-white/10 transition-colors"
+          >
+            <XCircle className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Receipt Area */}
+        <div className="flex-1 overflow-y-auto p-6 bg-slate-50 border-b border-slate-100">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-4 max-w-[340px] mx-auto">
+            <div id="order-detail-receipt-print-area">
+              <POSReceipt order={order} />
+            </div>
+          </div>
+        </div>
+
+        {/* Footer Actions */}
+        <div className="p-4 bg-white flex gap-3 shrink-0">
+          <button
+            onClick={onClose}
+            className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-xs rounded-xl transition-all duration-150 active:scale-95"
+          >
+            ĐÓNG
+          </button>
+          <button
+            onClick={handlePrint}
+            className="flex-1 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-extrabold text-xs rounded-xl shadow-md shadow-blue-500/10 transition-all duration-150 active:scale-95 flex items-center justify-center gap-1.5"
+          >
+            <Printer className="w-4 h-4" />
+            IN HÓA ĐƠN (K80)
+          </button>
+        </div>
+
+        <iframe
+          ref={printFrameRef}
+          style={{ display: "none" }}
+          title="Print Frame"
+        />
+      </div>
+    </div>
   );
 };
 

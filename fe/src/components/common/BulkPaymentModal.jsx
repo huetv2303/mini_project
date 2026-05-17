@@ -194,7 +194,9 @@ const BulkPaymentModal = ({
             >
               <option value="">Chọn phương thức thanh toán</option>
               {paymentMethods
-                .filter((pm) => pm.code !== "vnpay")
+                .filter(
+                  (pm) => pm.code !== "vnpay" && pm.code !== "bank_transfer",
+                )
                 .map((method) => (
                   <option key={method.id} value={method.id}>
                     <img

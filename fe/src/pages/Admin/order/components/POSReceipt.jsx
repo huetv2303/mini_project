@@ -16,17 +16,22 @@ const POSReceipt = ({ order, cashierName = "Admin" }) => {
     order.recipient_phone ||
     "";
 
-  const subtotal =
-    Number(order.subtotal) ||
-    items.reduce(
-      (acc, item) => acc + Number(item.price) * Number(item.quantity),
-      0,
-    );
+  const subtotal = items.reduce(
+    (acc, item) => {
+      const qty = Number(item.quantity) - (Number(item.returned_quantity) || 0);
+      return acc + Number(item.price) * Math.max(0, qty);
+    },
+    0,
+  );
+
   const discountAmount = Number(order.discount_amount) || 0;
-  const taxAmount = Number(order.tax_amount) || 0;
+  const taxRate = Number(order.tax_rate_snapshot) || 0;
+  const taxAmount = taxRate > 0 
+    ? Math.max(0, subtotal - discountAmount) * (taxRate / 100)
+    : Number(order.tax_amount) || 0;
+
   const shippingFee = Number(order.shipping_fee) || 0;
-  const total =
-    Number(order.total) || subtotal + taxAmount + shippingFee - discountAmount;
+  const total = Math.max(0, subtotal + taxAmount + shippingFee - discountAmount);
 
   const paymentMethod =
     order.payment_method?.name || order.payment_method_name || "Tiền mặt";
@@ -249,7 +254,8 @@ const POSReceipt = ({ order, cashierName = "Admin" }) => {
                 ?.map((a) => a.attribute_value)
                 .join(" / ") ||
               "";
-            const qty = Number(item.quantity) || 1;
+            const qty = Number(item.quantity) - (Number(item.returned_quantity) || 0);
+            if (qty <= 0) return null;
             const price = Number(item.price) || 0;
             const totalItemPrice = price * qty;
 
@@ -283,9 +289,9 @@ const POSReceipt = ({ order, cashierName = "Admin" }) => {
             <span>-{formatPrice(discountAmount)}</span>
           </div>
         )}
-        {taxAmount > 0 && (
+        {(taxAmount > 0 || taxRate > 0) && (
           <div className="summary-row">
-            <span>Thuế GTGT (VAT):</span>
+            <span>Thuế GTGT (VAT {taxRate}%):</span>
             <span>{formatPrice(taxAmount)}</span>
           </div>
         )}

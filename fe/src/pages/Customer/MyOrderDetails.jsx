@@ -589,7 +589,7 @@ const MyOrderDetails = () => {
                       ₫
                     </span>
                   </div>
-                  {order.tax_amount > 0 && (
+                  {(Number(order.tax_amount) > 0 || Number(order.tax_rate_snapshot) > 0) && (
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-700 font-medium">
                         Thuế (VAT {order.tax_rate_snapshot ?? 0}%)
