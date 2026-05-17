@@ -23,9 +23,49 @@ class ProductRepository implements ProductRepositoryInterface
                     $query->whereIn('category_id', $categoryIds);
                 }
             }
-            if ($request->sort) {
-                if ($request->sort === 'latest') $query->latest();
+            if ($request->min_price !== null && $request->min_price !== '') {
+                $query->whereHas('variants', function ($q) use ($request) {
+                    $q->where('price', '>=', $request->min_price);
+                });
             }
+            if ($request->max_price !== null && $request->max_price !== '') {
+                $query->whereHas('variants', function ($q) use ($request) {
+                    $q->where('price', '<=', $request->max_price);
+                });
+            }
+            if ($request->rating !== null && $request->rating !== '') {
+                $ratingThreshold = intval($request->rating);
+                $query->where(function ($sub) {
+                    $sub->selectRaw('AVG(rating)')
+                        ->from('comments')
+                        ->whereColumn('product_id', 'products.id');
+                }, '>=', $ratingThreshold);
+            }
+            if ($request->sort) {
+                if ($request->sort === 'latest') {
+                    $query->latest();
+                } elseif ($request->sort === 'price_low') {
+                    $query->orderBy(
+                        \App\Models\ProductVariant::selectRaw('MIN(price)')
+                            ->whereColumn('product_id', 'products.id')
+                            ->limit(1),
+                        'asc'
+                    );
+                } elseif ($request->sort === 'price_high') {
+                    $query->orderBy(
+                        \App\Models\ProductVariant::selectRaw('MIN(price)')
+                            ->whereColumn('product_id', 'products.id')
+                            ->limit(1),
+                        'desc'
+                    );
+                } elseif ($request->sort === 'popular') {
+                    $query->orderBy('sold_count', 'desc');
+                }
+            } else {
+                $query->latest();
+            }
+        } else {
+            $query->latest();
         }
 
         $limit = $request->limit ?? 15;

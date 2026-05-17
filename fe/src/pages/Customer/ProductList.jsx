@@ -10,6 +10,8 @@ import {
   List as ListIcon,
   ChevronRight,
   Heart,
+  Home,
+  Coins,
 } from "lucide-react";
 import StarRating from "../../components/review/StarRating";
 import { useWishlist } from "../../context/WishlistContext";
@@ -24,6 +26,95 @@ const ProductList = () => {
   const [viewMode, setViewMode] = useState("grid");
   const [sortBy, setSortBy] = useState("latest");
   const { toggleWishlist, isInWishlist } = useWishlist();
+
+  // Price range and rating filters
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+  const [minVal, setMinVal] = useState(0);
+  const [maxVal, setMaxVal] = useState(2000000);
+  const [ratingFilter, setRatingFilter] = useState("");
+
+  const priceRanges = [
+    { label: "Dưới 200.000đ", min: 0, max: 200000 },
+    { label: "200.000đ - 500.000đ", min: 200000, max: 500000 },
+    { label: "500.000đ - 1.000.000đ", min: 500000, max: 1000000 },
+    { label: "Trên 1.000.000đ", min: 1000000, max: 99999999 },
+  ];
+
+  const sliderStyle = `
+    .price-slider-container {
+      position: relative;
+      width: 100%;
+      height: 24px;
+      display: flex;
+      align-items: center;
+    }
+    .price-slider-container input[type="range"] {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: transparent !important;
+      pointer-events: none;
+      -webkit-appearance: none;
+      appearance: none;
+      margin: 0;
+      padding: 0;
+      z-index: 30;
+      outline: none;
+      border: none;
+    }
+    /* Webkit (Chrome, Safari, Edge) */
+    .price-slider-container input[type="range"]::-webkit-slider-runnable-track {
+      background: transparent !important;
+      border: none;
+      -webkit-appearance: none;
+      height: 100%;
+    }
+    .price-slider-container input[type="range"]::-webkit-slider-thumb {
+      pointer-events: auto;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #0284c7;
+      border: 3px solid #ffffff;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15), 0 2px 4px -2px rgba(0, 0, 0, 0.15);
+      cursor: pointer;
+      -webkit-appearance: none;
+      margin-top: 2px; /* Perfect vertical alignment */
+      transition: transform 0.15s ease, background-color 0.15s ease;
+    }
+    .price-slider-container input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+      background: #0369a1;
+    }
+    .price-slider-container input[type="range"]::-webkit-slider-thumb:active {
+      transform: scale(0.95);
+    }
+    /* Firefox */
+    .price-slider-container input[type="range"]::-moz-range-track {
+      background: transparent !important;
+      border: none;
+      height: 100%;
+    }
+    .price-slider-container input[type="range"]::-moz-range-thumb {
+      pointer-events: auto;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #0284c7;
+      border: 3px solid #ffffff;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15), 0 2px 4px -2px rgba(0, 0, 0, 0.15);
+      cursor: pointer;
+      transition: transform 0.15s ease, background-color 0.15s ease;
+    }
+    .price-slider-container input[type="range"]::-moz-range-thumb:hover {
+      transform: scale(1.2);
+      background: #0369a1;
+    }
+    .price-slider-container input[type="range"]::-moz-range-thumb:active {
+      transform: scale(0.95);
+    }
+  `;
 
   useEffect(() => {
     const loadData = async () => {
@@ -41,6 +132,11 @@ const ProductList = () => {
           sort: sortBy,
           limit: 12,
         };
+
+        if (minPrice !== "") params.min_price = minPrice;
+        if (maxPrice !== "") params.max_price = maxPrice;
+        if (ratingFilter !== "") params.rating = ratingFilter;
+
         const productRes = await fetchProductsRequest(params);
         setProducts(productRes.data?.data || productRes.data || []);
       } catch (error) {
@@ -51,43 +147,70 @@ const ProductList = () => {
     };
 
     loadData();
-  }, [categorySlug, sortBy]);
+  }, [categorySlug, sortBy, minPrice, maxPrice, ratingFilter]);
 
   const activeCategory = (Array.isArray(categories) ? categories : []).find(
     (c) => c.slug === categorySlug,
   );
 
+  const handleCustomPriceFilter = () => {
+    setMinPrice(minVal);
+    setMaxPrice(maxVal);
+  };
+
+  const handleQuickPriceFilter = (min, max) => {
+    setMinVal(min);
+    setMaxVal(max === 99999999 ? 2000000 : max);
+    setMinPrice(min);
+    setMaxPrice(max);
+  };
+
+  const clearFilters = () => {
+    setMinVal(0);
+    setMaxVal(2000000);
+    setMinPrice("");
+    setMaxPrice("");
+    setRatingFilter("");
+  };
+
   return (
     <CustomerLayout>
-      <div className="pt-32 pb-24 bg-white min-h-screen">
+      <div className="pt-32 pb-24 bg-[#f8fafc] min-h-screen text-left">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           {/* Breadcrumbs */}
-          <div className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest mb-12">
-            <Link to="/" className="hover:text-black transition-colors">
+          <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-10 bg-white px-5 py-3 rounded-2xl border border-slate-100 shadow-sm w-fit">
+            <Link to="/" className="hover:text-sky-600 transition-colors flex items-center gap-1">
+              <Home size={13} className="text-slate-400" />
               Trang chủ
             </Link>
-            <ChevronRight size={12} />
-            <span className="text-black">Cửa hàng</span>
+            <ChevronRight size={12} className="text-slate-300" />
+            <span className="text-slate-800">Cửa hàng</span>
             {activeCategory && (
               <>
-                <ChevronRight size={12} />
-                <span className="text-purple-600">{activeCategory.name}</span>
+                <ChevronRight size={12} className="text-slate-300" />
+                <span className="text-sky-600 font-black">{activeCategory.name}</span>
               </>
             )}
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-12">
+          <div className="flex flex-col lg:flex-row gap-8">
             {/* Sidebar Filters */}
-            <aside className="lg:w-1/4 space-y-10">
-              <div>
-                <h3 className="text-sm font-bold uppercase mb-6 border-b pb-4">
+            <aside className="lg:w-1/4 space-y-6">
+              {/* Category Card */}
+              <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+                <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest mb-5 pb-3 border-b border-slate-50 flex items-center gap-2">
+                  <Filter size={14} className="text-sky-500" />
                   Danh mục
                 </h3>
-                <ul className="space-y-3">
+                <ul className="space-y-2">
                   <li>
                     <Link
                       to="/products"
-                      className={`text-sm font-bold transition-all hover:pl-2 ${!categorySlug ? "text-purple-600" : "text-gray-500 hover:text-black"}`}
+                      className={`block px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                        !categorySlug
+                          ? "bg-sky-600 text-white shadow-md shadow-sky-500/10"
+                          : "text-slate-600 hover:text-sky-600 hover:bg-slate-50"
+                      }`}
                     >
                       Tất cả sản phẩm
                     </Link>
@@ -97,7 +220,11 @@ const ProductList = () => {
                       <li key={cat.id}>
                         <Link
                           to={`/products?category=${cat.slug}`}
-                          className={`text-sm font-medium transition-all hover:pl-2 ${categorySlug === cat.slug ? "text-purple-600" : "text-gray-500 hover:text-black"}`}
+                          className={`block px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                            categorySlug === cat.slug
+                              ? "bg-sky-600 text-white shadow-md shadow-sky-500/10"
+                              : "text-slate-600 hover:text-sky-600 hover:bg-slate-50"
+                          }`}
                         >
                           {cat.name}
                         </Link>
@@ -106,64 +233,200 @@ const ProductList = () => {
                 </ul>
               </div>
 
-              <div>
-                <h3 className="text-sm font-bold uppercase tracking-widest mb-6 border-b pb-4">
-                  Khoảng giá
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-4">
-                    <input
-                      type="number"
-                      placeholder="Từ"
-                      className="w-full bg-gray-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-purple-500"
-                    />
-                    <span className="text-gray-300">-</span>
-                    <input
-                      type="number"
-                      placeholder="Đến"
-                      className="w-full bg-gray-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-purple-500"
-                    />
+              {/* Price filter Card */}
+              <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+                <style>{sliderStyle}</style>
+                <div className="flex items-center justify-between mb-5 pb-3 border-b border-slate-50">
+                  <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
+                    <Coins size={14} className="text-sky-500" />
+                    Khoảng giá
+                  </h3>
+                  {(minPrice !== "" || maxPrice !== "") && (
+                    <button
+                      onClick={clearFilters}
+                      className="text-[10px] font-black text-rose-500 hover:underline uppercase tracking-wider"
+                    >
+                      Xóa lọc
+                    </button>
+                  )}
+                </div>
+
+                {/* Dual range price slider */}
+                <div className="price-slider-container relative w-full h-6 mt-4 mb-4">
+                  <input
+                    type="range"
+                    min="0"
+                    max="2000000"
+                    step="20000"
+                    value={minVal}
+                    onChange={(e) => {
+                      const val = Math.min(Number(e.target.value), maxVal - 100000);
+                      setMinVal(val);
+                    }}
+                  />
+                  <input
+                    type="range"
+                    min="0"
+                    max="2000000"
+                    step="20000"
+                    value={maxVal}
+                    onChange={(e) => {
+                      const val = Math.max(Number(e.target.value), minVal + 100000);
+                      setMaxVal(val);
+                    }}
+                  />
+
+                  {/* Simulated range track */}
+                  <div className="absolute w-full h-1.5 bg-slate-100 rounded-full z-10 pointer-events-none">
+                    <div
+                      className="absolute h-full bg-sky-500 rounded-full"
+                      style={{
+                        left: `${(minVal / 2000000) * 100}%`,
+                        width: `${((maxVal - minVal) / 2000000) * 100}%`,
+                      }}
+                    ></div>
                   </div>
-                  <button className="w-full h-12 bg-black text-white rounded-lg text-xs font-black uppercase hover:bg-purple-600 transition-all">
-                    Lọc giá
-                  </button>
+                </div>
+
+                {/* Amount display values */}
+                <div className="flex justify-between items-center text-xs font-bold text-slate-500 mb-6 bg-slate-50 px-4 py-2.5 rounded-xl border border-slate-100">
+                  <div>
+                    <span className="block text-[10px] text-slate-400 font-medium">Từ</span>
+                    <span className="text-slate-800 text-[13px]">{formatPrice(minVal)}</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="block text-[10px] text-slate-400 font-medium">Đến</span>
+                    <span className="text-slate-800 text-[13px]">
+                      {maxVal === 2000000 ? "2.000.000đ+" : formatPrice(maxVal)}
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleCustomPriceFilter}
+                  className="w-full h-11 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-md shadow-sky-500/10 active:scale-95 mb-6"
+                >
+                  Lọc giá
+                </button>
+
+                {/* Quick select price ranges */}
+                <div className="space-y-1 pt-4 border-t border-slate-50">
+                  <span className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Chọn nhanh khoảng giá</span>
+                  {priceRanges.map((range, index) => {
+                    const isActive =
+                      minPrice === range.min && maxPrice === range.max;
+                    return (
+                      <button
+                        key={index}
+                        onClick={() =>
+                          handleQuickPriceFilter(range.min, range.max)
+                        }
+                        className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                          isActive
+                            ? "bg-sky-50 text-sky-600 font-extrabold"
+                            : "text-slate-500 hover:text-sky-600 hover:bg-slate-50"
+                        }`}
+                      >
+                        {range.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Ratings filter Card */}
+              <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 mt-6">
+                <div className="flex items-center justify-between mb-5 pb-3 border-b border-slate-50">
+                  <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
+                    <span className="text-amber-400 text-sm">★</span> Đánh giá
+                  </h3>
+                  {ratingFilter !== "" && (
+                    <button
+                      onClick={() => setRatingFilter("")}
+                      className="text-[10px] font-black text-rose-500 hover:underline uppercase tracking-wider"
+                    >
+                      Xóa lọc
+                    </button>
+                  )}
+                </div>
+
+                <div className="space-y-1">
+                  {[5, 4, 3, 2, 1].map((stars) => {
+                    const isActive = ratingFilter === stars;
+                    return (
+                      <button
+                        key={stars}
+                        onClick={() => setRatingFilter(stars)}
+                        className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm transition-all ${
+                          isActive
+                            ? "bg-sky-50 text-sky-600 font-extrabold"
+                            : "text-slate-500 hover:text-sky-600 hover:bg-slate-50"
+                        }`}
+                      >
+                        <div className="flex items-center gap-0.5">
+                          {[...Array(5)].map((_, i) => (
+                            <span
+                              key={i}
+                              className={`text-[15px] leading-none ${
+                                i < stars ? "text-amber-400" : "text-slate-200"
+                              }`}
+                            >
+                              ★
+                            </span>
+                          ))}
+                        </div>
+                        <span className="text-[11px] font-black uppercase tracking-wide">
+                          {stars === 5 ? "5 sao" : `Từ ${stars} sao`}
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </aside>
 
             {/* Main Content */}
-            <main className="lg:w-3/4">
+            <main className="lg:w-3/4 space-y-6">
               {/* Toolbar */}
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12 bg-gray-50 p-3 rounded-lg">
-                <div className="flex items-center gap-6">
-                  <div className="bg-white p-2 rounded-xl flex gap-1 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 rounded-3xl border border-slate-100 shadow-sm">
+                <div className="flex items-center gap-5">
+                  <div className="bg-slate-50 p-1.5 rounded-2xl flex gap-1 border border-slate-100">
                     <button
                       onClick={() => setViewMode("grid")}
-                      className={`p-2 rounded-lg transition-all ${viewMode === "grid" ? "bg-black text-white" : "text-gray-400 hover:bg-gray-100"}`}
+                      className={`p-2 rounded-xl transition-all ${
+                        viewMode === "grid"
+                          ? "bg-white text-sky-600 shadow-sm"
+                          : "text-slate-400 hover:text-slate-600"
+                      }`}
                     >
-                      <Grid size={18} />
+                      <Grid size={16} />
                     </button>
                     <button
                       onClick={() => setViewMode("list")}
-                      className={`p-2 rounded-lg transition-all ${viewMode === "list" ? "bg-black text-white" : "text-gray-400 hover:bg-gray-100"}`}
+                      className={`p-2 rounded-xl transition-all ${
+                        viewMode === "list"
+                          ? "bg-white text-sky-600 shadow-sm"
+                          : "text-slate-400 hover:text-slate-600"
+                      }`}
                     >
-                      <ListIcon size={18} />
+                      <ListIcon size={16} />
                     </button>
                   </div>
-                  <span className="text-sm font-bold text-gray-500">
-                    Hiển thị {Array.isArray(products) ? products.length : 0} kết
-                    quả
+                  <span className="text-sm font-medium text-slate-500">
+                    Hiển thị{" "}
+                    <span className="font-black text-slate-800">
+                      {Array.isArray(products) ? products.length : 0}
+                    </span>{" "}
+                    kết quả
                   </span>
                 </div>
 
-                <div className="flex items-center gap-4">
-                  <span className="text-xs font-bold text-gray-400 uppercase">
-                    Sắp xếp:
-                  </span>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-slate-400 ">Sắp xếp:</span>
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
-                    className="bg-white border-none rounded-lg text-sm font-bold focus:ring-2 focus:ring-purple-500 px-4 py-2 pr-10 shadow-sm"
+                    className="bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold text-slate-600 focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 px-4 py-2.5 pr-10 shadow-sm outline-none transition cursor-pointer"
                   >
                     <option value="latest">Mới nhất</option>
                     <option value="price_low">Giá: Thấp đến Cao</option>
@@ -175,127 +438,191 @@ const ProductList = () => {
 
               {/* Products Grid */}
               {loading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                   {[...Array(6)].map((_, i) => (
-                    <div key={i} className="animate-pulse space-y-4">
-                      <div className="aspect-[3/4] bg-gray-100 rounded-[40px]"></div>
-                      <div className="h-4 bg-gray-100 rounded w-2/3"></div>
-                      <div className="h-4 bg-gray-100 rounded w-1/3"></div>
+                    <div
+                      key={i}
+                      className="animate-pulse bg-white rounded-3xl border border-slate-100 p-4 space-y-4 flex flex-col h-full"
+                    >
+                      <div className="aspect-[3/4] bg-slate-100 rounded-2xl w-full"></div>
+                      <div className="h-4 bg-slate-100 rounded w-2/3"></div>
+                      <div className="h-3 bg-slate-50 rounded w-1/3"></div>
+                      <div className="h-4 bg-slate-100 rounded w-1/2"></div>
                     </div>
                   ))}
                 </div>
               ) : Array.isArray(products) && products.length > 0 ? (
                 <div
-                  className={`grid gap-10 ${viewMode === "grid" ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" : "grid-cols-1"}`}
+                  className={`grid gap-8 ${
+                    viewMode === "grid"
+                      ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+                      : "grid-cols-1"
+                  }`}
                 >
-                  {products.map((prod) => (
-                    <div
-                      key={prod.id}
-                      className={`group ${viewMode === "list" ? "flex flex-col md:flex-row gap-8 items-center bg-gray-50 p-6 rounded-[40px]" : ""}`}
-                    >
-                      <Link
-                        to={`/products/${prod.slug}`}
-                        className={`relative block overflow-hidden bg-gray-50 rounded-lg shadow-sm transition-all hover:shadow-xl group-hover:-translate-y-2 ${viewMode === "list" ? "w-full md:w-64 aspect-square" : "aspect-[3/4] mb-6"}`}
+                  {products.map((prod) => {
+                    // Generate premium tag logic to match the UI reference
+                    const tagType =
+                      prod.discount > 0
+                        ? "Sale"
+                        : prod.id % 3 === 0
+                          ? "Hot"
+                          : prod.id % 3 === 1
+                            ? "Mới"
+                            : null;
+
+                    return (
+                      <div
+                        key={prod.id}
+                        className={`group bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden flex flex-col h-full hover:shadow-md hover:border-slate-200/60 transition-all duration-300 ${
+                          viewMode === "list"
+                            ? "flex-col md:flex-row gap-6 p-5"
+                            : ""
+                        }`}
                       >
-                        <img
-                          src={getImageUrl(prod.image)}
-                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                          alt={prod.name}
-                        />
-                        {prod.discount > 0 && (
-                          <div className="absolute top-6 left-6 bg-red-500 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">
-                            -{prod.discount}%
-                          </div>
-                        )}
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            toggleWishlist(prod);
-                          }}
-                          className={`absolute top-4 right-4 z-10 p-2 rounded-full shadow-sm backdrop-blur-md transition-all duration-300 transform hover:scale-110 active:scale-95 ${
-                            isInWishlist(prod.id)
-                              ? "bg-red-50 text-red-500 hover:bg-red-100"
-                              : "bg-white/70 text-gray-900 hover:bg-black hover:text-white"
+                        <div
+                          className={`relative overflow-hidden bg-slate-50 flex-shrink-0 ${
+                            viewMode === "list"
+                              ? "w-full md:w-56 aspect-square rounded-2xl"
+                              : "aspect-[3/4] w-full"
                           }`}
                         >
-                          <Heart size={18} fill={isInWishlist(prod.id) ? "currentColor" : "none"} />
-                        </button>
-                        <button className="absolute hover:bg-black/80 bottom-6 left-1/2 -translate-x-1/2 translate-y-10 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-black text-white px-6 py-3 rounded-lg font-bold flex items-center gap-2 shadow-2xl">
-                          Mua ngay
-                        </button>
-                      </Link>
-                      <div
-                        className={`relative space-y-1 ${viewMode === "list" ? "flex-1" : ""}`}
-                      >
-                        <div className="flex justify-between items-center">
-                          <Link to={`/products/${prod.slug}`}>
-                            <h3 className="text-[1rem] font-medium text-gray-900 uppercase">
-                              {prod.name}
-                            </h3>
+                          <Link
+                            to={`/products/${prod.slug}`}
+                            className="block w-full h-full"
+                          >
+                            <img
+                              src={getImageUrl(prod.image)}
+                              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                              alt={prod.name}
+                            />
                           </Link>
-                          {prod.review_count > 0 && (
-                            <div className="flex items-center">
-                              <div className="flex items-center   ">
-                                <StarRating
-                                  rating={prod.average_rating}
-                                  size={15}
-                                />
-                                <span className="text-[1rem] font-medium ml-1">
-                                  ({Number(prod.average_rating || 0).toFixed(1)}
-                                  )
-                                </span>
-                              </div>
+
+                          {/* Dynamic premium badges */}
+                          {tagType && (
+                            <div className="absolute top-4 left-4 z-10">
+                              <span
+                                className={`text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-wider shadow-sm ${
+                                  tagType === "Sale"
+                                    ? "bg-rose-500 text-white"
+                                    : tagType === "Hot"
+                                      ? "bg-amber-500 text-white"
+                                      : "bg-emerald-500 text-white"
+                                }`}
+                              >
+                                {tagType}
+                              </span>
                             </div>
                           )}
-                        </div>
-                        <div className="flex justify-between items-center ">
-                          <div className="flex items-baseline gap-3">
-                            <span className="text-[1.2rem] text-gray-900">
-                              {formatPrice(prod.price)}
-                            </span>
-                          </div>
-                          <div className="pt-1">
-                            <span className="text-[1rem] text-gray-500 ">
-                              {prod.review_count || 0} Đánh giá
-                            </span>
-                          </div>
+
+                          {/* Wishlist toggle heart icon */}
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              toggleWishlist(prod);
+                            }}
+                            className={`absolute top-4 right-4 z-10 p-2.5 rounded-full shadow-sm backdrop-blur-md transition-all duration-300 transform hover:scale-110 active:scale-95 ${
+                              isInWishlist(prod.id)
+                                ? "bg-rose-50 text-rose-500 hover:bg-rose-100"
+                                : "bg-white/80 text-slate-400 hover:bg-white hover:text-rose-500"
+                            }`}
+                          >
+                            <Heart
+                              size={15}
+                              fill={
+                                isInWishlist(prod.id) ? "currentColor" : "none"
+                              }
+                            />
+                          </button>
+
+                          {/* Hover View Details Button */}
+                          <Link
+                            to={`/products/${prod.slug}`}
+                            className="absolute hover:bg-sky-700 bottom-4 left-1/2 -translate-x-1/2 translate-y-10 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-sky-600 text-white px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-sky-500/20 text-[11px] whitespace-nowrap"
+                          >
+                            Mua ngay
+                          </Link>
                         </div>
 
-                        {viewMode === "list" && (
-                          <p className="text-gray-500 text-sm line-clamp-2 mb-6">
-                            {prod.description}
-                          </p>
-                        )}
+                        {/* Card details body */}
+                        <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
+                          <div className="space-y-2">
+                            <Link
+                              to={`/products/${prod.slug}`}
+                              className="block"
+                            >
+                              <h3 className="text-sm font-bold text-black/80 line-clamp-2 group-hover:text-sky-600 transition-colors uppercase tracking-tight">
+                                {prod.name}
+                              </h3>
+                            </Link>
+
+                            {/* Ratings rating */}
+                          </div>
+
+                          <div className="flex items-baseline justify-between pt-1">
+                            <div className="flex items-baseline gap-2.5">
+                              <span className="text-base font-black text-sky-700">
+                                {formatPrice(prod.price)}
+                              </span>
+                              {prod.discount > 0 && (
+                                <span className="text-xs text-slate-400 line-through font-bold">
+                                  {formatPrice(
+                                    prod.price * (1 + prod.discount / 100),
+                                  )}
+                                </span>
+                              )}
+                            </div>
+                            {prod.average_rating ? (
+                              <div className="flex items-center gap-1.5">
+                                <StarRating
+                                  rating={prod.average_rating}
+                                  size={12}
+                                />
+                                <span className="text-[11px] font-bold text-slate-400">
+                                  ({prod.review_count})
+                                </span>
+                              </div>
+                            ) : (
+                              <span className="text-[11px] font-bold text-slate-400">
+                                Chưa có đánh giá
+                              </span>
+                            )}
+                          </div>
+
+                          {viewMode === "list" && prod.description && (
+                            <p className="text-slate-500 text-xs line-clamp-2 pt-2 border-t border-slate-50">
+                              {prod.description}
+                            </p>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
-                <div className="text-center py-40 bg-gray-50 rounded-[40px]">
-                  <h2 className="text-2xl font-black text-gray-300">
-                    Không tìm thấy sản phẩm nào
+                <div className="text-center py-32 bg-white rounded-3xl border border-slate-100 shadow-sm">
+                  <h2 className="text-xl font-bold text-slate-400 mb-4">
+                    Không tìm thấy sản phẩm nào phù hợp
                   </h2>
                   <button
-                    onClick={() => (window.location.href = "/products")}
-                    className="mt-6 text-purple-600 font-bold hover:underline"
+                    onClick={clearFilters}
+                    className="px-6 py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-black uppercase tracking-wider shadow-md shadow-sky-500/10 transition-all active:scale-95"
                   >
-                    {" "}
                     Xem tất cả sản phẩm
                   </button>
                 </div>
               )}
 
-              {/* Pagination (Simple for now) */}
+              {/* Pagination */}
               {Array.isArray(products) && products.length >= 12 && (
-                <div className="mt-20 flex justify-center gap-2">
-                  <button className="w-12 h-12 rounded-xl bg-black text-white font-black shadow-lg shadow-black/20 text-sm transition-all hover:-translate-y-1">
+                <div className="mt-16 flex justify-center gap-2">
+                  <button className="w-10 h-10 rounded-xl bg-sky-600 text-white font-bold shadow-md shadow-sky-500/10 text-xs transition-all hover:-translate-y-0.5">
                     1
                   </button>
-                  <button className="w-12 h-12 rounded-xl bg-white border-2 border-gray-100 text-gray-400 font-black text-sm hover:border-black hover:text-black transition-all hover:-translate-y-1">
+                  <button className="w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-500 font-bold text-xs hover:border-sky-600 hover:text-sky-600 transition-all hover:-translate-y-0.5">
                     2
                   </button>
-                  <button className="w-12 h-12 rounded-xl bg-white border-2 border-gray-100 text-gray-400 font-black text-sm hover:border-black hover:text-black transition-all hover:-translate-y-1">
+                  <button className="w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-500 font-bold text-xs hover:border-sky-600 hover:text-sky-600 transition-all hover:-translate-y-0.5">
                     3
                   </button>
                 </div>
