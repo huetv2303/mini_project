@@ -174,7 +174,8 @@ class CommentController extends Controller
             });
         }
 
-        $comments = $query->orderBy('created_at', 'desc')->paginate(20);
+        $limit = $request->input('per_page', $request->input('limit', 20));
+        $comments = $query->orderBy('created_at', 'desc')->paginate($limit);
 
         return response()->json([
             'status' => 'success',

@@ -99,8 +99,51 @@ const AdminDashboard = () => {
   if (loading) {
     return (
       <AdminLayout>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+        <div className="space-y-6 animate-pulse text-left">
+          {/* Header skeleton */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-xl shadow-sm border border-gray-100 h-24">
+            <div className="space-y-2 flex-1">
+              <div className="h-5 bg-slate-100 rounded w-1/4"></div>
+              <div className="h-3 bg-slate-50 rounded w-1/3"></div>
+            </div>
+            <div className="w-48 h-10 bg-slate-50 rounded-lg"></div>
+          </div>
+
+          {/* Top Cards Section skeleton */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex items-center h-28 space-x-4">
+                <div className="w-12 h-12 rounded-xl bg-slate-100"></div>
+                <div className="space-y-2 flex-1">
+                  <div className="h-3 bg-slate-100 rounded w-1/2"></div>
+                  <div className="h-6 bg-slate-100 rounded w-2/3"></div>
+                  <div className="h-3 bg-slate-50 rounded w-1/3"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Charts skeleton */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-5 h-80 space-y-4">
+              <div className="h-4 bg-slate-100 rounded w-1/4"></div>
+              <div className="h-60 bg-slate-50/50 rounded-xl"></div>
+            </div>
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 h-80 space-y-4">
+              <div className="h-4 bg-slate-100 rounded w-1/3"></div>
+              <div className="h-60 bg-slate-50/50 rounded-xl"></div>
+            </div>
+          </div>
+
+          {/* Latest Orders Table skeleton */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden h-64 space-y-4 p-5">
+            <div className="h-4 bg-slate-100 rounded w-1/4"></div>
+            <div className="space-y-3">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="h-10 bg-slate-50 rounded-xl"></div>
+              ))}
+            </div>
+          </div>
         </div>
       </AdminLayout>
     );

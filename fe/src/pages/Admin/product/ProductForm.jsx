@@ -429,10 +429,9 @@ const ProductForm = () => {
     return (
       <AdminLayout>
         <div className="flex flex-col items-center justify-center min-h-[60vh]">
-          <Loader2 className="w-10 h-10 text-blue-600 animate-spin mb-4" />
-          <p className="text-slate-500 font-bold uppercase text-[10px] animate-pulse">
-            Đang tải cấu trúc kho...
-          </p>
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+          </div>
         </div>
       </AdminLayout>
     );

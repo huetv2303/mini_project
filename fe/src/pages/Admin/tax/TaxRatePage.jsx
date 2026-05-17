@@ -127,75 +127,80 @@ const ManagementTab = () => {
 
       {/* Table */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        {loading ? (
-          <div className="flex justify-center items-center h-48">
-            <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead>
-                <tr className="bg-gray-50/50">
-                  <th className="py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Tên Thuế
-                  </th>
-                  <th className="py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">
-                    Mức (%)
-                  </th>
-                  <th className="py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">
-                    Trạng Thái
-                  </th>
-                  <th className="py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">
-                    Thao Tác
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {filtered.length > 0 ? (
-                  filtered.map((tax) => (
-                    <tr key={tax.id} className="hover:bg-gray-50/50 transition">
-                      <td className="py-4 px-6 font-semibold text-gray-900 text-sm">
-                        {tax.name}
-                      </td>
-                      <td className="py-4 px-6 text-center font-bold text-indigo-600 text-sm">
-                        {tax.rate}%
-                      </td>
-                      <td className="py-4 px-6 text-center">
-                        <span
-                          className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${tax.is_active ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}
-                        >
-                          {tax.is_active ? "Hoạt động" : "Tạm ngưng"}
-                        </span>
-                      </td>
-                      <td className="py-4 px-6 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => handleOpenModal(tax)}
-                            className="p-2 text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(tax.id)}
-                            className="p-2 text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="4" className="py-12 text-center text-gray-400">
-                      Không tìm thấy dữ liệu.
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="bg-gray-50/50">
+                <th className="py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Tên Thuế
+                </th>
+                <th className="py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">
+                  Mức (%)
+                </th>
+                <th className="py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">
+                  Trạng Thái
+                </th>
+                <th className="py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">
+                  Thao Tác
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {loading ? (
+                [...Array(5)].map((_, i) => (
+                  <tr
+                    key={i}
+                    className="animate-pulse border-b border-slate-100"
+                  >
+                    <td className="px-6 py-6" colSpan="4">
+                      <div className="h-12 bg-slate-50 rounded-xl"></div>
                     </td>
                   </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
+                ))
+              ) : filtered.length > 0 ? (
+                filtered.map((tax) => (
+                  <tr key={tax.id} className="hover:bg-gray-50/50 transition">
+                    <td className="py-4 px-6 font-semibold text-gray-900 text-sm">
+                      {tax.name}
+                    </td>
+                    <td className="py-4 px-6 text-center font-bold text-indigo-600 text-sm">
+                      {tax.rate}%
+                    </td>
+                    <td className="py-4 px-6 text-center">
+                      <span
+                        className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${tax.is_active ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}
+                      >
+                        {tax.is_active ? "Hoạt động" : "Tạm ngưng"}
+                      </span>
+                    </td>
+                    <td className="py-4 px-6 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => handleOpenModal(tax)}
+                          className="p-2 text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(tax.id)}
+                          className="p-2 text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="4" className="py-12 text-center text-gray-400">
+                    Không tìm thấy dữ liệu.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Modal */}
@@ -362,8 +367,21 @@ const StatisticsTab = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+      <div className="space-y-8 animate-pulse">
+        {/* Date Filter skeleton */}
+        <div className="bg-white rounded-2xl border border-gray-100 p-5 h-24 bg-slate-50/50"></div>
+        {/* Stat Cards skeleton */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="bg-white rounded-2xl border border-gray-100 p-6 h-36 space-y-3">
+              <div className="w-10 h-10 rounded-xl bg-slate-100"></div>
+              <div className="h-4 bg-slate-100 rounded w-1/2"></div>
+              <div className="h-6 bg-slate-100 rounded w-1/3"></div>
+            </div>
+          ))}
+        </div>
+        {/* Chart skeleton */}
+        <div className="bg-white rounded-2xl border border-gray-100 p-6 h-80 bg-slate-50/50"></div>
       </div>
     );
   }

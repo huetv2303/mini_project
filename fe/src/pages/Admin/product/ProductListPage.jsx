@@ -40,10 +40,11 @@ const ProductListPage = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(15);
   const [pagination, setPagination] = useState({
     total: 0,
     lastPage: 1,
-    perPage: 10,
+    perPage: 15,
   });
   const [selectedIds, setSelectedIds] = useState([]);
 
@@ -54,20 +55,25 @@ const ProductListPage = () => {
     type: "single",
   });
 
-  const getProducts = async (page = 1, search = "") => {
+  const getProducts = async (page = 1, search = "", perPageCount = 15) => {
     try {
       setLoading(true);
-      const res = await fetchProductsRequest({ page, search });
+      const res = await fetchProductsRequest({
+        page,
+        search,
+        per_page: perPageCount,
+        limit: perPageCount,
+      });
       const rawData = res?.data;
       const items = rawData?.data || [];
       const meta = rawData?.meta || {};
 
       setProducts(items);
       setPagination({
-        currentPage: meta.current_page,
-        lastPage: meta.last_page,
-        total: meta.total,
-        perPage: meta.per_page,
+        currentPage: meta.current_page || 1,
+        lastPage: meta.last_page || 1,
+        total: meta.total || 0,
+        perPage: meta.per_page || perPageCount,
       });
       console.log(items);
     } catch (error) {
@@ -79,20 +85,20 @@ const ProductListPage = () => {
   };
 
   const debouncedSearch = useCallback(
-    debounce((val) => {
+    debounce((val, perPage) => {
       setCurrentPage(1);
-      getProducts(1, val);
+      getProducts(1, val, perPage);
     }, 500),
     [],
   );
 
   useEffect(() => {
-    getProducts(currentPage, searchTerm);
-  }, [currentPage]);
+    getProducts(currentPage, searchTerm, itemsPerPage);
+  }, [currentPage, itemsPerPage]);
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
-    debouncedSearch(e.target.value);
+    debouncedSearch(e.target.value, itemsPerPage);
   };
 
   const openDeleteModal = (slug, name) => {
@@ -144,7 +150,8 @@ const ProductListPage = () => {
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= pagination.lastPage) {
-      getProducts(newPage, searchTerm);
+      getProducts(newPage, searchTerm, itemsPerPage);
+      setCurrentPage(newPage);
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
@@ -193,7 +200,7 @@ const ProductListPage = () => {
             )}
           </div>
 
-          <div className="overflow-x-auto overflow-y-auto max-h-[700px]">
+          <div className="">
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-slate-50/30">
@@ -234,14 +241,16 @@ const ProductListPage = () => {
               </thead>
               <tbody>
                 {loading ? (
-                  <tr>
-                    <td colSpan="7" className="px-6 py-24 text-center">
-                      <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
-                      <span className="text-slate-400 font-bold text-[10px] uppercase animate-pulse">
-                        Đang tải sản phẩm...
-                      </span>
-                    </td>
-                  </tr>
+                  [...Array(5)].map((_, i) => (
+                    <tr
+                      key={i}
+                      className="animate-pulse border-b border-slate-100"
+                    >
+                      <td className="px-6 py-6" colSpan="7">
+                        <div className="h-12 bg-slate-50 rounded-xl"></div>
+                      </td>
+                    </tr>
+                  ))
                 ) : products.length > 0 ? (
                   products.map((product) => {
                     const firstVariant = product.variants?.[0] || {};
@@ -361,7 +370,13 @@ const ProductListPage = () => {
             </table>
           </div>
 
-          <Pagination pagination={pagination} onPageChange={handlePageChange} />
+          <Pagination
+            pagination={pagination}
+            onPageChange={handlePageChange}
+            itemsPerPage={itemsPerPage}
+            setItemsPerPage={setItemsPerPage}
+            label="sản phẩm"
+          />
         </div>
       </div>
       <ConfirmModal

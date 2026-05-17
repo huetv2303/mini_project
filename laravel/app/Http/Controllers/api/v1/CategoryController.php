@@ -45,9 +45,10 @@ class CategoryController extends Controller
                 });
             }
 
+            $limit = $request->input('per_page', $request->input('limit', 10));
             $data = $query->with(['childrenRecursive'])
                 ->withCount('children')
-                ->paginate(10);
+                ->paginate($limit);
         } else {
             $data = $query->whereIn('parent_id', [null, 0]);
         }

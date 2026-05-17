@@ -12,6 +12,7 @@ import {
   Heart,
 } from "lucide-react";
 import StarRating from "../../components/review/StarRating";
+import { useWishlist } from "../../context/WishlistContext";
 
 const ProductList = () => {
   const [searchParams] = useSearchParams();
@@ -22,6 +23,7 @@ const ProductList = () => {
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState("grid");
   const [sortBy, setSortBy] = useState("latest");
+  const { toggleWishlist, isInWishlist } = useWishlist();
 
   useEffect(() => {
     const loadData = async () => {
@@ -205,8 +207,19 @@ const ProductList = () => {
                             -{prod.discount}%
                           </div>
                         )}
-                        <button className="absolute top-4 right-4 z-10 p-2 bg-white/70 backdrop-blur-md rounded-full text-gray-900 shadow-sm hover:bg-black hover:text-white transition-all duration-300 transform hover:scale-110 active:scale-95">
-                          <Heart size={18} />
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            toggleWishlist(prod);
+                          }}
+                          className={`absolute top-4 right-4 z-10 p-2 rounded-full shadow-sm backdrop-blur-md transition-all duration-300 transform hover:scale-110 active:scale-95 ${
+                            isInWishlist(prod.id)
+                              ? "bg-red-50 text-red-500 hover:bg-red-100"
+                              : "bg-white/70 text-gray-900 hover:bg-black hover:text-white"
+                          }`}
+                        >
+                          <Heart size={18} fill={isInWishlist(prod.id) ? "currentColor" : "none"} />
                         </button>
                         <button className="absolute hover:bg-black/80 bottom-6 left-1/2 -translate-x-1/2 translate-y-10 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-black text-white px-6 py-3 rounded-lg font-bold flex items-center gap-2 shadow-2xl">
                           Mua ngay

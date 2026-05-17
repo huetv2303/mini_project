@@ -4,12 +4,14 @@ export const fetchCategoriesRequest = async ({
   all = false,
   search = "",
   page = 1,
+  per_page = 15,
 } = {}) => {
   try {
     const params = new URLSearchParams();
     if (all) params.append("all", "true");
     if (search) params.append("search", search);
     if (!all && page) params.append("page", page);
+    if (per_page) params.append("per_page", per_page);
 
     const url = `/categories?${params.toString()}`;
     const response = await api.get(url);

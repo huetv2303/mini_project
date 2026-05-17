@@ -543,16 +543,16 @@ const OrderListPage = () => {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {loading ? (
-                  <tr>
-                    <td colSpan="8" className="px-6 py-20 text-center">
-                      <div className="flex flex-col items-center gap-2">
-                        <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
-                        <span className="text-gray-500 text-sm">
-                          Đang tải dữ liệu...
-                        </span>
-                      </div>
-                    </td>
-                  </tr>
+                  [...Array(5)].map((_, i) => (
+                    <tr
+                      key={i}
+                      className="animate-pulse border-b border-slate-100"
+                    >
+                      <td className="px-6 py-6" colSpan="8">
+                        <div className="h-12 bg-slate-50 rounded-xl"></div>
+                      </td>
+                    </tr>
+                  ))
                 ) : orders.length > 0 ? (
                   orders.map((order) => {
                     const isSelected = selectedIds.includes(order.id);

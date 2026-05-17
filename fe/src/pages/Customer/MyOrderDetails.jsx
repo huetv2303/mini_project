@@ -134,11 +134,8 @@ const MyOrderDetails = () => {
     return (
       <CustomerLayout>
         <div className="bg-slate-50 min-h-screen pt-32 pb-24 flex items-center justify-center">
-          <div className="flex flex-col items-center gap-4">
-            <Loader2 className="w-12 h-12 animate-spin" />
-            <p className="text-gray-400 font-bold  uppercase text-xs">
-              Đang tải chi tiết đơn hàng...
-            </p>
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
           </div>
         </div>
       </CustomerLayout>
@@ -589,13 +586,17 @@ const MyOrderDetails = () => {
                       ₫
                     </span>
                   </div>
-                  {(Number(order.tax_amount) > 0 || Number(order.tax_rate_snapshot) > 0) && (
+                  {(Number(order.tax_amount) > 0 ||
+                    Number(order.tax_rate_snapshot) > 0) && (
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-700 font-medium">
                         Thuế (VAT {order.tax_rate_snapshot ?? 0}%)
                       </span>
                       <span className="">
-                        {new Intl.NumberFormat("vi-VN").format(order.tax_amount)}₫
+                        {new Intl.NumberFormat("vi-VN").format(
+                          order.tax_amount,
+                        )}
+                        ₫
                       </span>
                     </div>
                   )}
@@ -604,7 +605,10 @@ const MyOrderDetails = () => {
                       TỔNG GIÁ TRỊ
                     </span>
                     <span className="text-xl">
-                      {new Intl.NumberFormat("vi-VN").format(order.final_amount)}₫
+                      {new Intl.NumberFormat("vi-VN").format(
+                        order.final_amount,
+                      )}
+                      ₫
                     </span>
                   </div>
 
@@ -616,7 +620,11 @@ const MyOrderDetails = () => {
                           ĐÃ TRỪ TỪ VÍ
                         </span>
                         <span>
-                          -{new Intl.NumberFormat("vi-VN").format(order.wallet_amount_used)}₫
+                          -
+                          {new Intl.NumberFormat("vi-VN").format(
+                            order.wallet_amount_used,
+                          )}
+                          ₫
                         </span>
                       </div>
                       <div className="flex justify-between text-sm pt-2">
@@ -625,8 +633,13 @@ const MyOrderDetails = () => {
                         </span>
                         <span className="text-xl font-black text-rose-600">
                           {new Intl.NumberFormat("vi-VN").format(
-                            Math.max(0, order.final_amount - (order.wallet_amount_used || 0))
-                          )}₫
+                            Math.max(
+                              0,
+                              order.final_amount -
+                                (order.wallet_amount_used || 0),
+                            ),
+                          )}
+                          ₫
                         </span>
                       </div>
                     </>

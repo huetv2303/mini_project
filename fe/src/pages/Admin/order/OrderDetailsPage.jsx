@@ -248,10 +248,9 @@ const OrderDetailsPage = () => {
     return (
       <AdminLayout>
         <div className="flex flex-col items-center justify-center min-h-[60vh]">
-          <Loader2 className="w-12 h-12 text-black animate-spin mb-4" />
-          <p className="text-gray-400 font-bold text-xs uppercase ">
-            Đang tải hóa đơn...
-          </p>
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+          </div>
         </div>
       </AdminLayout>
     );
@@ -490,7 +489,8 @@ const OrderDetailsPage = () => {
                         -{formatPrice(order.discount_amount)}
                       </span>
                     </div>
-                    {(Number(order.tax_amount) > 0 || Number(order.tax_rate_snapshot) > 0) && (
+                    {(Number(order.tax_amount) > 0 ||
+                      Number(order.tax_rate_snapshot) > 0) && (
                       <div className="flex justify-between items-center text-sm">
                         <span className="text-gray-500 font-bold uppercase text-[12px]">
                           Thuế ({order.tax_rate_snapshot}%)

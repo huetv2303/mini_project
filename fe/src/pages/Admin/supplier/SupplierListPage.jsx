@@ -43,10 +43,11 @@ const SupplierListPage = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(15);
   const [pagination, setPagination] = useState({
     total: 0,
     lastPage: 1,
-    perPage: 10,
+    perPage: 15,
   });
 
   const [selectedIds, setSelectedIds] = useState(new Set());
@@ -58,20 +59,24 @@ const SupplierListPage = () => {
     mode: "single",
   });
 
-  const getSuppliers = async (page = 1, search = "") => {
+  const getSuppliers = async (page = 1, search = "", perPageCount = 15) => {
     try {
       setLoading(true);
-      const res = await fetchSuppliersRequest({ page, search });
+      const res = await fetchSuppliersRequest({
+        page,
+        search,
+        per_page: perPageCount,
+      });
       const rawData = res?.data;
       const items = rawData?.data || [];
       const meta = rawData?.meta || {};
 
       setSuppliers(items);
       setPagination({
-        currentPage: meta.current_page,
-        lastPage: meta.last_page,
-        total: meta.total,
-        perPage: meta.per_page,
+        currentPage: meta.current_page || 1,
+        lastPage: meta.last_page || 1,
+        total: meta.total || 0,
+        perPage: meta.per_page || perPageCount,
       });
       setSelectedIds(new Set());
     } catch (error) {
@@ -84,26 +89,27 @@ const SupplierListPage = () => {
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= pagination.lastPage) {
-      getSuppliers(newPage, searchTerm);
+      getSuppliers(newPage, searchTerm, itemsPerPage);
+      setCurrentPage(newPage);
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   const debouncedSearch = useCallback(
-    debounce((val) => {
+    debounce((val, perPage) => {
       setCurrentPage(1);
-      getSuppliers(1, val);
+      getSuppliers(1, val, perPage);
     }, 500),
     [],
   );
 
   useEffect(() => {
-    getSuppliers(currentPage, searchTerm);
-  }, [currentPage]);
+    getSuppliers(currentPage, searchTerm, itemsPerPage);
+  }, [currentPage, itemsPerPage]);
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
-    debouncedSearch(e.target.value);
+    debouncedSearch(e.target.value, itemsPerPage);
   };
 
   const selectAllOnPage = () => {
@@ -198,7 +204,7 @@ const SupplierListPage = () => {
             )}
           </div>
 
-          <div className="overflow-x-auto overflow-y-auto max-h-[700px]">
+          <div className="">
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-slate-50/30 border-b border-slate-100">
@@ -235,14 +241,16 @@ const SupplierListPage = () => {
               </thead>
               <tbody>
                 {loading ? (
-                  <tr>
-                    <td colSpan="5" className="px-6 py-24 text-center">
-                      <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
-                      <span className="text-slate-500 font-bold text-[10px] uppercase animate-pulse">
-                        Đang tải nhà cung cấp...
-                      </span>
-                    </td>
-                  </tr>
+                  [...Array(5)].map((_, i) => (
+                    <tr
+                      key={i}
+                      className="animate-pulse border-b border-slate-100"
+                    >
+                      <td className="px-6 py-6" colSpan="5">
+                        <div className="h-12 bg-slate-50 rounded-xl"></div>
+                      </td>
+                    </tr>
+                  ))
                 ) : suppliers.length > 0 ? (
                   suppliers.map((sup) => (
                     <tr
@@ -342,7 +350,9 @@ const SupplierListPage = () => {
           <Pagination
             pagination={pagination}
             onPageChange={handlePageChange}
-            label="Nhà cung cấp"
+            itemsPerPage={itemsPerPage}
+            setItemsPerPage={setItemsPerPage}
+            label="nhà cung cấp"
           />
         </div>
       </div>

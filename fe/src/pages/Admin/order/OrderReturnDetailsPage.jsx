@@ -15,7 +15,10 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { formatPrice } from "../../../helper/helper";
-import { ReceiveStatusBadge, RefundStatusBadge } from "../../../components/common/OrderBadges";
+import {
+  ReceiveStatusBadge,
+  RefundStatusBadge,
+} from "../../../components/common/OrderBadges";
 
 const OrderReturnDetailsPage = () => {
   const { id } = useParams();
@@ -71,10 +74,9 @@ const OrderReturnDetailsPage = () => {
     return (
       <AdminLayout>
         <div className="flex flex-col items-center justify-center min-h-[60vh]">
-          <Loader2 className="w-12 h-12 text-black animate-spin mb-4" />
-          <p className="text-gray-400 font-bold text-xs uppercase ">
-            Đang tải phiếu trả hàng...
-          </p>
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+          </div>
         </div>
       </AdminLayout>
     );

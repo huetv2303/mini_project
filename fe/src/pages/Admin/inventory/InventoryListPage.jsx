@@ -50,20 +50,22 @@ const InventoryListPage = () => {
     product: null,
     variant: null,
   });
+  const [itemsPerPage, setItemsPerPage] = useState(15);
   const [pagination, setPagination] = useState({
     currentPage: 1,
     lastPage: 1,
     total: 0,
-    perPage: 10,
+    perPage: 15,
   });
 
-  const getProducts = async (search = "", page = 1) => {
+  const getProducts = async (search = "", page = 1, perPageCount = 15) => {
     try {
       setLoading(true);
       const res = await fetchProductsRequest({
         page,
         search,
-        limit: pagination.perPage,
+        per_page: perPageCount,
+        limit: perPageCount,
       });
       console.log("Inventory API Res:", res);
       const items = res?.data?.data || [];
@@ -72,10 +74,10 @@ const InventoryListPage = () => {
       const meta = res?.data?.meta;
       if (meta) {
         setPagination({
-          currentPage: meta.current_page,
-          lastPage: meta.last_page,
-          total: meta.total,
-          perPage: meta.per_page,
+          currentPage: meta.current_page || 1,
+          lastPage: meta.last_page || 1,
+          total: meta.total || 0,
+          perPage: meta.per_page || perPageCount,
         });
       }
     } catch (error) {
@@ -87,26 +89,26 @@ const InventoryListPage = () => {
   };
 
   const debouncedSearch = useCallback(
-    debounce((val) => {
-      getProducts(val, 1);
+    debounce((val, perPage) => {
+      getProducts(val, 1, perPage);
     }, 500),
     [],
   );
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= pagination.lastPage) {
-      getProducts(searchTerm, newPage);
+      getProducts(searchTerm, newPage, itemsPerPage);
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   useEffect(() => {
-    getProducts();
-  }, []);
+    getProducts(searchTerm, 1, itemsPerPage);
+  }, [itemsPerPage]);
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
-    debouncedSearch(e.target.value);
+    debouncedSearch(e.target.value, itemsPerPage);
   };
 
   const toggleRowExpand = (productId) => {
@@ -344,17 +346,16 @@ const InventoryListPage = () => {
                   </thead>
                   <tbody className="divide-y divide-gray-100">
                     {loading ? (
-                      <tr>
-                        <td
-                          colSpan="7"
-                          className="px-6 py-16 text-center text-emerald-500"
+                      [...Array(5)].map((_, i) => (
+                        <tr
+                          key={i}
+                          className="animate-pulse border-b border-slate-100"
                         >
-                          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-3" />
-                          <span className="text-sm font-medium">
-                            Đang tải biểu mẫu...
-                          </span>
-                        </td>
-                      </tr>
+                          <td className="px-6 py-6" colSpan="7">
+                            <div className="h-12 bg-slate-50 rounded-xl"></div>
+                          </td>
+                        </tr>
+                      ))
                     ) : products.length === 0 ? (
                       <tr>
                         <td
@@ -597,6 +598,8 @@ const InventoryListPage = () => {
               <Pagination
                 pagination={pagination}
                 onPageChange={handlePageChange}
+                itemsPerPage={itemsPerPage}
+                setItemsPerPage={setItemsPerPage}
                 label="sản phẩm"
               />
             </div>

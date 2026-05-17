@@ -1,40 +1,26 @@
 import React, { useState, useEffect } from "react";
 import AdminLayout from "../../../components/layout/Admin/AdminLayout";
-import {
-  Search,
-  User,
-  UserPlus,
-  Mail,
-  ShieldCheck,
-  ShieldAlert,
-  Trash2,
-  Edit3,
-  CheckSquare,
-  Square,
-  ChevronLeft,
-  ChevronRight,
-  Key,
-} from "lucide-react";
+import { Search, User, UserPlus, Mail, Trash2, Edit3 } from "lucide-react";
 import {
   fetchUsersRequest,
   deleteUserRequest,
   fetchRolesRequest,
-  createUserRequest,
-  updateUserRequest,
 } from "../../../services/UserService";
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 import StaffFormModal from "./StaffFormModal";
+import Pagination from "../../../components/common/Pagination";
 
 const StaffListPage = () => {
   const [staffs, setStaffs] = useState([]);
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedIds, setSelectedIds] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingStaff, setEditingStaff] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(15);
 
   const fetchData = async () => {
     try {
@@ -49,6 +35,7 @@ const StaffListPage = () => {
         (u) => u.role && u.role.code !== "customer",
       );
       setStaffs(staffList);
+      console.log(staffList);
 
       // Chỉ lấy các role admin và staff để gán
       const staffRoles = rolesRes.data.filter((r) => r.code !== "customer");
@@ -106,6 +93,18 @@ const StaffListPage = () => {
     );
   });
 
+  const total = filteredStaffs.length;
+  const lastPage = Math.ceil(total / itemsPerPage) || 1;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedStaffs = filteredStaffs.slice(startIndex, startIndex + itemsPerPage);
+
+  const paginationObj = {
+    currentPage,
+    lastPage,
+    total,
+    perPage: itemsPerPage,
+  };
+
   return (
     <AdminLayout>
       <div className="mb-8 animate-in fade-in duration-500">
@@ -139,7 +138,10 @@ const StaffListPage = () => {
               placeholder="Tìm theo tên, email hoặc vai trò..."
               className="w-full h-11 bg-slate-50/50 border border-slate-200 rounded-xl pl-12 pr-4 text-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none text-slate-800 font-semibold"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
             />
           </div>
         </div>
@@ -179,8 +181,8 @@ const StaffListPage = () => {
                       </td>
                     </tr>
                   ))
-                ) : filteredStaffs.length > 0 ? (
-                  filteredStaffs.map((staff) => (
+                ) : paginatedStaffs.length > 0 ? (
+                  paginatedStaffs.map((staff) => (
                     <tr
                       key={staff.id}
                       className="group hover:bg-slate-50/50 transition-colors border-b border-slate-100 last:border-0"
@@ -195,7 +197,7 @@ const StaffListPage = () => {
                               {staff.name}
                             </p>
                             <p className="text-[10px] text-slate-400 font-bold">
-                              ID: #{staff.id.toString().padStart(4, "0")}
+                              ID: {staff.id.toString().padStart(4, "0")}
                             </p>
                           </div>
                         </div>
@@ -208,13 +210,15 @@ const StaffListPage = () => {
                       </td>
                       <td className="px-6 py-4">
                         <span
-                          className={`px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-tight ${
+                          className={`px-3 py-1 rounded-full text-[10px] font-medium uppercase tracking-tight ${
                             staff.role?.code === "admin"
                               ? "bg-rose-50 text-rose-600 border border-rose-100"
                               : "bg-blue-50 text-blue-600 border border-blue-100"
                           }`}
                         >
-                          {staff.role?.name || "N/A"}
+                          {staff.role?.code === "admin"
+                            ? "Quản trị viên"
+                            : "Nhân viên"}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-sm text-slate-500 font-semibold">
@@ -255,6 +259,19 @@ const StaffListPage = () => {
               </tbody>
             </table>
           </div>
+          <Pagination
+            pagination={paginationObj}
+            onPageChange={(page) => {
+              setCurrentPage(page);
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+            itemsPerPage={itemsPerPage}
+            setItemsPerPage={(limit) => {
+              setItemsPerPage(limit);
+              setCurrentPage(1);
+            }}
+            label="nhân viên"
+          />
         </div>
       </div>
 

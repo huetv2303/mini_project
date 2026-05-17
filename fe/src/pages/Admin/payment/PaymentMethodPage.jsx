@@ -166,35 +166,41 @@ const PaymentMethodPage = () => {
             </div>
           </div>
 
-          {loading ? (
-            <div className="flex justify-center items-center h-64">
-              <Loader2 className="w-8 h-8 animate-spin text-black" />
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-gray-50/50">
-                    <th className="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider">
-                      Ảnh
-                    </th>
-                    <th className="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider">
-                      Tên Phương Thức
-                    </th>
-                    <th className="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider">
-                      Mã Code
-                    </th>
-                    <th className="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider text-center">
-                      Trạng Thái
-                    </th>
-                    <th className="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">
-                      Thao Tác
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {filteredMethods.length > 0 ? (
-                    filteredMethods.map((method) => (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-gray-50/50">
+                  <th className="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                    Ảnh
+                  </th>
+                  <th className="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                    Tên Phương Thức
+                  </th>
+                  <th className="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                    Mã Code
+                  </th>
+                  <th className="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider text-center">
+                    Trạng Thái
+                  </th>
+                  <th className="py-4 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">
+                    Thao Tác
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {loading ? (
+                  [...Array(5)].map((_, i) => (
+                    <tr
+                      key={i}
+                      className="animate-pulse border-b border-slate-100"
+                    >
+                      <td className="px-6 py-6" colSpan="5">
+                        <div className="h-12 bg-slate-50 rounded-xl"></div>
+                      </td>
+                    </tr>
+                  ))
+                ) : filteredMethods.length > 0 ? (
+                  filteredMethods.map((method) => (
                       <tr
                         key={method.id}
                         className="hover:bg-gray-50/50 transition duration-150"
@@ -263,7 +269,6 @@ const PaymentMethodPage = () => {
                 </tbody>
               </table>
             </div>
-          )}
         </div>
 
         {isModalOpen && (

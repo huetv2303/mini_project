@@ -279,10 +279,9 @@ const MyOrders = () => {
           <div className="space-y-6">
             {loading ? (
               <div className="bg-white rounded-3xl p-20 flex flex-col items-center justify-center border border-gray-100 shadow-sm">
-                <Loader2 className="w-12 h-12 text-black animate-spin mb-4" />
-                <p className="text-gray-400 font-bold uppercase tracking-widest text-xs">
-                  Đang tải dữ liệu...
-                </p>
+                <div className="flex items-center justify-center min-h-[400px]">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+                </div>
               </div>
             ) : orders.length > 0 ? (
               <>

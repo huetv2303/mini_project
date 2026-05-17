@@ -21,6 +21,7 @@ import {
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import ConfirmModal from "../../../components/common/ConfirmModal";
+import Pagination from "../../../components/common/Pagination";
 
 // Tự viết hàm debounce để không cần cài thư viện lodash
 const debounce = (func, delay) => {
@@ -36,7 +37,7 @@ import { useAuth } from "../../../context/AuthContext";
 const CategoryListPage = () => {
   const { hasPermission } = useAuth();
   const canManage = hasPermission("categories.manage");
-  
+
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedRows, setExpandedRows] = useState(new Set());
@@ -44,10 +45,11 @@ const CategoryListPage = () => {
   // States for Search & Pagination
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(15);
   const [pagination, setPagination] = useState({
     total: 0,
     lastPage: 1,
-    perPage: 3,
+    perPage: 15,
   });
 
   // Bulk Selection States
@@ -115,10 +117,14 @@ const CategoryListPage = () => {
     setSelectedIds(newSelected);
   };
 
-  const getCategories = async (page = 1, search = "") => {
+  const getCategories = async (page = 1, search = "", perPageCount = 15) => {
     try {
       setLoading(true);
-      const res = await fetchCategoriesRequest({ page, search });
+      const res = await fetchCategoriesRequest({
+        page,
+        search,
+        per_page: perPageCount,
+      });
       const rawData = res?.data;
       const items = rawData?.data || [];
       const meta = rawData?.meta || {};
@@ -127,7 +133,7 @@ const CategoryListPage = () => {
       setPagination({
         total: meta.total || 0,
         lastPage: meta.last_page || 1,
-        perPage: meta.per_page || 10,
+        perPage: meta.per_page || perPageCount,
       });
       // Clear selection when navigating or searching
       setSelectedIds(new Set());
@@ -139,22 +145,29 @@ const CategoryListPage = () => {
     }
   };
 
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= pagination.lastPage) {
+      setCurrentPage(newPage);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
   const debouncedSearch = useCallback(
-    debounce((val) => {
+    debounce((val, perPage) => {
       setCurrentPage(1);
-      getCategories(1, val);
+      getCategories(1, val, perPage);
     }, 500),
     [],
   );
 
   useEffect(() => {
-    getCategories(currentPage, searchTerm);
-  }, [currentPage]);
+    getCategories(currentPage, searchTerm, itemsPerPage);
+  }, [currentPage, itemsPerPage]);
 
   const handleSearchChange = (e) => {
     const val = e.target.value;
     setSearchTerm(val);
-    debouncedSearch(val);
+    debouncedSearch(val, itemsPerPage);
   };
 
   // Mở modal xóa đơn
@@ -420,14 +433,16 @@ const CategoryListPage = () => {
               </thead>
               <tbody>
                 {loading ? (
-                  <tr>
-                    <td colSpan="6" className="px-6 py-20 text-center">
-                      <Loader2 className="w-10 h-10 text-blue-600 animate-spin mx-auto mb-2" />
-                      <span className="text-slate-400 font-bold text-xs uppercase animate-pulse">
-                        Đang tải dữ liệu...
-                      </span>
-                    </td>
-                  </tr>
+                  [...Array(5)].map((_, i) => (
+                    <tr
+                      key={i}
+                      className="animate-pulse border-b border-slate-100"
+                    >
+                      <td className="px-6 py-6" colSpan="6">
+                        <div className="h-12 bg-slate-50 rounded-xl"></div>
+                      </td>
+                    </tr>
+                  ))
                 ) : categories.length > 0 ? (
                   categories.map((category) => renderCategoryRow(category))
                 ) : (
@@ -445,39 +460,13 @@ const CategoryListPage = () => {
           </div>
 
           {/* Pagination Controls */}
-          {!loading && categories.length > 0 && pagination.lastPage > 1 && (
-            <div className="p-6 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
-              <span className="text-sm text-slate-500 font-medium">
-              </span>
-              <div className="flex items-center gap-2">
-                <button
-                  disabled={currentPage === 1}
-                  onClick={() => setCurrentPage((prev) => prev - 1)}
-                  className={`p-2 rounded-xl border border-slate-200 transition-all ${currentPage === 1 ? "opacity-50 cursor-not-allowed bg-slate-50" : "bg-white hover:bg-slate-50 active:scale-95"}`}
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                <div className="flex items-center gap-1">
-                  {[...Array(pagination.lastPage)].map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setCurrentPage(i + 1)}
-                      className={`w-10 h-10 rounded-xl text-sm font-bold transition-all ${currentPage === i + 1 ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20" : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"}`}
-                    >
-                      {i + 1}
-                    </button>
-                  ))}
-                </div>
-                <button
-                  disabled={currentPage === pagination.lastPage}
-                  onClick={() => setCurrentPage((prev) => prev - 1)}
-                  className={`p-2 rounded-xl border border-slate-200 transition-all ${currentPage === pagination.lastPage ? "opacity-50 cursor-not-allowed bg-slate-50" : "bg-white hover:bg-slate-50 active:scale-95"}`}
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-          )}
+          <Pagination
+            pagination={pagination}
+            onPageChange={handlePageChange}
+            itemsPerPage={itemsPerPage}
+            setItemsPerPage={setItemsPerPage}
+            label="danh mục"
+          />
         </div>
       </div>
 

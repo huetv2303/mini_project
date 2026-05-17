@@ -33,7 +33,8 @@ class SupplierController extends Controller
             ]);
         }
 
-        $suppliers = $query->paginate(10);
+        $limit = $request->input('per_page', $request->input('limit', 10));
+        $suppliers = $query->paginate($limit);
         return response()->json([
             'status' => 'success',
             'data'   => SupplierResource::collection($suppliers)->response()->getData(true)

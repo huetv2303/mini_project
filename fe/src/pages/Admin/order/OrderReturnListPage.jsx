@@ -211,14 +211,16 @@ const OrderReturnListPage = () => {
               </thead>
               <tbody>
                 {loading ? (
-                  <tr>
-                    <td colSpan="7" className="px-6 py-24 text-center">
-                      <Loader2 className="w-12 h-12 text-black animate-spin mx-auto mb-4" />
-                      <span className="text-gray-400 font-bold text-[10px] uppercase ">
-                        Đang tải dữ liệu...
-                      </span>
-                    </td>
-                  </tr>
+                  [...Array(5)].map((_, i) => (
+                    <tr
+                      key={i}
+                      className="animate-pulse border-b border-slate-100"
+                    >
+                      <td className="px-6 py-6" colSpan="8">
+                        <div className="h-12 bg-slate-50 rounded-xl"></div>
+                      </td>
+                    </tr>
+                  ))
                 ) : returns.length > 0 ? (
                   returns.map((item) => {
                     return (

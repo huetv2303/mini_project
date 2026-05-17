@@ -11,12 +11,13 @@ import {
   RotateCcw,
 } from "lucide-react";
 
-import { fetchMonthlyReport, exportMonthlyReport } from "../../../../services/InventoryService";
+import {
+  fetchMonthlyReport,
+  exportMonthlyReport,
+} from "../../../../services/InventoryService";
 import Pagination from "../../../../components/common/Pagination";
 import toast from "react-hot-toast";
 import { formatPrice } from "../../../../helper/helper";
-
-
 
 const InventoryReportTab = () => {
   const currentDate = new Date();
@@ -77,11 +78,13 @@ const InventoryReportTab = () => {
 
   const handleExport = async () => {
     try {
-      toast.loading("Đang chuẩn bị dữ liệu xuất báo cáo...", { id: "export-toast" });
-      
+      toast.loading("Đang chuẩn bị dữ liệu xuất báo cáo...", {
+        id: "export-toast",
+      });
+
       const res = await exportMonthlyReport(month, year);
       const allItems = res?.data?.items?.data || [];
-      
+
       if (allItems.length === 0) {
         toast.error("Không có dữ liệu tồn kho để xuất", { id: "export-toast" });
         return;
@@ -99,15 +102,15 @@ const InventoryReportTab = () => {
         "Điều Chỉnh Tồn",
         "Hoàn Trả",
         "Tồn Cuối Kỳ",
-        "Trạng Thái"
+        "Trạng Thái",
       ];
 
       // Format data rows
-      const rows = allItems.map(row => {
+      const rows = allItems.map((row) => {
         let statusText = "Còn hàng";
         if (row.status === "out_of_stock") statusText = "Hết hàng";
         else if (row.status === "low_stock") statusText = "Sắp hết hàng";
-        
+
         return [
           row.sku,
           `"${row.productName.replace(/"/g, '""')}"`,
@@ -119,23 +122,28 @@ const InventoryReportTab = () => {
           row.adjustQty,
           row.returnQty,
           row.endStock,
-          statusText
+          statusText,
         ];
       });
 
       // Construct CSV content with UTF-8 BOM
-      const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
-      
+      const csvContent =
+        "\uFEFF" +
+        [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
+
       // Create download link
       const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.setAttribute("href", url);
-      link.setAttribute("download", `Bao_Cao_Ton_Kho_Thang_${month}_${year}.csv`);
+      link.setAttribute(
+        "download",
+        `Bao_Cao_Ton_Kho_Thang_${month}_${year}.csv`,
+      );
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
+
       toast.success("Xuất báo cáo tồn kho thành công!", { id: "export-toast" });
     } catch (error) {
       console.error("Export monthly report error:", error);
@@ -359,8 +367,10 @@ const InventoryReportTab = () => {
                     colSpan="10"
                     className="px-5 py-12 text-center text-gray-500"
                   >
-                    <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-                    Đang tải dữ liệu báo cáo...
+                    <div className="flex items-center justify-center min-h-[400px]">
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+                    </div>
+                    .
                   </td>
                 </tr>
               ) : reportData.length === 0 ? (

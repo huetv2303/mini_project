@@ -84,10 +84,9 @@ const TransactionHistoryModal = ({ isOpen, onClose, product, variant }) => {
                       colSpan="6"
                       className="px-6 py-12 text-center text-gray-400"
                     >
-                      <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
-                      <span className="text-sm font-medium">
-                        Đang tải biểu mẫu...
-                      </span>
+                      <div className="flex items-center justify-center min-h-[400px]">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+                      </div>
                     </td>
                   </tr>
                 ) : history.length === 0 ? (
@@ -103,12 +102,17 @@ const TransactionHistoryModal = ({ isOpen, onClose, product, variant }) => {
                   </tr>
                 ) : (
                   history.map((record, index) => (
-                    <tr key={index} className="hover:bg-gray-50/50 transition-colors">
+                    <tr
+                      key={index}
+                      className="hover:bg-gray-50/50 transition-colors"
+                    >
                       <td className="px-4 py-4 text-sm text-gray-600 font-medium whitespace-nowrap">
-                        {new Date(record.created_at).toLocaleString('vi-VN')}
+                        {new Date(record.created_at).toLocaleString("vi-VN")}
                       </td>
                       <td className="px-4 py-4">
-                        {(record.type === "out" || record.type === "adjustment") && record.quantity_change < 0 ? (
+                        {(record.type === "out" ||
+                          record.type === "adjustment") &&
+                        record.quantity_change < 0 ? (
                           <span className="inline-flex items-center px-2 py-1 rounded bg-red-50 text-red-600 text-[10px] font-bold uppercase tracking-wider">
                             EXPORT
                           </span>
@@ -119,8 +123,12 @@ const TransactionHistoryModal = ({ isOpen, onClose, product, variant }) => {
                         )}
                       </td>
                       <td className="px-4 py-4 text-center">
-                        <span className={`text-sm font-bold ${record.quantity_change < 0 ? 'text-red-500' : 'text-emerald-500'}`}>
-                           {record.quantity_change > 0 ? `+${record.quantity_change}` : record.quantity_change}
+                        <span
+                          className={`text-sm font-bold ${record.quantity_change < 0 ? "text-red-500" : "text-emerald-500"}`}
+                        >
+                          {record.quantity_change > 0
+                            ? `+${record.quantity_change}`
+                            : record.quantity_change}
                         </span>
                       </td>
                       <td className="px-4 py-4 text-center text-sm text-gray-600 font-medium">

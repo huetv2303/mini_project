@@ -84,122 +84,127 @@ const PromotionPage = () => {
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        {loading ? (
-          <div className="flex justify-center items-center h-48">
-            <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead>
-                <tr className="bg-gray-50/50">
-                  <th className="py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Mã / Tên
-                  </th>
-                  <th className="py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">
-                    Giảm Giá
-                  </th>
-                  <th className="py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">
-                    Phạm Vi / Kênh
-                  </th>
-                  <th className="py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">
-                    Hiệu Lực
-                  </th>
-                  <th className="py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">
-                    Thao Tác
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {filtered.length > 0 ? (
-                  filtered.map((promo) => (
-                    <tr
-                      key={promo.id}
-                      className="hover:bg-gray-50/50 transition"
-                    >
-                      <td className="py-4 px-6">
-                        <div className="font-bold text-gray-900">
-                          {promo.code}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {promo.name}
-                        </div>
-                      </td>
-                      <td className="py-4 px-6 text-center font-bold text-indigo-600">
-                        {promo.type === "percent"
-                          ? `${promo.value}%`
-                          : `${Number(promo.value).toLocaleString()}đ`}
-                      </td>
-                      <td className="py-4 px-6 text-center space-y-1">
-                        <div>
-                          <span
-                            className={`inline-flex px-2 py-0.5 text-xs font-semibold rounded-full bg-blue-50 text-blue-600`}
-                          >
-                            {promo.scope === "all"
-                              ? "Toàn bộ"
-                              : promo.scope === "category"
-                                ? "Danh mục"
-                                : "Sản phẩm"}
-                          </span>
-                        </div>
-                        <div>
-                          <span
-                            className={`inline-flex px-2 py-0.5 text-xs font-semibold rounded-full bg-purple-50 text-purple-600`}
-                          >
-                            {promo.applies_to === "all"
-                              ? "Tất cả kênh"
-                              : promo.applies_to === "website"
-                                ? "Chỉ Web"
-                                : "Chỉ POS"}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="py-4 px-6 text-center text-sm">
-                        <div className="flex flex-col items-center gap-1">
-                          {promo.is_active ? (
-                            <span className="text-green-600 font-semibold text-xs bg-green-50 px-2 py-0.5 rounded-full">
-                              Đang bật
-                            </span>
-                          ) : (
-                            <span className="text-red-600 font-semibold text-xs bg-red-50 px-2 py-0.5 rounded-full">
-                              Đã tắt
-                            </span>
-                          )}
-                          <span className="text-gray-500 text-xs mt-1 bg-gray-100 px-2 py-0.5 rounded-lg whitespace-nowrap">
-                            Đã dùng: {promo.used_count}{" "}
-                            {promo.usage_limit ? `/ ${promo.usage_limit}` : ""}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="py-4 px-6 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => navigate(`/admin/promotions/edit/${promo.id}`)}
-                            className="p-2 text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(promo.id)}
-                            className="p-2 text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="5" className="py-12 text-center text-gray-400">
-                      Không tìm thấy dữ liệu.
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="bg-gray-50/50">
+                <th className="py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Mã / Tên
+                </th>
+                <th className="py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">
+                  Giảm Giá
+                </th>
+                <th className="py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">
+                  Phạm Vi / Kênh
+                </th>
+                <th className="py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">
+                  Hiệu Lực
+                </th>
+                <th className="py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">
+                  Thao Tác
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {loading ? (
+                [...Array(5)].map((_, i) => (
+                  <tr
+                    key={i}
+                    className="animate-pulse border-b border-slate-100"
+                  >
+                    <td className="px-6 py-6" colSpan="5">
+                      <div className="h-12 bg-slate-50 rounded-xl"></div>
                     </td>
                   </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
+                ))
+              ) : filtered.length > 0 ? (
+                filtered.map((promo) => (
+                  <tr
+                    key={promo.id}
+                    className="hover:bg-gray-50/50 transition"
+                  >
+                    <td className="py-4 px-6">
+                      <div className="font-bold text-gray-900">
+                        {promo.code}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {promo.name}
+                      </div>
+                    </td>
+                    <td className="py-4 px-6 text-center font-bold text-indigo-600">
+                      {promo.type === "percent"
+                        ? `${promo.value}%`
+                        : `${Number(promo.value).toLocaleString()}đ`}
+                    </td>
+                    <td className="py-4 px-6 text-center space-y-1">
+                      <div>
+                        <span
+                          className={`inline-flex px-2 py-0.5 text-xs font-semibold rounded-full bg-blue-50 text-blue-600`}
+                        >
+                          {promo.scope === "all"
+                            ? "Toàn bộ"
+                            : promo.scope === "category"
+                              ? "Danh mục"
+                              : "Sản phẩm"}
+                        </span>
+                      </div>
+                      <div>
+                        <span
+                          className={`inline-flex px-2 py-0.5 text-xs font-semibold rounded-full bg-purple-50 text-purple-600`}
+                        >
+                          {promo.applies_to === "all"
+                            ? "Tất cả kênh"
+                            : promo.applies_to === "website"
+                              ? "Chỉ Web"
+                              : "Chỉ POS"}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="py-4 px-6 text-center text-sm">
+                      <div className="flex flex-col items-center gap-1">
+                        {promo.is_active ? (
+                          <span className="text-green-600 font-semibold text-xs bg-green-50 px-2 py-0.5 rounded-full">
+                            Đang bật
+                          </span>
+                        ) : (
+                          <span className="text-red-600 font-semibold text-xs bg-red-50 px-2 py-0.5 rounded-full">
+                            Đã tắt
+                          </span>
+                        )}
+                        <span className="text-gray-500 text-xs mt-1 bg-gray-100 px-2 py-0.5 rounded-lg whitespace-nowrap">
+                          Đã dùng: {promo.used_count}{" "}
+                          {promo.usage_limit ? `/ ${promo.usage_limit}` : ""}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="py-4 px-6 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => navigate(`/admin/promotions/edit/${promo.id}`)}
+                          className="p-2 text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(promo.id)}
+                          className="p-2 text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5" className="py-12 text-center text-gray-400">
+                    Không tìm thấy dữ liệu.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </AdminLayout>
   );
