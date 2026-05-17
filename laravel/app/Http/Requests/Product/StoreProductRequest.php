@@ -30,6 +30,7 @@ class StoreProductRequest extends FormRequest
             'description'       => 'nullable|string',
             'status'            => 'in:active,inactive,draft',
             'feature_image'     => 'nullable|image|max:2048',
+            'is_taxable'        => 'nullable|boolean',
 
             'images'              => 'nullable|array',
             'images.*.file'       => 'required|image|max:2048',

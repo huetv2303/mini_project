@@ -12,7 +12,6 @@ import { fetchSuppliersRequest } from "../../../services/SupplierService";
 import toast from "react-hot-toast";
 import { getImageUrl } from "../../../helper/helper";
 
-
 // Sub-components
 import ProductFormTabs from "./components/ProductFormTabs";
 import GeneralInfoSection from "./components/GeneralInfoSection";
@@ -32,7 +31,6 @@ const ProductForm = () => {
   const [hasVariants, setHasVariants] = useState(false);
   const [activeTab, setActiveTab] = useState("general");
 
-
   const [categories, setCategories] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
 
@@ -43,6 +41,7 @@ const ProductForm = () => {
     short_description: "",
     description: "",
     status: "active",
+    is_taxable: 1,
     attributes: [],
   });
 
@@ -98,6 +97,7 @@ const ProductForm = () => {
             short_description: p.short_description,
             description: p.description,
             status: p.status,
+            is_taxable: p.is_taxable ? 1 : 0,
             attributes: p.attributes.map((a) => ({
               id: a.id,
               attribute_name: a.attribute_name,
@@ -233,7 +233,7 @@ const ProductForm = () => {
     setProductOptions(newOptions);
 
     const validOptions = newOptions.filter(
-      (o) => o.name && o.values.length > 0
+      (o) => o.name && o.values.length > 0,
     );
     if (validOptions.length === 0) {
       if (hasVariants) {
@@ -256,11 +256,12 @@ const ProductForm = () => {
     }
 
     const cartesian = (args) =>
-      args.reduce((a, b) => a.flatMap((d) => b.map((e) => [d, e].flat())), [
-        [],
-      ]);
+      args.reduce(
+        (a, b) => a.flatMap((d) => b.map((e) => [d, e].flat())),
+        [[]],
+      );
     const formattedOptions = validOptions.map((o) =>
-      o.values.map((v) => ({ attribute_name: o.name, attribute_value: v }))
+      o.values.map((v) => ({ attribute_name: o.name, attribute_value: v })),
     );
     const combinations = cartesian(formattedOptions);
 
@@ -272,8 +273,8 @@ const ProductForm = () => {
           v.attributes.some(
             (va) =>
               va.attribute_name === c.attribute_name &&
-              va.attribute_value === c.attribute_value
-          )
+              va.attribute_value === c.attribute_value,
+          ),
         );
       });
 
@@ -284,11 +285,15 @@ const ProductForm = () => {
           const exAttr = existingMatch.attributes.find(
             (va) =>
               va.attribute_name === c.attribute_name &&
-              va.attribute_value === c.attribute_value
+              va.attribute_value === c.attribute_value,
           );
           return exAttr && exAttr.id ? { ...c, id: exAttr.id } : c;
         });
-        return { ...existingMatch, name: generatedName, attributes: mergedAttributes };
+        return {
+          ...existingMatch,
+          name: generatedName,
+          attributes: mergedAttributes,
+        };
       } else {
         return {
           id: null,
@@ -314,10 +319,7 @@ const ProductForm = () => {
         const nv = { ...v, inventory: { ...v.inventory } };
         if (updates.price !== undefined && updates.price !== "")
           nv.price = updates.price;
-        if (
-          updates.compare_price !== undefined &&
-          updates.compare_price !== ""
-        )
+        if (updates.compare_price !== undefined && updates.compare_price !== "")
           nv.compare_price = updates.compare_price;
         if (
           updates.inventory?.quantity !== undefined &&
@@ -331,83 +333,8 @@ const ProductForm = () => {
           nv.sku = `${updates.sku_prefix}-${String(i + 1).padStart(3, "0")}`;
         }
         return nv;
-      })
+      }),
     );
-  };
-
-  const handleAddAttribute = (variantIndex = null, attribute = { attribute_name: "", attribute_value: "" }) => {
-    if (variantIndex === null) {
-      setFormData({
-        ...formData,
-        attributes: [
-          ...formData.attributes,
-          attribute,
-        ],
-      });
-    } else {
-      const newVariants = [...variants];
-      newVariants[variantIndex].attributes.push(attribute);
-      setVariants(newVariants);
-    }
-  };
-
-  const handleBatchAddAttributes = (variantIndex, batchString) => {
-    // Expected format: "Tên: Giá trị 1, Giá trị 2, ..."
-    // Or just "Giá trị 1, Giá trị 2, ..." (will need a name later or it splits values for a given name if provided)
-    // Let's assume the format is "Tên: Giá trị 1, Giá trị 2, Giá trị 3"
-    
-    if (!batchString.includes(':')) {
-       toast.error("Vui lòng nhập theo định dạng 'Tên: Giá trị1, Giá trị2...'");
-       return;
-    }
-
-    const [name, valuesPart] = batchString.split(':');
-    const attrName = name.trim();
-    const values = valuesPart.split(',').map(v => v.trim()).filter(v => v !== "");
-
-    if (!attrName || values.length === 0) {
-      toast.error("Định dạng không hợp lệ");
-      return;
-    }
-
-    if (variantIndex === null) {
-      const newAttributes = values.map(v => ({ attribute_name: attrName, attribute_value: v }));
-      setFormData({
-        ...formData,
-        attributes: [...formData.attributes, ...newAttributes]
-      });
-    } else {
-      const newVariants = [...variants];
-      const newAttributes = values.map(v => ({ attribute_name: attrName, attribute_value: v }));
-      newVariants[variantIndex].attributes.push(...newAttributes);
-      setVariants(newVariants);
-    }
-    toast.success(`Đã thêm ${values.length} thuộc tính`);
-  };
-
-  const removeAttribute = (attrIndex, variantIndex = null) => {
-    if (variantIndex === null) {
-      const newAttrs = formData.attributes.filter((_, i) => i !== attrIndex);
-      setFormData({ ...formData, attributes: newAttrs });
-    } else {
-      const newVariants = [...variants];
-      newVariants[variantIndex].attributes = newVariants[
-        variantIndex
-      ].attributes.filter((_, i) => i !== attrIndex);
-      setVariants(newVariants);
-    }
-  };
-
-  const updateAttribute = (attrIndex, field, value, variantIndex = null) => {
-    if (variantIndex === null) {
-      const newAttrs = [...formData.attributes];
-      newAttrs[attrIndex][field] = value;
-      setFormData({ ...formData, attributes: newAttrs });
-    } else {
-      const newVariants = [...variants];
-      newVariants[variantIndex].attributes[attrIndex][field] = value;
-      setVariants(newVariants);
-    }
   };
 
   const handleSubmit = async (e) => {
@@ -571,13 +498,6 @@ const ProductForm = () => {
                     categories={categories}
                     suppliers={suppliers}
                   />
-                  {/* <CommonAttributesSection
-                    formData={formData}
-                    updateAttribute={updateAttribute}
-                    removeAttribute={removeAttribute}
-                    handleAddAttribute={handleAddAttribute}
-                    handleBatchAddAttributes={handleBatchAddAttributes}
-                  /> */}
                   <StatusSection
                     formData={formData}
                     setFormData={setFormData}
@@ -626,13 +546,7 @@ const ProductForm = () => {
                   categories={categories}
                   suppliers={suppliers}
                 />
-                {/* <CommonAttributesSection
-                  formData={formData}
-                  updateAttribute={updateAttribute}
-                  removeAttribute={removeAttribute}
-                  handleAddAttribute={handleAddAttribute}
-                  handleBatchAddAttributes={handleBatchAddAttributes}
-                /> */}
+
                 <ProductVariantToggle
                   hasVariants={hasVariants}
                   setHasVariants={setHasVariants}

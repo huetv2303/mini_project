@@ -135,14 +135,7 @@ class ProductController extends Controller
 
     public function search(Request $request)
     {
-        $query = $request->query('q');
-        if (!$query) {
-            return response()->json([
-                'status' => 'success',
-                'data' => []
-            ]);
-        }
-
+        $query = $request->query('q', '');
         $products = $this->productService->search($query);
 
         return response()->json([

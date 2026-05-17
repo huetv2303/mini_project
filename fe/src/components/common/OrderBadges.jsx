@@ -7,6 +7,7 @@ import {
   RotateCcw,
   Clock,
   Globe,
+  Store,
 } from "lucide-react";
 
 export const getOrderStatusStyle = (status) => {
@@ -270,7 +271,7 @@ export const OrderSourceBadge = ({ source, className = "" }) => {
       className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider border ${style.bg} ${style.text} ${style.border} ${className}`}
     >
       {style.label === "Website" && <Globe size={13} />}
-      {style.label === "Tại quầy (POS)" && <Shop size={13} />}
+      {style.label === "Tại quầy (POS)" && <Store size={13} />}
       {style.label}
     </div>
   );

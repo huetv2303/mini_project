@@ -28,6 +28,7 @@ class ProductResource extends JsonResource
             'sold_count'        => $this->sold_count,
             'average_rating'    => $this->average_rating,
             'review_count'      => $this->review_count,
+            'is_taxable'        => (bool)$this->is_taxable,
             'category'          => $this->whenLoaded('category', fn() => [
                 'id'   => $this->category->id,
                 'name' => $this->category->name,

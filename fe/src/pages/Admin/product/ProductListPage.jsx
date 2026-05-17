@@ -28,7 +28,6 @@ const debounce = (func, delay) => {
   };
 };
 
-
 import { useAuth } from "../../../context/AuthContext";
 
 const ProductListPage = () => {
@@ -36,7 +35,7 @@ const ProductListPage = () => {
   const canManage = hasPermission("products.create");
   const canEdit = hasPermission("products.edit");
   const canDelete = hasPermission("products.delete");
-  
+
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -194,7 +193,7 @@ const ProductListPage = () => {
             )}
           </div>
 
-          <div className="overflow-x-auto overflow-y-auto max-h-[480px]">
+          <div className="overflow-x-auto overflow-y-auto max-h-[700px]">
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-gray-50/50">

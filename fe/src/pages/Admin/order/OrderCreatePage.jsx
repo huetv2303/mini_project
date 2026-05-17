@@ -224,7 +224,14 @@ const OrderCreatePage = () => {
 
   const addTab = () => {
     const newId = `tab-${tabCounter}`;
-    setSessions((prev) => [...prev, createEmptySession(newId)]);
+    const activeTax = taxRates.find(
+      (r) => r.is_active === 1 || r.is_active === true,
+    );
+    const newSession = createEmptySession(newId);
+    if (activeTax) {
+      newSession.selectedTaxRate = activeTax.id;
+    }
+    setSessions((prev) => [...prev, newSession]);
     setActiveSessionId(newId);
     setTabCounter((prev) => prev + 1);
   };
@@ -337,14 +344,33 @@ const OrderCreatePage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [pm, tr, bc] = await Promise.all([
+        const [pm, tr, bc, prod] = await Promise.all([
           api.get("/payment-methods"),
           api.get("/tax-rates"),
           fetchBankConfigRequest(),
+          api.get("/products/search", { params: { q: "" } }),
         ]);
         setPaymentMethods(pm.data.data || pm.data);
-        setTaxRates(tr.data.data || tr.data);
+        const rates = tr.data.data || tr.data;
+        setTaxRates(rates);
         setBankConfig(bc.data);
+        setSearchResults(prod.data.data || prod.data || []);
+
+        // Tự động chọn thuế đang active cho các tab chưa chọn thuế
+        const activeTax = rates.find(
+          (r) => r.is_active === 1 || r.is_active === true,
+        );
+        if (activeTax) {
+          setSessions((prev) =>
+            prev.map((s) =>
+              s.selectedTaxRate === null ||
+              s.selectedTaxRate === undefined ||
+              s.selectedTaxRate === ""
+                ? { ...s, selectedTaxRate: activeTax.id }
+                : s,
+            ),
+          );
+        }
       } catch (error) {
         toast.error("Lỗi tải dữ liệu cấu hình");
       }
@@ -355,16 +381,12 @@ const OrderCreatePage = () => {
   // --- Handlers ---
   const handleProductSearch = useCallback(
     debounce(async (term) => {
-      if (!term) {
-        setSearchResults([]);
-        return;
-      }
       setIsSearching(true);
       try {
         const res = await api.get("/products/search", {
-          params: { q: term },
+          params: { q: term || "" },
         });
-        setSearchResults(res.data.data || res.data);
+        setSearchResults(res.data.data || res.data || []);
       } catch (error) {
         console.error(error);
       } finally {
@@ -426,6 +448,7 @@ const OrderCreatePage = () => {
         price: Number(variant.price),
         quantity: 1,
         image: product.feature_image || product.images?.[0]?.url,
+        is_taxable: product.is_taxable !== false,
       });
     }
     patchSession({ selectedItems: items });
@@ -446,10 +469,21 @@ const OrderCreatePage = () => {
       (acc, i) => acc + i.price * i.quantity,
       0,
     );
+  const calculateTaxableSubtotal = () =>
+    activeSession.selectedItems.reduce(
+      (acc, i) => acc + (i.is_taxable !== false ? i.price * i.quantity : 0),
+      0,
+    );
   const calculateTax = () => {
     const rate =
       taxRates.find((t) => t.id == activeSession.selectedTaxRate)?.rate || 0;
-    return (calculateSubtotal() * rate) / 100;
+    const totalSub = calculateSubtotal();
+    if (totalSub <= 0) return 0;
+    const taxableSub = calculateTaxableSubtotal();
+    const discountAmount = activeSession.discountAmount || 0;
+    const taxableRatio = taxableSub / totalSub;
+    const discountForTaxable = discountAmount * taxableRatio;
+    return (Math.max(0, taxableSub - discountForTaxable) * rate) / 100;
   };
   const calculateTotal = () => {
     const sub = calculateSubtotal();
@@ -484,19 +518,27 @@ const OrderCreatePage = () => {
   };
 
   const fetchEligiblePromotions = async () => {
-    if (activeSession.selectedItems.length === 0) return;
-    const data = await runFetchEligiblePromotions(
-      activeSession.selectedItems.map((item) => ({
-        product_id: item.product_id,
-        category_id: item.category_id,
-        subtotal: item.price * item.quantity,
-      })),
-      activeSession.selectedCustomer?.id,
-      "pos",
-    );
+    if (activeSession.selectedItems.length === 0) {
+      toast.error("Vui lòng thêm sản phẩm vào đơn hàng để xem danh sách khuyến mại!");
+      return;
+    }
+    try {
+      const data = await runFetchEligiblePromotions(
+        activeSession.selectedItems.map((item) => ({
+          product_id: item.product_id,
+          category_id: item.category_id,
+          subtotal: item.price * item.quantity,
+        })),
+        activeSession.selectedCustomer?.id,
+        "pos",
+      );
 
-    if (data) {
-      setIsPromotionModalOpen(true);
+      if (data) {
+        setIsPromotionModalOpen(true);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Không thể tải danh sách khuyến mại!");
     }
   };
 
@@ -707,7 +749,12 @@ const OrderCreatePage = () => {
                     setSearchTerm(e.target.value);
                     handleProductSearch(e.target.value);
                   }}
-                  onFocus={() => setShowResults(true)}
+                  onFocus={() => {
+                    setShowResults(true);
+                    if (!searchTerm && searchResults.length === 0) {
+                      handleProductSearch("");
+                    }
+                  }}
                   placeholder="Tìm sản phẩm (Tên/SKU)..."
                   className="w-full pl-12 pr-4 py-4 bg-gray-50 rounded-lg outline-none"
                 />
@@ -715,7 +762,7 @@ const OrderCreatePage = () => {
                 {isSearching && (
                   <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-gray-400" />
                 )}
-                {showResults && searchTerm.length >= 1 && (
+                {showResults && (
                   <div className="absolute top-full left-0 w-full mt-2 bg-white border rounded-lg shadow-2xl p-4 max-h-[500px] overflow-y-auto z-50">
                     {searchResults.length > 0 ? (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1070,12 +1117,52 @@ const OrderCreatePage = () => {
                 </label>
                 <SelectSearch
                   placeholder="Chọn thuế"
-                  options={taxRates.map((t) => ({
-                    label: `${t.name}`,
-                    value: t.id,
-                  }))}
+                  options={taxRates
+                    ?.filter((t) => t.is_active)
+                    ?.map((t) => ({
+                      label: `${t.name}`,
+                      value: t.id,
+                    }))}
                   value={activeSession.selectedTaxRate || ""}
                   onChange={(val) => patchSession({ selectedTaxRate: val })}
+                />
+              </div>
+
+              <div className="space-y-3">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    fetchEligiblePromotions();
+                  }}
+                  className="w-full py-3 border-2 border-dashed border-gray-200 rounded-xl text-[10px] text-gray-400 font-bold uppercase hover:border-blue-200 hover:text-blue-500 transition-all flex items-center justify-center gap-2"
+                >
+                  {isLoadingEligible ? (
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                  ) : (
+                    <Tag className="w-3 h-3" />
+                  )}{" "}
+                  DANH SÁCH MÃ GIẢM GIÁ
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <h4 className="text-[0.8rem] font-medium text-gray-700 uppercase">
+                  Phương thức thanh toán
+                </h4>
+                <SelectSearch
+                  placeholder="Chọn phương thức thanh toán"
+                  options={paymentMethods
+                    .filter((pm) => pm.code !== "vnpay")
+                    .map((pm) => ({
+                      icon: getImageUrl(pm.image),
+                      label: pm.name,
+                      value: pm.id,
+                    }))}
+                  value={activeSession.selectedPaymentMethod || ""}
+                  onChange={(val) =>
+                    patchSession({ selectedPaymentMethod: val })
+                  }
                 />
               </div>
 
@@ -1144,40 +1231,6 @@ const OrderCreatePage = () => {
                     )}
                   </button>
                 </div>
-              </div>
-
-              <div className="space-y-3">
-                <button
-                  onClick={fetchEligiblePromotions}
-                  className="w-full py-3 border-2 border-dashed border-gray-200 rounded-xl text-[10px] text-gray-400 font-bold uppercase hover:border-blue-200 hover:text-blue-500 transition-all flex items-center justify-center gap-2"
-                >
-                  {isLoadingEligible ? (
-                    <Loader2 className="w-3 h-3 animate-spin" />
-                  ) : (
-                    <Tag className="w-3 h-3" />
-                  )}{" "}
-                  DANH SÁCH MÃ GIẢM GIÁ
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                <h4 className="text-[0.8rem] font-medium text-gray-700 uppercase">
-                  Phương thức thanh toán
-                </h4>
-                <SelectSearch
-                  placeholder="Chọn phương thức thanh toán"
-                  options={paymentMethods
-                    .filter((pm) => pm.code !== "vnpay")
-                    .map((pm) => ({
-                      icon: getImageUrl(pm.image),
-                      label: pm.name,
-                      value: pm.id,
-                    }))}
-                  value={activeSession.selectedPaymentMethod || ""}
-                  onChange={(val) =>
-                    patchSession({ selectedPaymentMethod: val })
-                  }
-                />
               </div>
 
               {/* {activeSession.selectedPaymentMethod &&

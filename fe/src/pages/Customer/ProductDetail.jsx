@@ -316,6 +316,7 @@ const ProductDetail = () => {
       price: activeVariant.price,
       image: activeVariant.image ?? product.feature_image,
       sku: activeVariant.sku,
+      is_taxable: product.is_taxable || false,
       // Lưu lại mã đang áp dụng (nếu có)
       appliedPromotion: appliedPromotion,
       discountAmount: discountAmount,

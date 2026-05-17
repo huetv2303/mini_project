@@ -55,6 +55,8 @@ class SearchOrderDetailsFunction implements ChatFunctionInterface
                 'status' => $order->status,
                 'payment_status' => $order->payment_status,
                 'total_amount' => number_format($order->total_amount, 0, ',', '.') . 'đ',
+                'tax_rate_snapshot' => $order->tax_rate_snapshot ? ($order->tax_rate_snapshot . '%') : '0%',
+                'tax_amount' => number_format($order->tax_amount, 0, ',', '.') . 'đ',
                 'final_amount' => number_format($order->final_amount, 0, ',', '.') . 'đ',
                 'shipping_address' => $order->shipping_address,
                 'created_at' => $order->created_at

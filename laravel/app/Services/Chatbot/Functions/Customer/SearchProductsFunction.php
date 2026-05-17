@@ -138,7 +138,8 @@ class SearchProductsFunction implements ChatFunctionInterface
                 'link' => "/products/{$p->slug}",
                 'feature_image' => $p->feature_image,
                 'category' => $p->category ? $p->category->name : '',
-                'total_sold' => $p->sold_count ?? 0
+                'total_sold' => $p->sold_count ?? 0,
+                'is_taxable' => $p->is_taxable ? 'Có áp dụng thuế' : 'Không áp dụng thuế'
             ];
         }
 

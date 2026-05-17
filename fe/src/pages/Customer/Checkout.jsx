@@ -34,6 +34,7 @@ import {
 import toast from "react-hot-toast";
 import { format } from "date-fns";
 import PromotionModal from "../Admin/order/components/PromotionModal";
+import api from "../../api/axios";
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -143,15 +144,17 @@ const Checkout = () => {
   const [shippingMethods, setShippingMethods] = useState([]);
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [bankConfig, setBankConfig] = useState(null);
+  const [activeTaxRate, setActiveTaxRate] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [shippingRes, paymentRes, bankRes] = await Promise.all([
+        const [shippingRes, paymentRes, bankRes, taxRes] = await Promise.all([
           ShippingMethodService.getActive(),
           fetchPaymentMethodsRequest(),
           fetchBankConfigRequest(),
+          api.get("/tax-rates"),
         ]);
 
         const shipping = shippingRes.data || [];
@@ -159,10 +162,13 @@ const Checkout = () => {
           (p) => p.is_active,
         );
         const bank = bankRes.data || bankRes;
+        const rates = taxRes.data.data || taxRes.data || [];
+        const activeTax = rates.find((r) => r.is_active === 1 || r.is_active === true);
 
         setShippingMethods(shipping);
         setPaymentMethods(payments);
         setBankConfig(bank);
+        setActiveTaxRate(activeTax);
 
         setFormData((prev) => ({
           ...prev,
@@ -318,9 +324,26 @@ const Checkout = () => {
     (m) => m.id === parseInt(formData.shipping_method_id),
   );
   const shippingFee = selectedShipping?.cost || 0;
+
+  // Tính tiền chịu thuế
+  const taxableAmount = displayItems.reduce((acc, item) => {
+    if (item.is_taxable) {
+      return acc + (Number(item.price) * (Number(item.quantity) || 1));
+    }
+    return acc;
+  }, 0);
+
+  let taxAmount = 0;
+  if (activeTaxRate) {
+    const rate = Number(activeTaxRate.rate) || 0;
+    const taxableRatio = Number(subtotal) > 0 ? taxableAmount / Number(subtotal) : 0;
+    const discountForTaxable = Number(discount) * taxableRatio;
+    taxAmount = Math.max(0, taxableAmount - discountForTaxable) * (rate / 100);
+  }
+
   const total = Math.max(
     0,
-    Number(subtotal) - Number(discount) + Number(shippingFee),
+    Number(subtotal) - Number(discount) + Number(shippingFee) + taxAmount,
   );
 
   useEffect(() => {
@@ -870,6 +893,15 @@ const Checkout = () => {
                       </span>
                       <span className="">{formatPrice(shippingFee)}</span>
                     </div>
+
+                    {activeTaxRate && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500 font-medium flex items-center gap-1">
+                          Thuế ({activeTaxRate.name} - {activeTaxRate.rate}%)
+                        </span>
+                        <span className="">{formatPrice(taxAmount)}</span>
+                      </div>
+                    )}
 
                     {useWallet && user && user.wallet_balance > 0 && (
                       <div className="flex justify-between text-sm text-indigo-600 font-bold bg-indigo-50 p-2 rounded-lg border border-indigo-100">

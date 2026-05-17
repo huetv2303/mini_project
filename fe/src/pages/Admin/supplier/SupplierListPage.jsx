@@ -38,7 +38,7 @@ import { useAuth } from "../../../context/AuthContext";
 const SupplierListPage = () => {
   const { hasPermission } = useAuth();
   const canManage = hasPermission("suppliers.manage");
-  
+
   const [suppliers, setSuppliers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -198,7 +198,7 @@ const SupplierListPage = () => {
             )}
           </div>
 
-          <div className="overflow-x-auto overflow-y-auto max-h-[480px]">
+          <div className="overflow-x-auto overflow-y-auto max-h-[700px]">
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-gray-50/50">
@@ -249,20 +249,20 @@ const SupplierListPage = () => {
                       key={sup.id}
                       className={`border-b border-gray-50 transition-all group ${selectedIds.has(sup.id) ? "bg-indigo-50/40" : "hover:bg-gray-50/50"}`}
                     >
-                        {canManage && (
-                          <td className="px-8 py-5">
-                            <button
-                              onClick={() => toggleSelect(sup.id)}
-                              className="text-indigo-500"
-                            >
-                              {selectedIds.has(sup.id) ? (
-                                <CheckSquare className="w-6 h-6" />
-                              ) : (
-                                <Square className="w-6 h-6 text-gray-200" />
-                              )}
-                            </button>
-                          </td>
-                        )}
+                      {canManage && (
+                        <td className="px-8 py-5">
+                          <button
+                            onClick={() => toggleSelect(sup.id)}
+                            className="text-indigo-500"
+                          >
+                            {selectedIds.has(sup.id) ? (
+                              <CheckSquare className="w-6 h-6" />
+                            ) : (
+                              <Square className="w-6 h-6 text-gray-200" />
+                            )}
+                          </button>
+                        </td>
+                      )}
                       <td className="px-6 py-5">
                         <div className="flex items-center gap-4">
                           <img
@@ -303,24 +303,26 @@ const SupplierListPage = () => {
                           {sup.status === 1 ? "Hoạt động" : "Tạm ngưng"}
                         </span>
                       </td>
-                        {canManage && (
-                          <td className="px-6 py-5">
-                            <div className="flex justify-end gap-2">
-                              <Link
-                                to={`/admin/suppliers/edit/${sup.slug}`}
-                                className="p-2.5 text-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-2xl transition-all"
-                              >
-                                <Edit2 className="w-5 h-5" />
-                              </Link>
-                              <button
-                                onClick={() => openDeleteModal(sup.slug, sup.name)}
-                                className="p-2.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all"
-                              >
-                                <Trash2 className="w-5 h-5" />
-                              </button>
-                            </div>
-                          </td>
-                        )}
+                      {canManage && (
+                        <td className="px-6 py-5">
+                          <div className="flex justify-end gap-2">
+                            <Link
+                              to={`/admin/suppliers/edit/${sup.slug}`}
+                              className="p-2.5 text-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-2xl transition-all"
+                            >
+                              <Edit2 className="w-5 h-5" />
+                            </Link>
+                            <button
+                              onClick={() =>
+                                openDeleteModal(sup.slug, sup.name)
+                              }
+                              className="p-2.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all"
+                            >
+                              <Trash2 className="w-5 h-5" />
+                            </button>
+                          </div>
+                        </td>
+                      )}
                     </tr>
                   ))
                 ) : (

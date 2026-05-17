@@ -64,14 +64,19 @@ class ProductRepository implements ProductRepositoryInterface
 
     public function search($query)
     {
-        return Product::with(['images', 'variants.inventories', 'variants.attributes'])
+        $qBuilder = Product::with(['images', 'variants.inventories', 'variants.attributes'])
             ->where(function ($q) use ($query) {
                 $q->where('name', 'like', '%' . $query . '%')
                     ->orWhereHas('variants', function ($v) use ($query) {
                         $v->where('sku', 'like', '%' . $query . '%');
                     });
-            })
-            ->get();
+            });
+
+        if (empty($query)) {
+            $qBuilder->limit(50);
+        }
+
+        return $qBuilder->get();
     }
 
     public function getBySku($sku)

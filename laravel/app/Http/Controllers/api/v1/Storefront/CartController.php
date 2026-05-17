@@ -43,7 +43,8 @@ class CartController extends Controller
                     'image' => $variant->image ?? $variant->product->image,
                     'sku' => $variant->sku,
                     'attributes' => $variant->attributes,
-                    'slug' => $variant->product->slug
+                    'slug' => $variant->product->slug,
+                    'is_taxable' => (bool)$variant->product->is_taxable,
                 ];
             }
         }

@@ -589,6 +589,16 @@ const MyOrderDetails = () => {
                       ₫
                     </span>
                   </div>
+                  {order.tax_amount > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-700 font-medium">
+                        Thuế (VAT {order.tax_rate_snapshot ?? 0}%)
+                      </span>
+                      <span className="">
+                        {new Intl.NumberFormat("vi-VN").format(order.tax_amount)}₫
+                      </span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-sm pt-4 border-t border-white/10">
                     <span className="text-gray-700 font-medium">
                       TỔNG GIÁ TRỊ

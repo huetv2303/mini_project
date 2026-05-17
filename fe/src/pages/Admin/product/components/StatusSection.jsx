@@ -29,6 +29,28 @@ const StatusSection = ({ formData, setFormData }) => {
           </button>
         </div>
       </div>
+      <div className="space-y-4 pt-4 border-t border-gray-50">
+        <label className="font-bold text-sm text-gray-700 flex items-center justify-between">
+          <span>Áp dụng thuế suất</span>
+          <span className="text-xs font-normal text-gray-400">(Thuế VAT khi bán hàng)</span>
+        </label>
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            type="button"
+            onClick={() => setFormData({ ...formData, is_taxable: 1 })}
+            className={`py-4 rounded-lg text-xs font-bold transition-all ${formData.is_taxable ? "bg-indigo-600 text-white shadow-lg shadow-indigo-100" : "bg-gray-50 text-gray-400 hover:bg-gray-100"}`}
+          >
+            Có áp dụng
+          </button>
+          <button
+            type="button"
+            onClick={() => setFormData({ ...formData, is_taxable: 0 })}
+            className={`py-4 rounded-lg text-xs font-bold transition-all ${!formData.is_taxable ? "bg-gray-800 text-white shadow-lg shadow-gray-400" : "bg-gray-50 text-gray-400 hover:bg-gray-100"}`}
+          >
+            Không áp dụng
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

@@ -235,9 +235,7 @@ const VariantsSection = ({
                 <input
                   type="text"
                   placeholder={
-                    opt.values.length === 0
-                      ? "Nhập M, L rồi bấm phẩy (,)"
-                      : "..."
+                    opt.values.length === 0 ? "Nhập M, L rồi bấm Enter" : "..."
                   }
                   value={activeTyping[optIdx] || ""}
                   onChange={(e) =>

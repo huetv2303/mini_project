@@ -36,9 +36,14 @@ class CheckoutRepository implements CheckoutRepositoryInterface
         }
 
         $subtotal = 0;
+        $taxableSubtotal = 0;
         foreach ($rawItems as $item) {
-            $variant = ProductVariant::findOrFail($item['product_variant_id']);
-            $subtotal += $variant->price * $item['quantity'];
+            $variant = ProductVariant::with('product')->findOrFail($item['product_variant_id']);
+            $itemSubtotal = $variant->price * $item['quantity'];
+            $subtotal += $itemSubtotal;
+            if ($variant->product && $variant->product->is_taxable) {
+                $taxableSubtotal += $itemSubtotal;
+            }
         }
 
         $shippingFee = 0;
@@ -48,11 +53,24 @@ class CheckoutRepository implements CheckoutRepositoryInterface
         }
 
         $discountAmount = floatval($request->input('discount_amount', 0));
-        $finalAmount = max(0, ($subtotal - $discountAmount) + $shippingFee);
+        
+        $taxRate = \App\Models\TaxRate::where('is_active', true)->first();
+        $taxAmount = 0;
+        $taxRateSnapshot = 0;
+        if ($taxRate) {
+            $taxRateSnapshot = $taxRate->rate;
+            $taxableRatio = $subtotal > 0 ? $taxableSubtotal / $subtotal : 0;
+            $discountForTaxable = $discountAmount * $taxableRatio;
+            $taxAmount = max(0, $taxableSubtotal - $discountForTaxable) * ($taxRateSnapshot / 100);
+        }
+
+        $finalAmount = max(0, ($subtotal - $discountAmount) + $shippingFee + $taxAmount);
 
         return [
             'subtotal' => $subtotal,
             'shipping_fee' => $shippingFee,
+            'tax_amount' => $taxAmount,
+            'tax_rate_snapshot' => $taxRateSnapshot,
             'final_amount' => $finalAmount,
             'discount_amount' => $discountAmount,
             'items_count' => count($rawItems)
@@ -80,6 +98,7 @@ class CheckoutRepository implements CheckoutRepositoryInterface
 
 
             $subtotal      = 0;
+            $taxableAmount = 0;
             $preparedItems = [];
 
             foreach ($rawItems as $item) {
@@ -99,6 +118,10 @@ class CheckoutRepository implements CheckoutRepositoryInterface
                 $itemPrice    = $variant->price;
                 $itemSubtotal = $itemPrice * $item['quantity'];
                 $subtotal    += $itemSubtotal;
+
+                if ($variant->product && $variant->product->is_taxable) {
+                    $taxableAmount += $itemSubtotal;
+                }
 
                 $preparedItems[] = [
                     'product_id'         => $variant->product_id,
@@ -126,8 +149,19 @@ class CheckoutRepository implements CheckoutRepositoryInterface
             $promotionId            = $request->input('promotion_id');
             $promotionCodeSnapshot  = $request->input('promotion_code_snapshot');
 
+            $taxRate = \App\Models\TaxRate::where('is_active', true)->first();
+            $taxAmount = 0;
+            $taxRateSnapshot = 0;
+            $taxRateId = null;
+            if ($taxRate) {
+                $taxRateId = $taxRate->id;
+                $taxRateSnapshot = $taxRate->rate;
+                $taxableRatio = $subtotal > 0 ? $taxableAmount / $subtotal : 0;
+                $discountForTaxable = $discountAmount * $taxableRatio;
+                $taxAmount = max(0, $taxableAmount - $discountForTaxable) * ($taxRateSnapshot / 100);
+            }
 
-            $finalAmount = max(0, ($subtotal - $discountAmount) + $shippingFee);
+            $finalAmount = max(0, ($subtotal - $discountAmount) + $shippingFee + $taxAmount);
 
 
             $customerId = $user?->id;
@@ -150,6 +184,9 @@ class CheckoutRepository implements CheckoutRepositoryInterface
                 'total_amount'            => $subtotal,
                 'discount_amount'         => $discountAmount,
                 'shipping_fee'            => $shippingFee,
+                'tax_rate_id'             => $taxRateId,
+                'tax_rate_snapshot'       => $taxRateSnapshot,
+                'tax_amount'              => $taxAmount,
                 'final_amount'            => $finalAmount,
                 'expected_delivery_date'  => $expectedDeliveryDate,
                 'status'                  => 'pending',

@@ -31,6 +31,7 @@ class Product extends Model
         'feature_image',
         'status',
         'sold_count',
+        'is_taxable',
     ];
 
     public function variants()

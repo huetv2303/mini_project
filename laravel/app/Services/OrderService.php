@@ -54,6 +54,7 @@ class OrderService
         return DB::transaction(function () use ($data, $staffId) {
             $items = $data['items'];
             $totalAmount = 0;
+            $taxableAmount = 0;
             $preparedItems = [];
             $reserved = 0;
 
@@ -71,6 +72,11 @@ class OrderService
                 $price    = $variant->price;
                 $subtotal = $price * $item['quantity'];
                 $totalAmount += $subtotal;
+                
+                if ($variant->product && $variant->product->is_taxable) {
+                    $taxableAmount += $subtotal;
+                }
+
                 $reserved += $item['quantity'];
                 $preparedItems[] = [
                     'product_id'         => $variant->product_id,
@@ -97,15 +103,18 @@ class OrderService
 
             $discountAmount = $data['discount_amount'] ?? 0;
 
-            $taxRateId = $data['tax_rate_id'] ?? null;
+            $taxRate = TaxRate::where('is_active', true)->first();
+            $taxRateId = $taxRate ? $taxRate->id : null;
             $taxRateSnapshot = 0;
             $taxAmount = 0;
-            if ($taxRateId) {
-                $taxRate = TaxRate::find($taxRateId);
-                if ($taxRate) {
-                    $taxRateSnapshot = $taxRate->rate;
-                    $taxAmount = ($totalAmount - $discountAmount) * ($taxRateSnapshot / 100);
-                }
+            if ($taxRate) {
+                $taxRateSnapshot = $taxRate->rate;
+                
+                // Phân bổ discount tỷ lệ cho phần chịu thuế
+                $taxableRatio = $totalAmount > 0 ? $taxableAmount / $totalAmount : 0;
+                $discountForTaxable = $discountAmount * $taxableRatio;
+                
+                $taxAmount = max(0, $taxableAmount - $discountForTaxable) * ($taxRateSnapshot / 100);
             }
 
             $finalAmount = max(0, ($totalAmount - $discountAmount) + $taxAmount + $shippingFee);

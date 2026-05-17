@@ -31,6 +31,14 @@ class TaxRateController extends Controller
             'is_active' => 'boolean',
         ]);
 
+        if (!isset($validated['is_active'])) {
+            $validated['is_active'] = true;
+        }
+
+        if ($validated['is_active']) {
+            TaxRate::where('is_active', true)->update(['is_active' => false]);
+        }
+
         $taxRate = TaxRate::create($validated);
         return response()->json($taxRate, 201);
     }
@@ -50,6 +58,10 @@ class TaxRateController extends Controller
             'rate' => 'sometimes|numeric|min:0|max:100',
             'is_active' => 'boolean',
         ]);
+
+        if (isset($validated['is_active']) && $validated['is_active']) {
+            TaxRate::where('id', '!=', $id)->where('is_active', true)->update(['is_active' => false]);
+        }
 
         $taxRate->update($validated);
         return response()->json($taxRate);

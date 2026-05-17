@@ -97,6 +97,7 @@ export const CartProvider = ({ children }) => {
           sku: variant.sku,
           attributes: variant.attributes,
           slug: product.slug,
+          is_taxable: product.is_taxable || false,
         });
       }
       setCartItems(newItems);
