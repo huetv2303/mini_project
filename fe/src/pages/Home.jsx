@@ -327,26 +327,45 @@ const Home = () => {
               }}
               className="featured-swiper !pb-14"
             >
-              {featuredProducts.map((prod) => (
-                <SwiperSlide key={prod.id}>
-                  <div className="group bg-white rounded-3xl border border-slate-100 p-4 shadow-sm hover:shadow-md hover:border-slate-200/60 transition-all duration-300 flex flex-col justify-between">
-                    <Link
-                      to={`/products/${prod.slug}`}
-                      className="relative h-64 mb-4 rounded-2xl overflow-hidden bg-slate-50 flex items-center justify-center flex-shrink-0"
-                    >
-                      <img
-                        src={
-                          getImageUrl(prod.image) ||
-                          "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80"
-                        }
-                        alt={prod.name}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                      />
+              {featuredProducts.map((prod) => {
+                const isOutOfStock = !prod.variants || prod.variants.length === 0 || prod.variants.every(v => {
+                  const inv = v.inventory;
+                  if (!inv) return true;
+                  return inv.available <= 0;
+                });
 
-                      <span className="absolute bottom-4 left-1/2 -translate-x-1/2 translate-y-10 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-sky-600 hover:bg-sky-700 text-white px-5 py-2.5 rounded-2xl font-black text-[10px] uppercase tracking-wider flex items-center gap-1.5 shadow-md shadow-sky-500/10 z-10 whitespace-nowrap">
-                        <ShoppingBag size={12} /> MUA NGAY
-                      </span>
-                    </Link>
+                return (
+                  <SwiperSlide key={prod.id}>
+                    <div className={`group bg-white rounded-3xl border border-slate-100 p-4 shadow-sm hover:shadow-md hover:border-slate-200/60 transition-all duration-300 flex flex-col justify-between ${isOutOfStock ? "opacity-90" : ""}`}>
+                      <Link
+                        to={`/products/${prod.slug}`}
+                        className="relative h-64 mb-4 rounded-2xl overflow-hidden bg-slate-50 flex items-center justify-center flex-shrink-0"
+                      >
+                        <img
+                          src={
+                            getImageUrl(prod.image) ||
+                            "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80"
+                          }
+                          alt={prod.name}
+                          className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 ${
+                            isOutOfStock ? "grayscale opacity-75" : ""
+                          }`}
+                        />
+
+                        {isOutOfStock && (
+                          <span className="absolute top-4 left-4 bg-rose-600 text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-wider shadow-sm animate-pulse z-10">
+                            Hết hàng
+                          </span>
+                        )}
+
+                        <span className={`absolute bottom-4 left-1/2 -translate-x-1/2 translate-y-10 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300 px-5 py-2.5 rounded-2xl font-black text-[10px] uppercase tracking-wider flex items-center gap-1.5 shadow-md z-10 whitespace-nowrap ${
+                          isOutOfStock
+                            ? "bg-slate-500 hover:bg-slate-600 text-white shadow-slate-500/20"
+                            : "bg-sky-600 hover:bg-sky-700 text-white shadow-sky-500/20"
+                        }`}>
+                          <ShoppingBag size={12} /> {isOutOfStock ? "HẾT HÀNG" : "XEM CHI TIẾT"}
+                        </span>
+                      </Link>
 
                     <div className="flex flex-col justify-between">
                       <div className="space-y-1 text-left">
@@ -380,7 +399,8 @@ const Home = () => {
                     </div>
                   </div>
                 </SwiperSlide>
-              ))}
+              );
+            })}
             </Swiper>
 
             {/* Custom Navigation Buttons */}

@@ -241,6 +241,8 @@ const ProductDetail = () => {
       return colorMatch && sizeMatch;
     }) || product?.variants?.[0];
 
+  const isOutOfStock = !activeVariant || !activeVariant.inventory || activeVariant.inventory.available <= 0;
+
   // Smart Selection Handlers
   const handleColorChange = (color) => {
     setSelectedColor(color);
@@ -422,6 +424,18 @@ const ProductDetail = () => {
                         <span className="text-slate-500 text-xs font-bold bg-slate-50 border border-slate-100 px-2.5 py-1 rounded-lg">
                           SKU: {activeVariant?.sku || "N/A"}
                         </span>
+
+                        {/* Dynamic Stock Indicator Badge */}
+                        {isOutOfStock ? (
+                          <span className="text-rose-600 text-xs font-extrabold bg-rose-50 border border-rose-100 px-2.5 py-1 rounded-lg uppercase tracking-wider animate-pulse">
+                            Hết hàng
+                          </span>
+                        ) : (
+                          <span className="text-emerald-600 text-xs font-extrabold bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-lg">
+                            Còn lại: {activeVariant.inventory.available} sản phẩm
+                          </span>
+                        )}
+
                         <div className="flex items-center gap-2 bg-slate-50 border border-slate-100 px-3 py-1 rounded-xl w-fit">
                           <StarRating
                             rating={product.average_rating}
@@ -627,15 +641,25 @@ const ProductDetail = () => {
                   </button>
                   <button
                     onClick={handleAddToCart}
-                    className="hidden sm:flex w-16 h-16 border border-slate-200 bg-white hover:border-sky-600 hover:text-sky-600 text-slate-500 items-center justify-center rounded-2xl transition-all duration-300 shadow-sm"
+                    disabled={isOutOfStock}
+                    className={`hidden sm:flex w-16 h-16 border items-center justify-center rounded-2xl transition-all duration-300 shadow-sm ${
+                      isOutOfStock
+                        ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
+                        : "border-slate-200 bg-white hover:border-sky-600 hover:text-sky-600 text-slate-500"
+                    }`}
                   >
                     <ShoppingCart size={20} />
                   </button>
                   <button
                     onClick={handleBuyNow}
-                    className="flex-1 p-5 h-16 bg-sky-600 text-white text-xs font-black uppercase tracking-widest hover:bg-sky-700 transition-all rounded-2xl shadow-md shadow-sky-500/10 hover:-translate-y-0.5"
+                    disabled={isOutOfStock}
+                    className={`flex-1 p-5 h-16 text-white text-xs font-black uppercase tracking-widest transition-all rounded-2xl shadow-md ${
+                      isOutOfStock
+                        ? "bg-slate-400 cursor-not-allowed shadow-none"
+                        : "bg-sky-600 hover:bg-sky-700 hover:-translate-y-0.5 shadow-sky-500/10"
+                    }`}
                   >
-                    Mua ngay
+                    {isOutOfStock ? "Hết hàng" : "Mua ngay"}
                   </button>
                   {/* Mobile Heart & Cart Button */}
                   <div className="sm:hidden grid grid-cols-2 gap-4">
@@ -660,10 +684,17 @@ const ProductDetail = () => {
                     </button>
                     <button
                       onClick={handleAddToCart}
-                      className="h-14 flex items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-500"
+                      disabled={isOutOfStock}
+                      className={`h-14 flex items-center justify-center rounded-2xl border transition-all ${
+                        isOutOfStock
+                          ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
+                          : "border-slate-200 bg-white text-slate-500"
+                      }`}
                     >
                       <ShoppingCart size={18} className="mr-2" />
-                      <span className="text-xs font-bold">Thêm giỏ hàng</span>
+                      <span className="text-xs font-bold">
+                        {isOutOfStock ? "Hết hàng" : "Thêm giỏ hàng"}
+                      </span>
                     </button>
                   </div>
                 </div>

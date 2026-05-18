@@ -84,7 +84,10 @@ class ProductResource extends JsonResource
                         ? [
                             'quantity'     => $variant->inventories->first()->quantity,
                             'reserved'     => $variant->inventories->first()->reserved,
-                            'available'    => $variant->inventories->first()->quantity - $variant->inventories->first()->reserved,
+                            'available'    => $variant->inventories->first()->quantity 
+                                              - $variant->inventories->first()->reserved 
+                                              - $variant->inventories->first()->returning 
+                                              - $variant->inventories->first()->packing,
                             'min_quantity' => $variant->inventories->first()->min_quantity,
                             'unavailable'  => $variant->inventories->first()->unavailable,
                             'returning'    => $variant->inventories->first()->returning,

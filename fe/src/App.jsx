@@ -23,6 +23,7 @@ import WalletPage from "./pages/Customer/WalletPage";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import AdminProfile from "./pages/Admin/AdminProfile";
 import ReviewManagement from "./pages/Admin/review/ReviewManagement";
+import SupportChat from "./pages/Admin/support/SupportChat";
 import MyReviews from "./pages/Customer/MyReviews";
 
 // Auth & Route Guards
@@ -494,6 +495,16 @@ const App = () => {
                       <AuthGuard>
                         <RoleGuard permission="admin.manage">
                           <ReviewManagement />
+                        </RoleGuard>
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/admin/support"
+                    element={
+                      <AuthGuard>
+                        <RoleGuard permission="admin.manage">
+                          <SupportChat />
                         </RoleGuard>
                       </AuthGuard>
                     }

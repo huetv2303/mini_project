@@ -267,6 +267,23 @@ Route::group(['prefix' => 'v1'], function () {
             Route::get('/history', [\App\Http\Controllers\api\v1\ChatbotController::class, 'history']);
             Route::delete('/history', [\App\Http\Controllers\api\v1\ChatbotController::class, 'clearHistory']);
         });
+
+        // Real-time Support Chat routes
+        Route::prefix('support')->group(function () {
+            // Customer routes
+            Route::get('/messages', [\App\Http\Controllers\api\v1\SupportChatController::class, 'getCustomerMessages']);
+            Route::post('/messages', [\App\Http\Controllers\api\v1\SupportChatController::class, 'sendCustomerMessage']);
+
+            // Admin/Staff routes
+            Route::middleware('permission:admin.manage')->group(function () {
+                Route::get('/conversations', [\App\Http\Controllers\api\v1\SupportChatController::class, 'getAdminConversations']);
+                Route::get('/conversations/{customerId}/messages', [\App\Http\Controllers\api\v1\SupportChatController::class, 'getAdminMessages']);
+                Route::post('/conversations/{customerId}/messages', [\App\Http\Controllers\api\v1\SupportChatController::class, 'sendAdminReply']);
+            });
+
+            // Common route
+            Route::post('/conversations/{customerId}/read', [\App\Http\Controllers\api\v1\SupportChatController::class, 'markAsRead']);
+        });
     });
 
     // Webhooks should not be authenticated

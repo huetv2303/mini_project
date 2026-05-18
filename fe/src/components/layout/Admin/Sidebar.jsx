@@ -115,6 +115,12 @@ const Sidebar = () => {
             label="Đánh giá"
             show={hasPermission("reviews.manage")}
           />
+          <SidebarItem
+            to="/admin/support"
+            icon={MessageSquare}
+            label="Tư vấn Chat"
+            show={hasPermission("admin.manage")}
+          />
           
           <SectionTitle title="Mở rộng" show={isAdmin} />
           <SidebarItem

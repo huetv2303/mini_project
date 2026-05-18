@@ -81,7 +81,7 @@ const ProductVariantSelector = ({ product, onAdd }) => {
     [sel, product],
   );
 
-  const qty = matchingVariant ? matchingVariant.inventory?.quantity || 0 : 0;
+  const qty = matchingVariant ? matchingVariant.inventory?.available || 0 : 0;
   const min_qty = matchingVariant
     ? matchingVariant.inventory?.min_quantity || 0
     : 0;
@@ -485,9 +485,19 @@ const OrderCreatePage = () => {
   const addItemToOrder = (product, variant) => {
     const items = [...activeSession.selectedItems];
     const idx = items.findIndex((i) => i.variant_id === variant.id);
+    const available = variant.inventory?.available ?? 0;
+
     if (idx > -1) {
+      if (items[idx].quantity >= available) {
+        toast.error(`Không thể tăng thêm. Số lượng khả dụng tối đa trong kho là ${available}`);
+        return;
+      }
       items[idx].quantity += 1;
     } else {
+      if (available <= 0) {
+        toast.error("Biến thể này đã hết hàng khả dụng");
+        return;
+      }
       items.push({
         product_id: product.id,
         category_id: product.category_id,
@@ -501,6 +511,7 @@ const OrderCreatePage = () => {
         quantity: 1,
         image: product.feature_image || product.images?.[0]?.url,
         is_taxable: product.is_taxable !== false,
+        available: available,
       });
     }
     patchSession({ selectedItems: items });
@@ -509,6 +520,14 @@ const OrderCreatePage = () => {
 
   const updateQuantity = (idx, delta) => {
     const items = [...activeSession.selectedItems];
+    const item = items[idx];
+    const available = item.available !== undefined ? item.available : 99999;
+
+    if (delta > 0 && item.quantity >= available) {
+      toast.error(`Không thể tăng thêm. Số lượng khả dụng tối đa trong kho là ${available}`);
+      return;
+    }
+
     items[idx].quantity += delta;
     if (items[idx].quantity <= 0) {
       items.splice(idx, 1);

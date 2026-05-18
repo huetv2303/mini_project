@@ -4,8 +4,12 @@ use Illuminate\Support\Facades\Broadcast;
 
 
 Broadcast::channel('admin', function ($user) {
-    // Chỉ admin mới được nghe kênh này
-    return $user->role && $user->role->name === 'admin';
+    // Cho phép admin/staff có quyền quản lý được nghe kênh này
+    return $user->role && (
+        $user->role->code === 'admin' || 
+        $user->role->name === 'admin' || 
+        $user->hasPermission('admin.manage')
+    );
 });
 
 Broadcast::channel('user.{id}', function ($user, $id) {

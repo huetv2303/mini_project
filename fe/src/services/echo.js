@@ -1,5 +1,6 @@
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
+import axios from 'axios';
 
 window.Pusher = Pusher;
 
@@ -11,14 +12,28 @@ const echo = new Echo({
     wssPort: import.meta.env.VITE_REVERB_PORT,
     forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https',
     enabledTransports: ['ws', 'wss'],
-    // Endpoint để authenticate private channel
-    authEndpoint: `${import.meta.env.VITE_API_BASE_URL}/broadcasting/auth`,
-    auth: {
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-            Accept: 'application/json',
-        },
-    },
+    // Sử dụng custom authorizer để luôn đính kèm access_token mới nhất từ localStorage
+    authorizer: (channel, options) => {
+        return {
+            authorize: (socketId, callback) => {
+                axios.post(`${import.meta.env.VITE_API_BASE_URL}/broadcasting/auth`, {
+                    socket_id: socketId,
+                    channel_name: channel.name
+                }, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+                        Accept: 'application/json',
+                    }
+                })
+                .then(response => {
+                    callback(false, response.data);
+                })
+                .catch(error => {
+                    callback(true, error);
+                });
+            }
+        };
+    }
 });
 
 export default echo;
