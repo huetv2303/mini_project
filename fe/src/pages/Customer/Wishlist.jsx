@@ -6,22 +6,20 @@ import { useCart } from "../../context/CartContext";
 import { getImageUrl, formatPrice } from "../../helper/helper";
 import {
   Heart,
-  Trash2,
   ShoppingBag,
   ChevronRight,
   ArrowRight,
-  ShoppingBasket,
+  Home,
+  Trash2,
 } from "lucide-react";
+import StarRating from "../../components/review/StarRating";
 
 const Wishlist = () => {
   const { wishlistItems, toggleWishlist, loading } = useWishlist();
   const { addToCart, setIsCartOpen } = useCart();
 
   const handleAddToCart = (product) => {
-    // If product has variants, we should ideally redirect to detail page
-    // to choose variant, but for simplicity if we want to add directly:
     if (product.variants && product.variants.length > 0) {
-      // Add first variant by default or redirect
       addToCart(product, product.variants[0], 1);
     } else {
       addToCart(product, null, 1);
@@ -31,92 +29,124 @@ const Wishlist = () => {
 
   return (
     <CustomerLayout>
-      <div className="pt-32 pb-24 bg-white min-h-screen">
-        <div className="max-w-7xl mx-auto px-4 md:px-8">
+      <div className="pt-32 pb-24 bg-[#f8fafc] min-h-screen text-left">
+        <div className="max-w-7xl mx-auto px-10 md:px-20">
           {/* Breadcrumbs */}
-          <div className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest mb-12">
-            <Link to="/" className="hover:text-black transition-colors">
+          <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-10 bg-white px-5 py-3 rounded-2xl border border-slate-100 shadow-sm w-fit">
+            <Link
+              to="/"
+              className="hover:text-sky-600 transition-colors flex items-center gap-1"
+            >
+              <Home size={13} className="text-slate-400" />
               Trang chủ
             </Link>
-            <ChevronRight size={12} />
-            <span className="text-black">Danh sách yêu thích</span>
+            <ChevronRight size={12} className="text-slate-300" />
+            <span className="text-slate-800">Danh sách yêu thích</span>
           </div>
 
-          <div className="flex items-center justify-between mb-12">
+          {/* Page Title */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10 bg-white p-6 md:p-8 rounded-3xl border border-slate-100 shadow-sm">
             <div>
-              <h1 className="text-4xl font-black text-gray-900 uppercase tracking-tight mb-2">
+              <h1 className="text-2xl md:text-3xl font-black text-slate-800 uppercase tracking-tight mb-2">
                 Danh sách yêu thích
               </h1>
-              <p className="text-gray-500 font-medium">
-                {wishlistItems.length} sản phẩm bạn đã lưu lại
+              <p className="text-sm text-slate-500 font-medium">
+                Bạn đang lưu lại{" "}
+                <span className="font-extrabold text-sky-600">
+                  {wishlistItems.length}
+                </span>{" "}
+                sản phẩm tuyệt vời
               </p>
             </div>
             {wishlistItems.length > 0 && (
-              <button
-                onClick={() => {
-                  if (window.confirm("Bạn có chắc chắn muốn xóa tất cả?")) {
-                    // Logic to clear all if needed
-                  }
-                }}
-                className="text-xs font-bold text-gray-400 hover:text-red-500 transition-colors uppercase tracking-widest hidden md:block"
+              <Link
+                to="/products"
+                className="inline-flex items-center gap-2 bg-slate-50 border border-slate-100 hover:bg-slate-100 text-slate-600 px-5 py-3 rounded-2xl text-xs font-black uppercase tracking-wider transition-all"
               >
-                Xóa tất cả
-              </button>
+                Tiếp tục mua sắm
+                <ArrowRight size={14} />
+              </Link>
             )}
           </div>
 
           {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="animate-pulse space-y-4">
-                  <div className="aspect-[3/4] bg-gray-100 rounded-[30px]"></div>
-                  <div className="h-4 bg-gray-100 rounded w-2/3"></div>
-                  <div className="h-4 bg-gray-100 rounded w-1/3"></div>
+                <div
+                  key={i}
+                  className="animate-pulse bg-white rounded-3xl border border-slate-100 p-4 space-y-4 flex flex-col h-full"
+                >
+                  <div className="aspect-[3/4] bg-slate-100 rounded-2xl w-full"></div>
+                  <div className="h-4 bg-slate-100 rounded w-2/3"></div>
+                  <div className="h-3 bg-slate-50 rounded w-1/3"></div>
+                  <div className="h-4 bg-slate-100 rounded w-1/2"></div>
                 </div>
               ))}
             </div>
           ) : wishlistItems.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
               {wishlistItems.map((prod) => (
-                <div key={prod.id} className="group relative">
-                  <div className="relative aspect-[3/4] mb-6 overflow-hidden bg-gray-50 rounded-[30px] shadow-sm transition-all hover:shadow-xl group-hover:-translate-y-2">
-                    <Link to={`/products/${prod.slug}`}>
+                <div
+                  key={prod.id}
+                  className="group bg-white rounded-lg border border-slate-100 shadow-sm overflow-hidden flex flex-col h-full hover:shadow-md hover:border-slate-200/60 transition-all duration-300"
+                >
+                  <div className="relative aspect-[3/4] w-full overflow-hidden bg-slate-50 flex-shrink-0">
+                    <Link
+                      to={`/products/${prod.slug}`}
+                      className="block w-full h-full"
+                    >
                       <img
-                        src={getImageUrl(prod.image)}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        src={
+                          prod.image
+                            ? getImageUrl(prod.image)
+                            : "https://placehold.co/600x600/e2e8f0/475569?text=No+Image"
+                        }
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                         alt={prod.name}
                       />
                     </Link>
 
-                    {/* Delete Toggle */}
+                    {/* Glassmorphic Delete heart Wishlist toggle */}
                     <button
                       onClick={() => toggleWishlist(prod)}
-                      className="absolute top-6 right-6 z-10 p-3 bg-white/90 backdrop-blur-md rounded-2xl text-red-500 shadow-sm hover:bg-red-500 hover:text-white transition-all duration-300"
+                      className="absolute top-4 right-4 z-10 p-2.5 rounded-full shadow-sm bg-rose-50/90 text-rose-500 hover:bg-rose-500 hover:text-white backdrop-blur-md transition-all duration-300 transform hover:scale-110 active:scale-95"
                     >
-                      <Heart size={18} />
+                      <Heart size={15} fill="currentColor" />
                     </button>
 
-                    {/* Quick Add */}
+                    {/* Quick Add to Cart button on hover */}
                     <button
                       onClick={() => handleAddToCart(prod)}
-                      className="absolute bottom-6 left-6 right-6 h-14 bg-black text-white text-[13px] hover:bg-black/80 font-black uppercase  rounded-lg flex items-center justify-center gap-2 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 "
+                      className="absolute hover:bg-sky-700 bottom-4 left-1/2 -translate-x-1/2 translate-y-10 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-sky-600 text-white px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-sky-500/20 text-[11px] whitespace-nowrap"
                     >
-                      <ShoppingBag size={16} />
+                      <ShoppingBag size={14} />
                       Thêm vào giỏ
                     </button>
                   </div>
 
-                  <div className="space-y-1 px-2">
-                    <h3 className="text-sm font-bold text-gray-900 uppercase tracking-tight">
-                      <Link to={`/products/${prod.slug}`}>{prod.name}</Link>
-                    </h3>
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm  text-gray-900">
-                        {formatPrice(prod.price)}
-                      </span>
-                      {prod.old_price && (
-                        <span className="text-xs text-gray-400 line-through">
-                          {formatPrice(prod.old_price)}
+                  <div className="p-3 flex-1 flex flex-col justify-between space-y-3">
+                    <div className="space-y-1">
+                      <h3 className="text-sm font-bold text-black/80 line-clamp-2 group-hover:text-sky-600 transition-colors uppercase tracking-tight">
+                        <Link to={`/products/${prod.slug}`}>{prod.name}</Link>
+                      </h3>
+                    </div>
+
+                    <div className="flex items-baseline justify-between pt-1">
+                      <div className="flex items-baseline gap-2.5">
+                        <span className="text-base font-medium text-sky-700">
+                          {formatPrice(prod.price)}
+                        </span>
+                      </div>
+                      {prod.average_rating ? (
+                        <div className="flex items-center gap-1.5">
+                          <StarRating rating={prod.average_rating} size={12} />
+                          <span className="text-[11px] font-medium text-slate-400">
+                            ({prod.review_count})
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-[11px] font-medium text-slate-400">
+                          Chưa có đánh giá
                         </span>
                       )}
                     </div>
@@ -125,28 +155,26 @@ const Wishlist = () => {
               ))}
             </div>
           ) : (
-            <div className="text-center py-32 bg-gray-50 rounded-[40px] px-8 border-2 border-dashed border-gray-100">
-              <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-purple-500/10">
-                <Heart size={40} className="text-gray-200" />
+            <div className="text-center py-24 bg-white rounded-3xl border border-slate-100 shadow-sm px-6">
+              <div className="w-20 h-20 bg-sky-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Heart size={36} className="text-sky-400 animate-pulse" />
               </div>
-              <h2 className="text-2xl font-black text-gray-900 uppercase mb-4">
+              <h2 className="text-xl font-black text-slate-800 uppercase tracking-wide mb-3">
                 Danh sách của bạn đang trống
               </h2>
-              <p className="text-gray-500 mb-10 max-w-md mx-auto font-medium">
-                Hãy thêm những sản phẩm bạn yêu thích vào danh sách để dễ dàng
-                mua sắm sau này.
+              <p className="text-sm text-slate-400 mb-8 max-w-sm mx-auto font-medium">
+                Hãy thêm những sản phẩm yêu thích vào danh sách để cập nhật các
+                ưu đãi đặc biệt và mua sắm dễ dàng hơn nhé.
               </p>
               <Link
                 to="/products"
-                className="inline-flex items-center gap-3 bg-black text-white px-10 py-5 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-purple-600 transition-all shadow-xl shadow-black/10 hover:-translate-y-1"
+                className="inline-flex items-center gap-2 bg-sky-600 text-white px-8 py-3.5 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-sky-700 transition-all shadow-md shadow-sky-500/10 hover:-translate-y-0.5 active:scale-95"
               >
                 Khám phá ngay
-                <ArrowRight size={16} />
+                <ArrowRight size={14} />
               </Link>
             </div>
           )}
-
-          {/* Recently Viewed or Suggestions can go here */}
         </div>
       </div>
     </CustomerLayout>

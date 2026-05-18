@@ -18,7 +18,7 @@ import {
   Ticket,
   LayoutDashboard,
   MessageSquare,
-  Wallet
+  Wallet,
 } from "lucide-react";
 import LogoTrendora from "../../../assets/LogoTrendora.png";
 import { getImageUrl } from "../../../helper/helper";
@@ -230,17 +230,20 @@ const CustomerNavbar = () => {
                           <p className="text-sm font-bold text-gray-900 truncate">
                             {user.email}
                           </p>
-                            <div className="mt-2 flex items-center gap-2">
-                              <span className="px-2 py-0.5 bg-black text-white text-[10px] font-bold rounded-full uppercase">
-                                {user.customer_profile?.loyalty_tier || "Bronze"}{" "}
-                                Member
-                              </span>
-                              <span className="flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-600 text-[10px] font-bold rounded-full">
-                                <Wallet size={10} />
-                                {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(user.wallet_balance || 0)}
-                              </span>
-                            </div>
+                          <div className="mt-2 flex items-center gap-2">
+                            <span className="px-2 py-0.5 bg-black text-white text-[10px] font-bold rounded-full uppercase">
+                              {user.customer_profile?.loyalty_tier || "Bronze"}{" "}
+                              Member
+                            </span>
+                            <span className="flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-600 text-[10px] font-bold rounded-full">
+                              <Wallet size={10} />
+                              {new Intl.NumberFormat("vi-VN", {
+                                style: "currency",
+                                currency: "VND",
+                              }).format(user.wallet_balance || 0)}
+                            </span>
                           </div>
+                        </div>
 
                         {user.role?.code === "admin" && (
                           <Link

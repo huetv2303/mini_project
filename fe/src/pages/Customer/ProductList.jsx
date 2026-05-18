@@ -9,6 +9,7 @@ import {
   Grid,
   List as ListIcon,
   ChevronRight,
+  ChevronLeft,
   Heart,
   Home,
   Coins,
@@ -26,6 +27,18 @@ const ProductList = () => {
   const [viewMode, setViewMode] = useState("grid");
   const [sortBy, setSortBy] = useState("latest");
   const { toggleWishlist, isInWishlist } = useWishlist();
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    lastPage: 1,
+    total: 0,
+    perPage: 12,
+  });
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [categorySlug]);
 
   // Price range and rating filters
   const [minPrice, setMinPrice] = useState("");
@@ -131,6 +144,7 @@ const ProductList = () => {
           category: categorySlug,
           sort: sortBy,
           limit: 12,
+          page: currentPage,
         };
 
         if (minPrice !== "") params.min_price = minPrice;
@@ -138,7 +152,18 @@ const ProductList = () => {
         if (ratingFilter !== "") params.rating = ratingFilter;
 
         const productRes = await fetchProductsRequest(params);
-        setProducts(productRes.data?.data || productRes.data || []);
+        const rawData = productRes?.data;
+        const items =
+          rawData?.data || (Array.isArray(productRes) ? productRes : []);
+        const meta = rawData?.meta || {};
+
+        setProducts(items);
+        setPagination({
+          currentPage: meta.current_page || 1,
+          lastPage: meta.last_page || 1,
+          total: meta.total || items.length,
+          perPage: meta.per_page || 12,
+        });
       } catch (error) {
         console.error("Error loading products:", error);
       } finally {
@@ -147,7 +172,7 @@ const ProductList = () => {
     };
 
     loadData();
-  }, [categorySlug, sortBy, minPrice, maxPrice, ratingFilter]);
+  }, [categorySlug, sortBy, minPrice, maxPrice, ratingFilter, currentPage]);
 
   const activeCategory = (Array.isArray(categories) ? categories : []).find(
     (c) => c.slug === categorySlug,
@@ -156,6 +181,7 @@ const ProductList = () => {
   const handleCustomPriceFilter = () => {
     setMinPrice(minVal);
     setMaxPrice(maxVal);
+    setCurrentPage(1);
   };
 
   const handleQuickPriceFilter = (min, max) => {
@@ -163,6 +189,7 @@ const ProductList = () => {
     setMaxVal(max === 99999999 ? 2000000 : max);
     setMinPrice(min);
     setMaxPrice(max);
+    setCurrentPage(1);
   };
 
   const clearFilters = () => {
@@ -171,15 +198,19 @@ const ProductList = () => {
     setMinPrice("");
     setMaxPrice("");
     setRatingFilter("");
+    setCurrentPage(1);
   };
 
   return (
     <CustomerLayout>
       <div className="pt-32 pb-24 bg-[#f8fafc] min-h-screen text-left">
-        <div className="max-w-7xl mx-auto px-4 md:px-8">
+        <div className="max-w-7xl mx-auto px-10 md:px-20">
           {/* Breadcrumbs */}
           <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-10 bg-white px-5 py-3 rounded-2xl border border-slate-100 shadow-sm w-fit">
-            <Link to="/" className="hover:text-sky-600 transition-colors flex items-center gap-1">
+            <Link
+              to="/"
+              className="hover:text-sky-600 transition-colors flex items-center gap-1"
+            >
               <Home size={13} className="text-slate-400" />
               Trang chủ
             </Link>
@@ -188,7 +219,9 @@ const ProductList = () => {
             {activeCategory && (
               <>
                 <ChevronRight size={12} className="text-slate-300" />
-                <span className="text-sky-600 font-black">{activeCategory.name}</span>
+                <span className="text-sky-600 font-black">
+                  {activeCategory.name}
+                </span>
               </>
             )}
           </div>
@@ -206,7 +239,7 @@ const ProductList = () => {
                   <li>
                     <Link
                       to="/products"
-                      className={`block px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                      className={`block px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
                         !categorySlug
                           ? "bg-sky-600 text-white shadow-md shadow-sky-500/10"
                           : "text-slate-600 hover:text-sky-600 hover:bg-slate-50"
@@ -220,7 +253,7 @@ const ProductList = () => {
                       <li key={cat.id}>
                         <Link
                           to={`/products?category=${cat.slug}`}
-                          className={`block px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                          className={`block px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
                             categorySlug === cat.slug
                               ? "bg-sky-600 text-white shadow-md shadow-sky-500/10"
                               : "text-slate-600 hover:text-sky-600 hover:bg-slate-50"
@@ -260,7 +293,10 @@ const ProductList = () => {
                     step="20000"
                     value={minVal}
                     onChange={(e) => {
-                      const val = Math.min(Number(e.target.value), maxVal - 100000);
+                      const val = Math.min(
+                        Number(e.target.value),
+                        maxVal - 100000,
+                      );
                       setMinVal(val);
                     }}
                   />
@@ -271,7 +307,10 @@ const ProductList = () => {
                     step="20000"
                     value={maxVal}
                     onChange={(e) => {
-                      const val = Math.max(Number(e.target.value), minVal + 100000);
+                      const val = Math.max(
+                        Number(e.target.value),
+                        minVal + 100000,
+                      );
                       setMaxVal(val);
                     }}
                   />
@@ -291,11 +330,17 @@ const ProductList = () => {
                 {/* Amount display values */}
                 <div className="flex justify-between items-center text-xs font-bold text-slate-500 mb-6 bg-slate-50 px-4 py-2.5 rounded-xl border border-slate-100">
                   <div>
-                    <span className="block text-[10px] text-slate-400 font-medium">Từ</span>
-                    <span className="text-slate-800 text-[13px]">{formatPrice(minVal)}</span>
+                    <span className="block text-[10px] text-slate-400 font-medium">
+                      Từ
+                    </span>
+                    <span className="text-slate-800 text-[13px]">
+                      {formatPrice(minVal)}
+                    </span>
                   </div>
                   <div className="text-right">
-                    <span className="block text-[10px] text-slate-400 font-medium">Đến</span>
+                    <span className="block text-[10px] text-slate-400 font-medium">
+                      Đến
+                    </span>
                     <span className="text-slate-800 text-[13px]">
                       {maxVal === 2000000 ? "2.000.000đ+" : formatPrice(maxVal)}
                     </span>
@@ -311,7 +356,9 @@ const ProductList = () => {
 
                 {/* Quick select price ranges */}
                 <div className="space-y-1 pt-4 border-t border-slate-50">
-                  <span className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Chọn nhanh khoảng giá</span>
+                  <span className="block text-[14px] font-medium text-slate-700 mb-3">
+                    Chọn nhanh khoảng giá
+                  </span>
                   {priceRanges.map((range, index) => {
                     const isActive =
                       minPrice === range.min && maxPrice === range.max;
@@ -321,9 +368,9 @@ const ProductList = () => {
                         onClick={() =>
                           handleQuickPriceFilter(range.min, range.max)
                         }
-                        className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                        className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
                           isActive
-                            ? "bg-sky-50 text-sky-600 font-extrabold"
+                            ? "bg-sky-50 text-sky-600 font-bold"
                             : "text-slate-500 hover:text-sky-600 hover:bg-slate-50"
                         }`}
                       >
@@ -342,7 +389,10 @@ const ProductList = () => {
                   </h3>
                   {ratingFilter !== "" && (
                     <button
-                      onClick={() => setRatingFilter("")}
+                      onClick={() => {
+                        setRatingFilter("");
+                        setCurrentPage(1);
+                      }}
                       className="text-[10px] font-black text-rose-500 hover:underline uppercase tracking-wider"
                     >
                       Xóa lọc
@@ -356,7 +406,10 @@ const ProductList = () => {
                     return (
                       <button
                         key={stars}
-                        onClick={() => setRatingFilter(stars)}
+                        onClick={() => {
+                          setRatingFilter(stars);
+                          setCurrentPage(1);
+                        }}
                         className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm transition-all ${
                           isActive
                             ? "bg-sky-50 text-sky-600 font-extrabold"
@@ -375,7 +428,7 @@ const ProductList = () => {
                             </span>
                           ))}
                         </div>
-                        <span className="text-[11px] font-black uppercase tracking-wide">
+                        <span className="text-[14px] font-medium">
                           {stars === 5 ? "5 sao" : `Từ ${stars} sao`}
                         </span>
                       </button>
@@ -425,7 +478,10 @@ const ProductList = () => {
                   <span className="text-xs text-slate-400 ">Sắp xếp:</span>
                   <select
                     value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value)}
+                    onChange={(e) => {
+                      setSortBy(e.target.value);
+                      setCurrentPage(1);
+                    }}
                     className="bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold text-slate-600 focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 px-4 py-2.5 pr-10 shadow-sm outline-none transition cursor-pointer"
                   >
                     <option value="latest">Mới nhất</option>
@@ -438,7 +494,7 @@ const ProductList = () => {
 
               {/* Products Grid */}
               {loading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 gap-8">
                   {[...Array(6)].map((_, i) => (
                     <div
                       key={i}
@@ -455,7 +511,7 @@ const ProductList = () => {
                 <div
                   className={`grid gap-8 ${
                     viewMode === "grid"
-                      ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+                      ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3"
                       : "grid-cols-1"
                   }`}
                 >
@@ -473,7 +529,7 @@ const ProductList = () => {
                     return (
                       <div
                         key={prod.id}
-                        className={`group bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden flex flex-col h-full hover:shadow-md hover:border-slate-200/60 transition-all duration-300 ${
+                        className={`group bg-white rounded-lg border border-slate-100 shadow-sm overflow-hidden flex flex-col h-full hover:shadow-md hover:border-slate-200/60 transition-all duration-300 ${
                           viewMode === "list"
                             ? "flex-col md:flex-row gap-6 p-5"
                             : ""
@@ -482,7 +538,7 @@ const ProductList = () => {
                         <div
                           className={`relative overflow-hidden bg-slate-50 flex-shrink-0 ${
                             viewMode === "list"
-                              ? "w-full md:w-56 aspect-square rounded-2xl"
+                              ? "w-full md:w-56 aspect-square rounded-lg"
                               : "aspect-[3/4] w-full"
                           }`}
                         >
@@ -491,7 +547,11 @@ const ProductList = () => {
                             className="block w-full h-full"
                           >
                             <img
-                              src={getImageUrl(prod.image)}
+                              src={
+                                prod.image
+                                  ? getImageUrl(prod.image)
+                                  : "https://placehold.co/600x600/e2e8f0/475569?text=No+Image"
+                              }
                               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                               alt={prod.name}
                             />
@@ -561,11 +621,11 @@ const ProductList = () => {
 
                           <div className="flex items-baseline justify-between pt-1">
                             <div className="flex items-baseline gap-2.5">
-                              <span className="text-base font-black text-sky-700">
+                              <span className="text-base font-medium text-sky-700">
                                 {formatPrice(prod.price)}
                               </span>
                               {prod.discount > 0 && (
-                                <span className="text-xs text-slate-400 line-through font-bold">
+                                <span className="text-sm text-slate-400 line-through font-medium">
                                   {formatPrice(
                                     prod.price * (1 + prod.discount / 100),
                                   )}
@@ -578,12 +638,12 @@ const ProductList = () => {
                                   rating={prod.average_rating}
                                   size={12}
                                 />
-                                <span className="text-[11px] font-bold text-slate-400">
+                                <span className="text-[11px] font-medium text-slate-400">
                                   ({prod.review_count})
                                 </span>
                               </div>
                             ) : (
-                              <span className="text-[11px] font-bold text-slate-400">
+                              <span className="text-[11px] font-medium text-slate-400">
                                 Chưa có đánh giá
                               </span>
                             )}
@@ -614,16 +674,49 @@ const ProductList = () => {
               )}
 
               {/* Pagination */}
-              {Array.isArray(products) && products.length >= 12 && (
-                <div className="mt-16 flex justify-center gap-2">
-                  <button className="w-10 h-10 rounded-xl bg-sky-600 text-white font-bold shadow-md shadow-sky-500/10 text-xs transition-all hover:-translate-y-0.5">
-                    1
+              {pagination.lastPage > 1 && (
+                <div className="mt-16 flex justify-center items-center gap-2">
+                  <button
+                    disabled={currentPage === 1}
+                    onClick={() => {
+                      setCurrentPage(currentPage - 1);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    className="w-10 h-10 rounded-2xl bg-white border border-slate-100 text-slate-500 hover:border-sky-600 hover:text-sky-600 shadow-sm flex items-center justify-center transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:-translate-y-0.5"
+                  >
+                    <ChevronLeft size={16} />
                   </button>
-                  <button className="w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-500 font-bold text-xs hover:border-sky-600 hover:text-sky-600 transition-all hover:-translate-y-0.5">
-                    2
-                  </button>
-                  <button className="w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-500 font-bold text-xs hover:border-sky-600 hover:text-sky-600 transition-all hover:-translate-y-0.5">
-                    3
+
+                  {[...Array(pagination.lastPage)].map((_, i) => {
+                    const pageNumber = i + 1;
+                    const isActive = pageNumber === currentPage;
+                    return (
+                      <button
+                        key={pageNumber}
+                        onClick={() => {
+                          setCurrentPage(pageNumber);
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        }}
+                        className={`w-10 h-10 rounded-2xl font-black text-xs transition-all hover:-translate-y-0.5 shadow-sm ${
+                          isActive
+                            ? "bg-sky-600 text-white shadow-md shadow-sky-500/10"
+                            : "bg-white border border-slate-100 text-slate-500 hover:border-sky-600 hover:text-sky-600"
+                        }`}
+                      >
+                        {pageNumber}
+                      </button>
+                    );
+                  })}
+
+                  <button
+                    disabled={currentPage === pagination.lastPage}
+                    onClick={() => {
+                      setCurrentPage(currentPage + 1);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    className="w-10 h-10 rounded-2xl bg-white border border-slate-100 text-slate-500 hover:border-sky-600 hover:text-sky-600 shadow-sm flex items-center justify-center transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:-translate-y-0.5"
+                  >
+                    <ChevronRight size={16} />
                   </button>
                 </div>
               )}

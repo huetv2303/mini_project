@@ -18,7 +18,6 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Link, Navigate } from "react-router-dom";
-import axios from "axios";
 import { fetchCategoriesRequest } from "../services/CategoryService";
 import { fetchProductsRequest } from "../services/ProductService";
 import { getImageUrl, formatPrice } from "../helper/helper";
@@ -62,7 +61,8 @@ const Home = () => {
 
   // Automatically redirect Admin and Staff to dashboard if they land on Home
   if (!authLoading && isAuthenticated) {
-    const isAdminOrStaff = user?.role?.code === "admin" || user?.role?.code === "staff";
+    const isAdminOrStaff =
+      user?.role?.code === "admin" || user?.role?.code === "staff";
     if (isAdminOrStaff) {
       return <Navigate to="/admin/dashboard" replace />;
     }
@@ -71,44 +71,49 @@ const Home = () => {
   return (
     <CustomerLayout>
       {/* Hero Section */}
-      <section className="relative h-[90vh] flex items-center overflow-hidden">
+      <section className="relative h-[90vh] flex items-center overflow-hidden bg-slate-950">
         {/* Hero Background Image */}
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
+          <img
+            src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=2000&q=80"
+            alt="Hero Background"
+            className="w-full h-full object-cover opacity-40 scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/60 to-transparent"></div>
         </div>
 
-        <div className="max-w-9xl mx-auto pt-20 px-10 md:px-20 relative z-10 w-full">
-          <div className="max-w-4xl space-y-10 animate-in fade-in slide-in-from-left-10 duration-1000">
-            <h1 className="text-7xl md:text-[140px] font-black text-white leading-[0.85] tracking-tighter">
+        <div className="max-w-7xl mx-auto pt-20 px-6 md:px-10 relative z-10 w-full text-left">
+          <div className="max-w-4xl space-y-8 animate-in fade-in slide-in-from-left-10 duration-1000">
+            <h1 className="text-5xl md:text-8xl font-black text-white leading-none tracking-tighter uppercase">
               ĐỊNH HÌNH <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-sky-500 to-sky-600">
                 PHONG CÁCH
               </span>
             </h1>
 
-            <p className="text-xl md:text-2xl text-white/60 max-w-xl leading-relaxed font-medium italic">
+            <p className="text-base md:text-lg text-slate-300 max-w-lg leading-relaxed font-bold">
               Kiến tạo dấu ấn cá nhân thông qua những thiết kế tối giản, tinh tế
-              và dẫn đầu xu hướng thời trang hiện đại.
+              và dẫn đầu xu hướng thời trang hiện đại toàn cầu.
             </p>
 
-            <div className="flex flex-wrap items-center gap-8 pt-4">
+            <div className="flex flex-wrap items-center gap-4 pt-4">
               <Link
                 to="/products"
-                className="group px-10 py-5 bg-white text-black font-black rounded-[32px] flex items-center gap-3 hover:bg-black hover:text-white transition-all duration-500 shadow-2xl shadow-white/10 hover:-translate-y-1"
+                className="group px-8 py-3.5 bg-sky-600 hover:bg-sky-700 text-white font-black rounded-2xl flex items-center gap-2 transition-all duration-300 shadow-lg shadow-sky-500/20 hover:-translate-y-0.5 active:scale-95 text-xs uppercase tracking-widest"
               >
                 KHÁM PHÁ NGAY
                 <ArrowRight
-                  size={22}
-                  className="group-hover:translate-x-2 transition-transform"
+                  size={14}
+                  className="group-hover:translate-x-1.5 transition-transform"
                 />
               </Link>
               <Link
                 to="/categories"
-                className="group px-10 py-5 bg-white/5 backdrop-blur-xl border border-white/10 text-white font-black rounded-[32px] hover:bg-white/10 transition-all duration-500 flex items-center gap-2"
+                className="group px-8 py-3.5 bg-white/10 hover:bg-white/20 backdrop-blur border border-white/10 text-white font-black rounded-2xl hover:bg-white/10 transition-all duration-300 flex items-center gap-2 text-xs uppercase tracking-widest"
               >
                 DANH MỤC
                 <ChevronDown
-                  size={18}
+                  size={14}
                   className="text-white/40 group-hover:text-white transition-colors"
                 />
               </Link>
@@ -117,67 +122,67 @@ const Home = () => {
         </div>
 
         {/* Scroll Indicator */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-50 animate-bounce">
-          <div className="w-1 h-3 bg-white rounded-full"></div>
-          <span className="text-[10px] text-white font-bold tracking-widest uppercase">
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 opacity-40 animate-bounce">
+          <div className="w-0.5 h-3 bg-white rounded-full"></div>
+          <span className="text-[9px] text-white font-black tracking-widest uppercase">
             Cuộn xuống
           </span>
         </div>
       </section>
 
       {/* Trust Badges */}
-      <section className="py-16 border-b border-gray-50 bg-white">
-        <div className="max-w-full mx-auto px-4 md:px-12">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
-            <div className="flex items-center gap-6 group">
-              <div className="w-16 h-16 bg-gray-50 rounded-[24px] flex items-center justify-center group-hover:bg-black group-hover:text-white transition-all duration-500 group-hover:scale-110 shadow-sm">
-                <Truck size={28} />
+      <section className="py-12 bg-white border-b border-slate-50 text-left">
+        <div className="max-w-7xl mx-auto px-6 md:px-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="flex items-center gap-4 group">
+              <div className="w-12 h-12 bg-sky-50 text-sky-600 rounded-2xl flex items-center justify-center group-hover:bg-sky-600 group-hover:text-white transition-all duration-300 flex-shrink-0">
+                <Truck size={20} />
               </div>
               <div>
-                <h4 className="font-black text-xs uppercase tracking-widest mb-1">
+                <h4 className="font-black text-xs uppercase tracking-wider text-slate-800 mb-0.5">
                   Giao hàng nhanh
                 </h4>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                   Miễn phí từ 500k
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-6 group">
-              <div className="w-16 h-16 bg-gray-50 rounded-[24px] flex items-center justify-center group-hover:bg-black group-hover:text-white transition-all duration-500 group-hover:scale-110 shadow-sm">
-                <ShieldCheck size={28} />
+            <div className="flex items-center gap-4 group">
+              <div className="w-12 h-12 bg-sky-50 text-sky-600 rounded-2xl flex items-center justify-center group-hover:bg-sky-600 group-hover:text-white transition-all duration-300 flex-shrink-0">
+                <ShieldCheck size={20} />
               </div>
               <div>
-                <h4 className="font-black text-xs uppercase tracking-widest mb-1">
+                <h4 className="font-black text-xs uppercase tracking-wider text-slate-800 mb-0.5">
                   Bảo đảm chính hãng
                 </h4>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                   Hoàn tiền 200% nếu giả
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-6 group">
-              <div className="w-16 h-16 bg-gray-50 rounded-[24px] flex items-center justify-center group-hover:bg-black group-hover:text-white transition-all duration-500 group-hover:scale-110 shadow-sm">
-                <RotateCcw size={28} />
+            <div className="flex items-center gap-4 group">
+              <div className="w-12 h-12 bg-sky-50 text-sky-600 rounded-2xl flex items-center justify-center group-hover:bg-sky-600 group-hover:text-white transition-all duration-300 flex-shrink-0">
+                <RotateCcw size={20} />
               </div>
               <div>
-                <h4 className="font-black text-xs uppercase tracking-widest mb-1">
+                <h4 className="font-black text-xs uppercase tracking-wider text-slate-800 mb-0.5">
                   Đổi trả 30 ngày
                 </h4>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                  Thủ tục siêu tốc
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                  Thủ tục cực kì siêu tốc
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-6 group">
-              <div className="w-16 h-16 bg-gray-50 rounded-[24px] flex items-center justify-center group-hover:bg-black group-hover:text-white transition-all duration-500 group-hover:scale-110 shadow-sm">
-                <Star size={28} />
+            <div className="flex items-center gap-4 group">
+              <div className="w-12 h-12 bg-sky-50 text-sky-600 rounded-2xl flex items-center justify-center group-hover:bg-sky-600 group-hover:text-white transition-all duration-300 flex-shrink-0">
+                <Star size={20} />
               </div>
               <div>
-                <h4 className="font-black text-xs uppercase tracking-widest mb-1">
+                <h4 className="font-black text-xs uppercase tracking-wider text-slate-800 mb-0.5">
                   Hỗ trợ 24/7
                 </h4>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                  Tư vấn tận tâm
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                  Tư vấn thời trang tận tâm
                 </p>
               </div>
             </div>
@@ -186,25 +191,25 @@ const Home = () => {
       </section>
 
       {/* Featured Categories */}
-      <section className="py-15">
-        <div className="max-w-full mx-auto px-4 md:px-12">
-          <div className="flex items-baseline justify-between mb-16">
+      <section className="py-20 bg-[#f8fafc] text-left">
+        <div className="max-w-7xl mx-auto px-6 md:px-8">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
             <div>
-              <p className="text-[1rem] font-bold text-gray-400 uppercase  mb-4">
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">
                 Bộ sưu tập hoàn mỹ
               </p>
-              <h2 className="text-5xl font-black text-slate-900 tracking-tighter">
-                DANH MỤC <span className="text-gray-300">CẢM HỨNG</span>
+              <h2 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight uppercase">
+                Danh mục <span className="text-sky-600">cảm hứng</span>
               </h2>
             </div>
             <Link
               to="/categories"
-              className="group text-sm font-bold flex items-center gap-3 transition-all hover:gap-5"
+              className="group text-xs font-black text-slate-400 hover:text-sky-600 uppercase tracking-wider flex items-center gap-1.5 self-start sm:self-auto transition-colors"
             >
-              XEM TẤT CẢ{" "}
+              Xem tất cả
               <ArrowRight
-                size={18}
-                className="text-gray-300 group-hover:text-black transition-colors"
+                size={14}
+                className="group-hover:translate-x-1 transition-transform"
               />
             </Link>
           </div>
@@ -214,7 +219,7 @@ const Home = () => {
               <Link
                 to={`/products?category=${cat.id}`}
                 key={cat.id}
-                className="group relative h-80 overflow-hidden rounded-3xl bg-gray-100 flex flex-col justify-end p-8"
+                className="group relative h-80 overflow-hidden rounded-3xl bg-slate-100 flex flex-col justify-end p-6 border border-slate-100"
               >
                 <img
                   src={
@@ -222,15 +227,15 @@ const Home = () => {
                     "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=800&q=80"
                   }
                   alt={cat.name}
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity"></div>
-                <div className="relative z-10 transition-transform duration-500 group-hover:-translate-y-2">
-                  <h3 className="text-xl font-black text-white mb-2 tracking-tight">
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-70 group-hover:opacity-90 transition-opacity duration-300"></div>
+                <div className="relative z-10 transition-transform duration-500 group-hover:-translate-y-1">
+                  <h3 className="text-lg font-black text-white mb-1 tracking-tight uppercase">
                     {cat.name}
                   </h3>
-                  <span className="inline-flex items-center gap-2 text-xs font-bold text-white/70 uppercase tracking-widest">
-                    Khám phá ngay <ArrowRight size={12} />
+                  <span className="inline-flex items-center gap-1.5 text-[10px] font-black text-white/80 uppercase tracking-widest">
+                    Khám phá ngay <ArrowRight size={11} />
                   </span>
                 </div>
               </Link>
@@ -240,35 +245,35 @@ const Home = () => {
       </section>
 
       {/* Promotional Banner */}
-      <section className="py-12 translate-y-24">
-        <div className="max-w-full mx-auto px-4 md:px-12">
-          <div className="relative h-[450px] rounded-[64px]overflow-hidden bg-black flex items-center p-8 md:p-24 group">
-            <div className="absolute inset-0 bg-gradient-to-r from-black via-black/50 to-transparent z-10"></div>
+      <section className="py-12 bg-white text-left">
+        <div className="max-w-7xl mx-auto px-6 md:px-8">
+          <div className="relative h-[380px] rounded-[32px] overflow-hidden bg-slate-950 flex items-center p-8 md:p-16 group">
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/40 to-transparent z-10"></div>
             <img
               src="https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=2000&q=80"
               alt="Promotion"
-              className="absolute inset-0 w-full h-full object-cover opacity-60 transition-transform duration-1000 group-hover:scale-110"
+              className="absolute inset-0 w-full h-full object-cover opacity-50 transition-transform duration-1000 group-hover:scale-105"
             />
 
-            <div className="relative z-20 space-y-8 max-w-xl ">
-              <div className="inline-block px-4 py-2 bg-white/20 backdrop-blur rounded-full text-white text-[10px] font-black uppercase tracking-[0.3em]">
+            <div className="relative z-20 space-y-6 max-w-lg">
+              <div className="inline-block px-3 py-1 bg-white/20 backdrop-blur rounded-full text-white text-[9px] font-black uppercase tracking-widest">
                 Siêu ưu đãi tuần này
               </div>
-              <h2 className="text-6xl md:text-8xl font-black text-white tracking-tighter leading-none">
-                ƯU ĐÃI <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">
-                  50% PHÍP
+              <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter leading-none uppercase">
+                ƯU ĐÃI KHỦNG <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-emerald-400">
+                  GIẢM GIÁ 50%
                 </span>
               </h2>
-              <p className="text-white/40 text-lg font-medium">
+              <p className="text-slate-300 text-xs font-bold leading-relaxed">
                 Áp dụng cho tất cả các sản phẩm thời trang trong bộ sưu tập mới
                 nhất. Sở hữu ngay những siêu phẩm với mức giá không tưởng.
               </p>
               <Link
                 to="/promotions"
-                className="inline-flex items-center justify-center px-12 py-5 bg-white text-black font-black rounded-[32px] hover:bg-black hover:text-white transition-all duration-500 shadow-2xl shadow-white/10"
+                className="inline-flex items-center justify-center px-8 py-3.5 bg-sky-600 hover:bg-sky-700 text-white font-black rounded-2xl text-xs uppercase tracking-widest transition-all shadow-md shadow-sky-500/20 hover:-translate-y-0.5 active:scale-95"
               >
-                LẤY MÃ NGAY
+                LẤY MÃ KHUYẾN MÃI NGAY
               </Link>
             </div>
           </div>
@@ -276,25 +281,25 @@ const Home = () => {
       </section>
 
       {/* Featured Products */}
-      <section className="py-40">
-        <div className="max-w-full mx-auto px-4 md:px-12">
-          <div className="flex items-baseline justify-between mb-16">
+      <section className="py-20 bg-[#f8fafc] text-left">
+        <div className="max-w-7xl mx-auto px-6 md:px-8">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
             <div>
-              <p className="text-[1rem] font-bold text-gray-400 uppercase  mb-4">
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">
                 Bán chạy nhất tuần qua
               </p>
-              <h2 className="text-5xl font-black text-slate-900 tracking-tighter">
-                SIÊU PHẨM <span className="text-gray-300">SĂN ĐÓN</span>
+              <h2 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight uppercase">
+                Siêu phẩm <span className="text-sky-600">săn đón</span>
               </h2>
             </div>
             <Link
               to="/products"
-              className="group text-sm font-bold flex items-center gap-3 transition-all hover:gap-5"
+              className="group text-xs font-black text-slate-400 hover:text-sky-600 uppercase tracking-wider flex items-center gap-1.5 self-start sm:self-auto transition-colors"
             >
-              CỬA HÀNG{" "}
+              Cửa hàng
               <ArrowRight
-                size={18}
-                className="text-gray-300 group-hover:text-black transition-colors"
+                size={14}
+                className="group-hover:translate-x-1 transition-transform"
               />
             </Link>
           </div>
@@ -302,7 +307,7 @@ const Home = () => {
           <div className="relative group/swiper">
             <Swiper
               modules={[Autoplay, Navigation, Pagination]}
-              spaceBetween={30}
+              spaceBetween={24}
               slidesPerView={1.2}
               autoplay={{
                 delay: 5000,
@@ -320,14 +325,14 @@ const Home = () => {
                 1024: { slidesPerView: 3.2 },
                 1280: { slidesPerView: 4 },
               }}
-              className="featured-swiper !pb-16"
+              className="featured-swiper !pb-14"
             >
               {featuredProducts.map((prod) => (
                 <SwiperSlide key={prod.id}>
-                  <div className="group flex flex-col pt-4">
+                  <div className="group bg-white rounded-3xl border border-slate-100 p-4 shadow-sm hover:shadow-md hover:border-slate-200/60 transition-all duration-300 flex flex-col justify-between">
                     <Link
                       to={`/products/${prod.slug}`}
-                      className="relative h-96 mb-6 rounded-lg overflow-hidden bg-gray-50 flex items-center justify-center"
+                      className="relative h-64 mb-4 rounded-2xl overflow-hidden bg-slate-50 flex items-center justify-center flex-shrink-0"
                     >
                       <img
                         src={
@@ -335,44 +340,41 @@ const Home = () => {
                           "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80"
                         }
                         alt={prod.name}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       />
 
-                      <button className="absolute bottom-6 left-1/2 -translate-x-1/2 translate-y-10 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-black text-white px-6 py-3 rounded-lg font-bold flex items-center gap-2 shadow-2xl z-10">
-                        <ShoppingBag size={18} /> MUA NGAY
-                      </button>
+                      <span className="absolute bottom-4 left-1/2 -translate-x-1/2 translate-y-10 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-sky-600 hover:bg-sky-700 text-white px-5 py-2.5 rounded-2xl font-black text-[10px] uppercase tracking-wider flex items-center gap-1.5 shadow-md shadow-sky-500/10 z-10 whitespace-nowrap">
+                        <ShoppingBag size={12} /> MUA NGAY
+                      </span>
                     </Link>
-                    <div className="space-y-2 px-2">
-                      <div className="flex items-center justify-between text-[1rem] text-gray-400  uppercase">
-                        {/* <span>{prod.category?.name || "Premium"}</span> */}
-                        <h3 className="text-[1rem] font-medium text-gray-800">
+
+                    <div className="flex flex-col justify-between">
+                      <div className="space-y-1 text-left">
+                        <h3 className="text-[1rem] font-medium text-slate-800  line-clamp-1">
                           <Link to={`/products/${prod.slug}`}>{prod.name}</Link>
                         </h3>
-                        <div>
-                          {prod.review_count > 0 && (
-                            <div className="flex items-center">
-                              <div className="flex items-center   ">
-                                <StarRating
-                                  rating={prod.average_rating}
-                                  size={15}
-                                />
-                                <span className="text-[1rem] font-medium ml-1">
-                                  ({Number(prod.average_rating || 0).toFixed(1)}
-                                  )
-                                </span>
-                              </div>
-                            </div>
-                          )}
-                        </div>
                       </div>
-                      <div className="pt-1 flex items-center justify-between">
-                        <p className="text-[1rem] ">
+
+                      <div className="pt-2 flex items-center justify-between border-t border-slate-50 mt-2">
+                        <p className="text-[14px] font-medium text-sky-700">
                           {formatPrice(prod.price)}
                         </p>
-                        <div className="pt-1">
-                          <span className="text-[1rem] text-gray-500 ">
-                            {prod.review_count || 0} Đánh giá
-                          </span>
+                        <div>
+                          {prod.review_count > 0 ? (
+                            <div className="flex items-center gap-1">
+                              <StarRating
+                                rating={prod.average_rating}
+                                size={12}
+                              />
+                              <span className="text-[14px] font-medium text-slate-400">
+                                ({Number(prod.average_rating || 0).toFixed(1)})
+                              </span>
+                            </div>
+                          ) : (
+                            <span className="text-[14px] font-medium text-slate-700">
+                              Chưa có đánh giá
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -380,43 +382,50 @@ const Home = () => {
                 </SwiperSlide>
               ))}
             </Swiper>
+
             {/* Custom Navigation Buttons */}
             <button
               onClick={() => swiperRef.current?.slidePrev()}
-              className="absolute top-1/2 -left-6 -translate-y-1/2 w-12 h-12 bg-white shadow-xl rounded-full flex items-center justify-center z-50 opacity-0 group-hover/swiper:opacity-100 transition-opacity hover:bg-black hover:text-white border border-gray-100 pointer-events-auto"
+              className="absolute top-1/2 -left-4 -translate-y-1/2 w-10 h-10 bg-white shadow-md rounded-2xl flex items-center justify-center z-50 opacity-0 group-hover/swiper:opacity-100 transition-opacity hover:bg-slate-50 border border-slate-100"
             >
-              <ChevronLeft size={24} />
+              <ChevronLeft
+                size={20}
+                className="text-slate-500 hover:text-sky-600"
+              />
             </button>
             <button
               onClick={() => swiperRef.current?.slideNext()}
-              className="absolute top-1/2 -right-6 -translate-y-1/2 w-12 h-12 bg-white shadow-xl rounded-full flex items-center justify-center z-50 opacity-0 group-hover/swiper:opacity-100 transition-opacity hover:bg-black hover:text-white border border-gray-100 pointer-events-auto"
+              className="absolute top-1/2 -right-4 -translate-y-1/2 w-12 h-12 bg-white shadow-md rounded-2xl flex items-center justify-center z-50 opacity-0 group-hover/swiper:opacity-100 transition-opacity hover:bg-slate-50 border border-slate-100"
             >
-              <ChevronRight size={24} />
+              <ChevronRight
+                size={20}
+                className="text-slate-500 hover:text-sky-600"
+              />
             </button>
           </div>
         </div>
       </section>
 
       {/* Brand Section */}
-      <section className="py-32 bg-slate-50 overflow-hidden">
-        <div className="max-w-full mx-auto px-4 md:px-12 text-center space-y-16">
-          <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.5em]">
+      <section className="py-24 bg-white overflow-hidden border-t border-slate-50">
+        <div className="max-w-7xl mx-auto px-6 md:px-8 text-center space-y-12">
+          <h4 className="text-[9px] font-black text-slate-400 uppercase tracking-[0.4em]">
             ĐỐI TÁC CHIẾN LƯỢC TOÀN CẦU
           </h4>
-          <div className="flex flex-wrap items-center justify-center gap-12 md:gap-24 opacity-30 grayscale hover:grayscale-0 transition-all">
-            <div className="text-4xl font-black italic tracking-tighter">
+          <div className="flex flex-wrap items-center justify-center gap-12 md:gap-20 opacity-35 grayscale hover:grayscale-0 transition-all duration-300">
+            <div className="text-2xl font-black italic tracking-tighter text-slate-700">
               NIKE
             </div>
-            <div className="text-4xl font-black italic tracking-tighter">
+            <div className="text-2xl font-black italic tracking-tighter text-slate-700">
               ADIDAS
             </div>
-            <div className="text-4xl font-black italic tracking-tighter">
+            <div className="text-2xl font-black italic tracking-tighter text-slate-700">
               ZARA
             </div>
-            <div className="text-4xl font-black italic tracking-tighter">
+            <div className="text-2xl font-black italic tracking-tighter text-slate-700">
               APPLE
             </div>
-            <div className="text-4xl font-black italic tracking-tighter">
+            <div className="text-2xl font-black italic tracking-tighter text-slate-700">
               SONY
             </div>
           </div>

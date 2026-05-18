@@ -7,6 +7,8 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 
+use App\Http\Resources\ProductResource;
+
 class WishlistController extends Controller
 {
     private function getWishlistKey($userId)
@@ -25,11 +27,13 @@ class WishlistController extends Controller
         $wishlist = Redis::get($wishlistKey);
         $productIds = $wishlist ? json_decode($wishlist, true) : [];
 
-        $products = Product::whereIn('id', $productIds)->get();
+        $products = Product::whereIn('id', $productIds)
+            ->with(['variants', 'category', 'supplier', 'images', 'attributes'])
+            ->get();
 
         return response()->json([
             'status' => 'success',
-            'data' => $products
+            'data' => ProductResource::collection($products)
         ]);
     }
 

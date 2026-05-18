@@ -21,6 +21,8 @@ import {
   ShoppingBag,
   CreditCard,
   RotateCcw,
+  Home,
+  ArrowRight,
 } from "lucide-react";
 import {
   fetchMyOrdersRequest,
@@ -50,23 +52,23 @@ const MyOrders = () => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const statusOptions = [
-    { value: "all", label: "Tất cả", icon: <Package size={16} /> },
-    { value: "pending", label: "Chờ xử lý", icon: <Clock size={16} /> },
-    { value: "processing", label: "Đang xử lý", icon: <Loader2 size={16} /> },
-    { value: "shipped", label: "Đang giao", icon: <Truck size={16} /> },
-    { value: "delivered", label: "Đã giao", icon: <CheckCircle size={16} /> },
-    { value: "cancelled", label: "Đã hủy", icon: <XCircle size={16} /> },
+    { value: "all", label: "Tất cả", icon: <Package size={14} /> },
+    { value: "pending", label: "Chờ xử lý", icon: <Clock size={14} /> },
+    { value: "processing", label: "Đang xử lý", icon: <Loader2 size={14} /> },
+    { value: "shipped", label: "Đang giao", icon: <Truck size={14} /> },
+    { value: "delivered", label: "Đã giao", icon: <CheckCircle size={14} /> },
+    { value: "cancelled", label: "Đã hủy", icon: <XCircle size={14} /> },
   ];
 
   const paymentOptions = [
-    { value: "all", label: "Tất cả", icon: <CreditCard size={16} /> },
-    { value: "paid", label: "Đã thanh toán", icon: <CheckCircle size={16} /> },
+    { value: "all", label: "Tất cả", icon: <CreditCard size={14} /> },
+    { value: "paid", label: "Đã thanh toán", icon: <CheckCircle size={14} /> },
     {
       value: "unpaid",
       label: "Chưa thanh toán",
-      icon: <AlertCircle size={16} />,
+      icon: <AlertCircle size={14} />,
     },
-    { value: "refunded", label: "Đã hoàn tiền", icon: <RotateCcw size={16} /> },
+    { value: "refunded", label: "Đã hoàn tiền", icon: <RotateCcw size={14} /> },
   ];
 
   const loadOrders = async () => {
@@ -140,41 +142,61 @@ const MyOrders = () => {
 
   return (
     <CustomerLayout>
-      <div className="bg-slate-50 min-h-screen pt-32 pb-24">
-        <div className="max-w-5xl mx-auto px-4 md:px-8">
-          {/* Header */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+      <div className="bg-[#f8fafc] min-h-screen pt-32 pb-24 text-left">
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
+          {/* Breadcrumbs */}
+          <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-10 bg-white px-5 py-3 rounded-2xl border border-slate-100 shadow-sm w-fit">
+            <Link
+              to="/"
+              className="hover:text-sky-600 transition-colors flex items-center gap-1"
+            >
+              <Home size={13} className="text-slate-400" />
+              Trang chủ
+            </Link>
+            <ChevronRight size={12} className="text-slate-300" />
+            <span className="text-slate-800">Đơn hàng của tôi</span>
+          </div>
+
+          {/* Title Area and Search */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 bg-white p-6 md:p-8 rounded-3xl border border-slate-100 shadow-sm">
             <div>
-              <h1 className="text-2xl font-medium text-gray-700 mb-2">
-                ĐƠN HÀNG CỦA TÔI
+              <h1 className="text-2xl md:text-3xl font-black text-slate-800 uppercase tracking-tight mb-2">
+                Đơn hàng của tôi
               </h1>
+              <p className="text-sm text-slate-400 font-medium">
+                Theo dõi tình trạng giao hàng và lịch sử đơn hàng của bạn
+              </p>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="relative flex-grow md:w-80 group">
+            <div className="flex items-center gap-3 self-start md:self-auto w-full md:w-auto">
+              <div className="relative flex-grow md:w-72 group">
                 <Search
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-black transition-colors"
-                  size={20}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-sky-600 transition-colors"
+                  size={16}
                 />
-                <form onSubmit={handleSearch}>
+                <form onSubmit={handleSearch} className="w-full">
                   <input
                     type="text"
-                    placeholder="Tìm theo mã đơn hàng..."
+                    placeholder="TÌM MÃ ĐƠN HÀNG..."
                     value={filters.search}
                     onChange={(e) =>
                       setFilters({ ...filters, search: e.target.value })
                     }
-                    className="w-full h-14 pl-12 pr-4 bg-white border border-gray-100 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-black/5 focus:border-black transition-all shadow-sm"
+                    className="w-full h-12 pl-11 pr-4 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-black uppercase outline-none focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all placeholder:text-slate-300"
                   />
                 </form>
               </div>
               <button
                 onClick={() => setIsFilterOpen(!isFilterOpen)}
-                className={`h-14 px-3 rounded-lg border flex items-center gap-2  text-sm transition-all shadow-sm ${isFilterOpen ? "bg-black text-white border-black" : "bg-white text-gray-700 border-gray-100 hover:bg-gray-50"}`}
+                className={`h-12 px-4 rounded-2xl border text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all active:scale-95 ${
+                  isFilterOpen
+                    ? "bg-sky-600 text-white border-sky-600 shadow-md shadow-sky-500/10"
+                    : "bg-white text-slate-600 border-slate-100 hover:bg-slate-50"
+                }`}
               >
-                <Filter size={18} />
-                Bộ lọc
+                <Filter size={14} />
+                Lọc
                 {activeFiltersCount > 0 && (
-                  <span className="w-5 h-5 bg-purple-500 text-white text-[10px] flex items-center justify-center rounded-full ml-1">
+                  <span className="w-5 h-5 bg-sky-100 text-sky-600 text-[10px] font-black flex items-center justify-center rounded-full ml-1">
                     {activeFiltersCount}
                   </span>
                 )}
@@ -182,93 +204,109 @@ const MyOrders = () => {
             </div>
           </div>
 
-          {/* Filter Bar */}
+          {/* Expanded Filter Panel */}
           {isFilterOpen && (
-            <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-xl mb-8 animate-in fade-in slide-in-from-top-4 duration-300">
-              <div className="flex items-center justify-between mb-8">
-                <h3 className="text-lg font-bold">Bộ lọc tìm kiếm</h3>
+            <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-sm mb-8 animate-in fade-in slide-in-from-top-4 duration-300">
+              <div className="flex items-center justify-between mb-6 pb-3 border-b border-slate-50">
+                <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest">
+                  Bộ lọc tìm kiếm nâng cao
+                </h3>
                 <button
                   onClick={clearFilters}
-                  className="text-sm font-bold text-red-500 hover:text-red-600 flex items-center gap-1"
+                  className="text-[10px] font-black text-rose-500 hover:underline uppercase tracking-wider flex items-center gap-1"
                 >
-                  <X size={16} /> Xóa bộ lọc
+                  <X size={12} /> Xóa bộ lọc
                 </button>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <div className="space-y-3">
-                  <label className="text-xs  text-gray-400 uppercase font-medium pl-1">
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Trạng thái đơn hàng */}
+                <div className="space-y-2.5">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
                     Trạng thái đơn hàng
                   </label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {statusOptions.map((opt) => (
-                      <button
-                        key={opt.value}
-                        onClick={() =>
-                          setFilters({ ...filters, status: opt.value })
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {statusOptions.map((opt) => {
+                      const isActive = filters.status === opt.value;
+                      return (
+                        <button
+                          key={opt.value}
+                          onClick={() =>
+                            setFilters({ ...filters, status: opt.value })
+                          }
+                          className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border ${
+                            isActive
+                              ? "bg-sky-600 text-white border-sky-600 shadow-md shadow-sky-500/10"
+                              : "bg-slate-50 text-slate-500 border-slate-50 hover:bg-slate-100 hover:text-slate-800"
+                          }`}
+                        >
+                          {opt.icon}
+                          {opt.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Trạng thái thanh toán & Ngày */}
+                <div className="space-y-6">
+                  <div className="space-y-2.5">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
+                      Trạng thái thanh toán
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {paymentOptions.map((opt) => {
+                        const isActive = filters.payment_status === opt.value;
+                        return (
+                          <button
+                            key={opt.value}
+                            onClick={() =>
+                              setFilters({
+                                ...filters,
+                                payment_status: opt.value,
+                              })
+                            }
+                            className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border ${
+                              isActive
+                                ? "bg-sky-600 text-white border-sky-600 shadow-md shadow-sky-500/10"
+                                : "bg-slate-50 text-slate-500 border-slate-50 hover:bg-slate-100 hover:text-slate-800"
+                            }`}
+                          >
+                            {opt.icon}
+                            {opt.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
+                        Từ ngày
+                      </label>
+                      <input
+                        type="date"
+                        value={filters.from_date}
+                        onChange={(e) =>
+                          setFilters({ ...filters, from_date: e.target.value })
                         }
-                        className={`flex items-center gap-2 px-4 py-3 rounded-lg text-[10px] font-bold transition-all border ${filters.status === opt.value ? "bg-black/90 text-white border-black shadow-lg shadow-black/10" : "bg-gray-50 text-gray-500 border-gray-50 hover:border-gray-200 hover:text-black"}`}
-                      >
-                        {opt.icon}
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <label className="text-xs font-black text-gray-400 uppercase tracking-widest pl-1">
-                    Thanh toán
-                  </label>
-                  <div className="grid grid-cols-1 gap-2">
-                    {paymentOptions.map((opt) => (
-                      <button
-                        key={opt.value}
-                        onClick={() =>
-                          setFilters({ ...filters, payment_status: opt.value })
+                        className="w-full h-11 px-4 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold focus:bg-white focus:outline-none focus:border-sky-500 transition-all"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">
+                        Đến ngày
+                      </label>
+                      <input
+                        type="date"
+                        value={filters.to_date}
+                        onChange={(e) =>
+                          setFilters({ ...filters, to_date: e.target.value })
                         }
-                        className={`flex items-center gap-2 px-4 py-3 rounded-lg text-[10px] font-bold transition-all border ${filters.payment_status === opt.value ? "bg-black/90 text-white border-black shadow-lg shadow-black/10" : "bg-gray-50 text-gray-500 border-gray-50 hover:border-gray-200 hover:text-black"}`}
-                      >
-                        {opt.icon}
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <label className="text-xs  text-gray-400 uppercase font-medium pl-1">
-                    Từ ngày
-                  </label>
-                  <div className="relative group">
-                    <Calendar
-                      className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                      size={18}
-                    />
-                    <input
-                      type="date"
-                      value={filters.from_date}
-                      onChange={(e) =>
-                        setFilters({ ...filters, from_date: e.target.value })
-                      }
-                      className="w-full h-14 pl-12 pr-4 bg-gray-50 border border-gray-50 rounded-lg text-sm focus:outline-none focus:ring-4 focus:ring-black/5 focus:border-black transition-all"
-                    />
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <label className="text-xs  text-gray-400 uppercase font-medium pl-1">
-                    Đến ngày
-                  </label>
-                  <div className="relative group">
-                    <Calendar
-                      className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                      size={18}
-                    />
-                    <input
-                      type="date"
-                      value={filters.to_date}
-                      onChange={(e) =>
-                        setFilters({ ...filters, to_date: e.target.value })
-                      }
-                      className="w-full h-14 pl-12 pr-4 bg-gray-50 border border-gray-50 rounded-lg text-sm focus:outline-none focus:ring-4 focus:ring-black/5 focus:border-black transition-all"
-                    />
+                        className="w-full h-11 px-4 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold focus:bg-white focus:outline-none focus:border-sky-500 transition-all"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -278,42 +316,43 @@ const MyOrders = () => {
           {/* Orders List */}
           <div className="space-y-6">
             {loading ? (
-              <div className="bg-white rounded-3xl p-20 flex flex-col items-center justify-center border border-gray-100 shadow-sm">
-                <div className="flex items-center justify-center min-h-[400px]">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-                </div>
+              <div className="space-y-6">
+                {[1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className="h-32 bg-white rounded-3xl border border-slate-100 animate-pulse"
+                  />
+                ))}
               </div>
             ) : orders.length > 0 ? (
               <>
                 {orders.map((order) => (
                   <div
                     key={order.id}
-                    className="bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden group"
+                    className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-md hover:border-slate-200/60 transition-all duration-300 group"
                   >
-                    <div className="p-3 md:p-4 flex flex-col md:flex-row md:items-center justify-between gap-6">
-                      <div className="flex items-start gap-6">
-                        <div className="w-20 h-20 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 group-hover:scale-110 transition-transform duration-500 border border-slate-100">
-                          <Package size={32} />
+                    <div className="p-5 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                      <div className="flex items-start gap-5">
+                        <div className="w-14 h-14 bg-sky-50 rounded-2xl flex items-center justify-center text-sky-600 group-hover:scale-105 transition-transform duration-300 border border-sky-100/50 flex-shrink-0">
+                          <Package size={22} />
                         </div>
                         <div>
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-xs font-medium">
+                          <div className="flex flex-wrap items-center gap-3 mb-1.5">
+                            <h3 className="text-xs font-black uppercase tracking-wider text-slate-800">
                               #{order.code}
                             </h3>
-                            <div className="text-xs">
-                              <OrderStatusBadge status={order.status} />
-                            </div>
+                            <OrderStatusBadge status={order.status} />
                           </div>
-                          <p className="text-xs  text-gray-400 flex items-center gap-2">
-                            <Calendar size={14} />
+                          <p className="text-[10px] font-bold text-slate-400 flex items-center gap-1.5 uppercase tracking-wider mb-2">
+                            <Calendar size={13} className="text-sky-500" />
                             {format(
                               new Date(order.created_at),
                               "dd/MM/yyyy HH:mm",
                             )}
                           </p>
                           {order.expected_delivery_date && (
-                            <p className="text-[10px] text-blue-600 font-medium flex items-center gap-2 mt-1">
-                              <Truck size={12} />
+                            <p className="text-[10px] text-sky-600 font-black uppercase tracking-wider flex items-center gap-1.5 mb-2">
+                              <Truck size={13} />
                               Dự kiến giao:{" "}
                               {format(
                                 new Date(order.expected_delivery_date),
@@ -321,53 +360,55 @@ const MyOrders = () => {
                               )}
                             </p>
                           )}
-                          <div className="mt-4 flex items-center gap-2">
+                          <div className="flex items-center gap-2">
                             <PaymentStatusBadge status={order.payment_status} />
-                            <span className="text-[13px]  text-gray-700  px-2 border-l border-gray-100">
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2.5 border-l border-slate-100">
                               {order.payment_method?.name || "N/A"}
                             </span>
                           </div>
                         </div>
                       </div>
 
-                      <div className="flex flex-col md:items-end gap-2 pr-4">
-                        <p className="text-xs  text-gray-400 text-left md:text-right">
+                      <div className="flex flex-col md:items-end gap-1 px-1">
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-left md:text-right">
                           Tổng thanh toán
                         </p>
-                        <p className="text-xl text-gray-700">
+                        <p className="text-lg font-black text-sky-700">
                           {new Intl.NumberFormat("vi-VN").format(
                             order.final_amount,
                           )}
-                          <span className="text-sm ml-1">₫</span>
+                          <span className="text-xs ml-0.5">₫</span>
                         </p>
                       </div>
 
-                      <div className="flex items-center gap-2 border-t md:border-t-0 md:border-l border-gray-50 pt-6 md:pt-0 md:pl-8">
-                        <Link to={`/orders/${order.id}`} className="p-4 ">
-                          <Eye className="hover:text-gray-500" size={18} />
+                      {/* Glassmorphic Action Panel */}
+                      <div className="flex items-center gap-1.5 border-t md:border-t-0 md:border-l border-slate-50 pt-4 md:pt-0 md:pl-6">
+                        <Link
+                          to={`/orders/${order.id}`}
+                          className="w-10 h-10 hover:bg-sky-50 text-slate-400 hover:text-sky-600 rounded-2xl flex items-center justify-center transition-all active:scale-90"
+                          title="Xem chi tiết"
+                        >
+                          <Eye size={16} />
                         </Link>
                         {order.status === "pending" && (
                           <button
                             onClick={() => handleCancelOrder(order.id)}
-                            className="p-4 "
+                            className="w-10 h-10 hover:bg-rose-50 text-slate-400 hover:text-rose-500 rounded-2xl flex items-center justify-center transition-all active:scale-90"
                             title="Hủy đơn hàng"
                           >
-                            <Trash2
-                              size={20}
-                              className="group-hover/cancel:scale-110 transition-transform"
-                            />
+                            <Trash2 size={16} />
                           </button>
                         )}
                       </div>
                     </div>
 
-                    {/* Quick preview of items */}
-                    <div className="bg-slate-50/50 px-3 md:px-4 py-2 border-t border-gray-50 flex flex-wrap gap-4 items-center">
-                      <div className="flex -space-x-3 overflow-hidden">
+                    {/* Quick Preview Item Strip */}
+                    <div className="bg-slate-50/50 px-5 py-3 border-t border-slate-50 flex flex-wrap gap-4 items-center justify-between">
+                      <div className="flex -space-x-2.5 overflow-hidden">
                         {order.items?.slice(0, 4).map((item, idx) => (
                           <div
                             key={idx}
-                            className="inline-block h-10 w-10 rounded-xl ring-2 ring-white overflow-hidden bg-white shadow-sm"
+                            className="inline-block h-8 w-8 rounded-xl ring-2 ring-white overflow-hidden bg-white shadow-sm"
                             title={item.product_name}
                           >
                             <img
@@ -378,12 +419,12 @@ const MyOrders = () => {
                           </div>
                         ))}
                         {order.items?.length > 4 && (
-                          <div className="h-10 w-10 rounded-xl ring-2 ring-white bg-slate-900 flex items-center justify-center text-[10px] font-bold text-white shadow-sm">
+                          <div className="h-8 w-8 rounded-xl ring-2 ring-white bg-slate-800 flex items-center justify-center text-[9px] font-black text-white shadow-sm">
                             +{order.items.length - 4}
                           </div>
                         )}
                       </div>
-                      <p className="text-xs font-bold text-gray-500 italic">
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-wide italic max-w-sm line-clamp-1">
                         {order.items?.length} sản phẩm -{" "}
                         {order.items
                           ?.map((i) => i.product_name)
@@ -397,51 +438,48 @@ const MyOrders = () => {
 
                 {/* Pagination */}
                 {total > 10 && (
-                  <div className="flex items-center justify-center gap-4 pt-10">
+                  <div className="flex items-center justify-center gap-3 pt-6">
                     <button
                       disabled={page === 1}
                       onClick={() => setPage(page - 1)}
-                      className="w-10 h-10 flex items-center justify-center bg-white border border-gray-100 rounded-lg text-slate-700 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-50 transition-all shadow-sm"
+                      className="w-10 h-10 flex items-center justify-center bg-white border border-slate-100 rounded-2xl text-slate-400 disabled:opacity-30 disabled:cursor-not-allowed hover:text-sky-600 hover:bg-slate-50 transition-all shadow-sm active:scale-90"
                     >
-                      <ChevronLeft size={24} />
+                      <ChevronLeft size={18} />
                     </button>
-                    <div className="h-10 px-4 bg-white border border-gray-100 rounded-lg flex items-center justify-center shadow-sm">
-                      <span className="text-sm uppercase">
+                    <div className="h-10 px-4 bg-white border border-slate-100 rounded-2xl flex items-center justify-center shadow-sm">
+                      <span className="text-[11px] font-black text-slate-600 uppercase tracking-widest">
                         Trang {page} / {Math.ceil(total / 10)}
                       </span>
                     </div>
                     <button
                       disabled={page >= Math.ceil(total / 10)}
                       onClick={() => setPage(page + 1)}
-                      className="w-10 h-10 flex items-center justify-center bg-white border border-gray-100 rounded-lg text-slate-700 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-50 transition-all shadow-sm"
+                      className="w-10 h-10 flex items-center justify-center bg-white border border-slate-100 rounded-2xl text-slate-400 disabled:opacity-30 disabled:cursor-not-allowed hover:text-sky-600 hover:bg-slate-50 transition-all shadow-sm active:scale-90"
                     >
-                      <ChevronRight size={24} />
+                      <ChevronRight size={18} />
                     </button>
                   </div>
                 )}
               </>
             ) : (
-              <div className="bg-white rounded-[40px] p-24 text-center border border-gray-50 shadow-2xl relative overflow-hidden group">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-slate-50 rounded-full -translate-y-32 group-hover:scale-110 transition-transform duration-700"></div>
-                <div className="relative z-10 flex flex-col items-center">
-                  <div className="w-24 h-24 bg-slate-100 rounded-[32px] flex items-center justify-center text-slate-300 mb-8 rotate-12 group-hover:rotate-0 transition-transform duration-500">
-                    <ShoppingBag size={48} />
-                  </div>
-                  <h3 className="text-3xl font-black text-slate-900 mb-4 tracking-tight">
-                    CHƯA CÓ ĐƠN HÀNG NÀO
-                  </h3>
-                  <p className="text-gray-400 font-medium mb-10 max-w-md mx-auto">
-                    Bạn chưa thực hiện bất kỳ giao dịch nào. Hãy khám phá những
-                    bộ sưu tập mới nhất của chúng tôi ngay!
-                  </p>
-                  <Link
-                    to="/products"
-                    className="inline-flex items-center gap-3 px-10 py-5 bg-black text-white rounded-2xl font-black text-sm tracking-widest hover:bg-black/90 hover:-translate-y-1 transition-all shadow-2xl shadow-black/20"
-                  >
-                    BẮT ĐẦU MUA SẮM
-                    <ChevronRight size={20} />
-                  </Link>
+              <div className="bg-white rounded-3xl border border-slate-100 p-20 text-center shadow-sm relative overflow-hidden group">
+                <div className="w-20 h-20 bg-sky-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <ShoppingBag size={36} className="text-sky-400" />
                 </div>
+                <h3 className="text-lg font-black text-slate-800 uppercase tracking-wide mb-3">
+                  Chưa có đơn hàng nào
+                </h3>
+                <p className="text-sm text-slate-400 mb-8 max-w-sm mx-auto font-medium">
+                  Bạn chưa thực hiện bất kỳ giao dịch nào. Hãy bắt đầu khám phá
+                  các bộ sưu tập mới nhất ngay nhé!
+                </p>
+                <Link
+                  to="/products"
+                  className="inline-flex items-center gap-2 bg-sky-600 text-white px-8 py-3.5 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-sky-700 transition-all shadow-md shadow-sky-500/10 hover:-translate-y-0.5 active:scale-95"
+                >
+                  Bắt đầu mua sắm
+                  <ArrowRight size={14} />
+                </Link>
               </div>
             )}
           </div>

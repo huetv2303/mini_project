@@ -136,4 +136,34 @@ class OrderController extends Controller
             ], 422);
         }
     }
+
+    public function notifyPendingPayment($id)
+    {
+        try {
+            $order = $this->orderService->findById($id);
+
+            if ($order->customer_id !== auth()->id()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Bạn không có quyền thao tác trên đơn hàng này.',
+                ], 403);
+            }
+
+            if ($order->paymentMethod && $order->paymentMethod->code === 'bank_transfer' && $order->payment_status === 'unpaid') {
+                if ($order->customer) {
+                    $order->customer->notify(new \App\Notifications\OrderPendingPaymentNotification($order));
+                }
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Thông báo đã được gửi.',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 422);
+        }
+    }
 }

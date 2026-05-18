@@ -225,6 +225,7 @@ Route::group(['prefix' => 'v1'], function () {
             Route::get('/{id}', [\App\Http\Controllers\api\v1\Storefront\OrderController::class, 'show']);
             Route::patch('/{id}/cancel', [\App\Http\Controllers\api\v1\Storefront\OrderController::class, 'cancel']);
             Route::post('/{id}/return', [\App\Http\Controllers\api\v1\Storefront\OrderController::class, 'return']);
+            Route::post('/{id}/notify-pending-payment', [\App\Http\Controllers\api\v1\Storefront\OrderController::class, 'notifyPendingPayment']);
         });
 
         // Storefront Checkout (Cart + Buy Now)

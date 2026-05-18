@@ -240,6 +240,15 @@ class OrderService
                 throw new \Exception('Không thể cập nhật đơn hàng đã bị hủy.');
             }
 
+            $isBankTransfer = $order->paymentMethod && $order->paymentMethod->code === 'bank_transfer';
+            $isPaid = $order->payment_status === 'paid';
+
+            if ($isBankTransfer && !$isPaid) {
+                if ($newStatus !== $oldStatus && $newStatus !== 'cancelled') {
+                    throw new \Exception('Không thể cập nhật trạng thái đối với đơn hàng chuyển khoản chưa thanh toán (chỉ có thể hủy đơn).');
+                }
+            }
+
             if ($newStatus === 'cancelled' && $oldStatus === 'shipped') {
                 throw new \Exception('Không thể hủy đơn hàng đang vận chuyển. Vui lòng dùng endpoint /cancel.');
             }
@@ -392,6 +401,11 @@ class OrderService
 
                     if ($action === 'update_status') {
                         if ($order->status === 'shipped' && $status !== 'delivered') {
+                            continue;
+                        }
+                        $isBankTransfer = $order->paymentMethod && $order->paymentMethod->code === 'bank_transfer';
+                        $isPaid = $order->payment_status === 'paid';
+                        if ($isBankTransfer && !$isPaid && $status !== 'cancelled') {
                             continue;
                         }
                         $this->updateOrder($id, ['status' => $status]);

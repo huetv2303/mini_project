@@ -10,20 +10,19 @@ import {
   Save,
   Calendar,
   Loader2,
-  CheckCircle2,
-  MessageSquare,
   Package,
   CreditCard,
-  Target,
   Lock,
   Eye,
   EyeOff,
+  Home,
+  ChevronRight,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { updateCustomerRequest } from "../../services/CustomerService";
 import { changePasswordRequest } from "../../services/AuthService";
 import { getImageUrl } from "../../helper/helper";
-
+import { Link } from "react-router-dom";
 
 const Profile = () => {
   const { user, fetchUser } = useAuth();
@@ -52,7 +51,6 @@ const Profile = () => {
     useState(false);
   const [passwordSaving, setPasswordSaving] = useState(false);
 
-
   useEffect(() => {
     if (user) {
       setFormData({
@@ -64,8 +62,6 @@ const Profile = () => {
         avatar: user.avatar || "",
       });
     }
-
-    console.log(user);
   }, [user]);
 
   const handleImageChange = (e) => {
@@ -97,7 +93,7 @@ const Profile = () => {
       await updateCustomerRequest(user.id, data);
 
       toast.success("Cập nhật thông tin thành công!");
-      await fetchUser(); // Reload user data
+      await fetchUser();
       setPreviewImage(null);
     } catch (error) {
       toast.error(
@@ -132,26 +128,38 @@ const Profile = () => {
 
   if (!user && !loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        Loading...
-      </div>
+      <CustomerLayout>
+        <div className="min-h-screen flex items-center justify-center bg-[#f8fafc]">
+          <Loader2 className="animate-spin text-sky-600 w-12 h-12" />
+        </div>
+      </CustomerLayout>
     );
   }
 
   return (
     <CustomerLayout>
-      <div className="bg-slate-50 pt-32 pb-24 min-h-screen">
+      <div className="bg-[#f8fafc] pt-32 pb-24 min-h-screen text-left">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
-          <div className="flex flex-col lg:flex-row gap-12">
+          {/* Breadcrumbs */}
+          <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-10 bg-white px-5 py-3 rounded-2xl border border-slate-100 shadow-sm w-fit">
+            <Link to="/" className="hover:text-sky-600 transition-colors flex items-center gap-1">
+              <Home size={13} className="text-slate-400" />
+              Trang chủ
+            </Link>
+            <ChevronRight size={12} className="text-slate-300" />
+            <span className="text-slate-800">Hồ sơ cá nhân</span>
+          </div>
+
+          <div className="flex flex-col lg:flex-row gap-8">
             {/* Sidebar / Left Column */}
             <div className="w-full lg:w-1/3 space-y-8">
               {/* Profile Card */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-10 text-center relative overflow-hidden group">
+              <div className="bg-white rounded-3xl border border-slate-100 p-8 text-center relative overflow-hidden group shadow-sm">
                 {/* Background Accent */}
-                <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-r from-purple-500 to-blue-500 opacity-5 group-hover:opacity-10 transition-opacity"></div>
+                <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-r from-sky-400 to-sky-600 opacity-[0.06] group-hover:opacity-[0.09] transition-opacity duration-300"></div>
 
                 <div className="relative z-10">
-                  <div className="relative inline-block mb-6 pt-10">
+                  <div className="relative inline-block mb-6 pt-6">
                     <input
                       type="file"
                       ref={fileInputRef}
@@ -159,7 +167,7 @@ const Profile = () => {
                       accept="image/*"
                       onChange={handleImageChange}
                     />
-                    <div className="w-40 h-40 rounded-[40px] bg-slate-100 border-4 border-white shadow-xl overflow-hidden ring-1 ring-gray-100 transition-transform group-hover:scale-105 duration-500">
+                    <div className="w-32 h-32 rounded-3xl bg-slate-50 border-2 border-white shadow-md overflow-hidden ring-1 ring-slate-100 group-hover:scale-105 transition-transform duration-500 mx-auto">
                       {previewImage ? (
                         <img
                           src={previewImage}
@@ -173,7 +181,7 @@ const Profile = () => {
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-black text-white text-4xl font-black">
+                        <div className="w-full h-full flex items-center justify-center bg-sky-600 text-white text-3xl font-black">
                           {user?.name?.charAt(0).toUpperCase()}
                         </div>
                       )}
@@ -181,61 +189,55 @@ const Profile = () => {
                     <button
                       type="button"
                       onClick={() => fileInputRef.current.click()}
-                      className="absolute bottom-2 right-2 w-12 h-12 bg-white rounded-2xl shadow-xl flex items-center justify-center hover:bg-black hover:text-white transition-all ring-4 ring-white"
+                      className="absolute bottom-1 right-1 w-10 h-10 bg-sky-600 hover:bg-sky-700 text-white rounded-2xl shadow-md shadow-sky-500/10 flex items-center justify-center transition-all active:scale-90"
                     >
-                      <Camera size={20} />
+                      <Camera size={16} />
                     </button>
                   </div>
 
-                  <h2 className="text-3xl font-bold text-slate-900  mb-2">
+                  <h2 className="text-xl font-black text-slate-800 uppercase tracking-tight mb-1">
                     {user?.name}
                   </h2>
-                  <p className="text-gray-800  mb-8">
-                    Thành viên từ{" "}
-                    {new Date(user?.created_at).toLocaleDateString()}
+                  <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-6">
+                    Tham gia ngày {new Date(user?.created_at).toLocaleDateString("vi-VN")}
                   </p>
 
-                  <div className="flex items-center justify-center gap-4">
-                    <div className="text-center px-6 py-2 bg-gray-50 rounded-2xl border border-gray-100">
-                      <p className="text-[10px] font-medium text-gray-400 uppercase tracking-widest leading-none mb-1">
-                        Hạng
-                      </p>
-                      <p className="text-sm font-medium text-medium uppercase leading-none">
-                        {user?.customer_profile?.loyalty_tier || "Bronze"}
-                      </p>
+                  <div className="flex items-center justify-center">
+                    <div className="text-center px-4 py-1.5 bg-sky-50 text-sky-600 rounded-full border border-sky-100/50 text-[10px] font-black uppercase tracking-widest">
+                      Hạng: {user?.customer_profile?.loyalty_tier || "Thường"}
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Stats Card */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-8 grid grid-cols-1 gap-6">
-                <div className="flex items-center gap-6 p-4 hover:bg-slate-50 rounded-3xl transition-colors group">
-                  <div className="w-14 h-14 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Package size={24} />
+              <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm space-y-4">
+                <div className="flex items-center gap-4 p-3 hover:bg-slate-50 rounded-2xl transition-colors group">
+                  <div className="w-12 h-12 bg-sky-50 text-sky-600 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform flex-shrink-0">
+                    <Package size={20} />
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-gray-400 uppercase tracking-widest mb-1 text-left">
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5 text-left">
                       Tổng đơn hàng
                     </p>
-                    <p className="text-2xl font-medium text-slate-900 text-left">
+                    <p className="text-lg font-black text-slate-800 text-left">
                       {user?.customer_profile?.total_orders || 0}
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-6 p-4 hover:bg-slate-50 rounded-3xl transition-colors group border-t border-gray-50 pt-6">
-                  <div className="w-14 h-14 bg-green-50 text-green-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <CreditCard size={24} />
+                <div className="flex items-center gap-4 p-3 hover:bg-slate-50 rounded-2xl transition-colors group border-t border-slate-50 pt-4">
+                  <div className="w-12 h-12 bg-emerald-50 text-emerald-500 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform flex-shrink-0">
+                    <CreditCard size={20} />
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-gray-400 uppercase tracking-widest mb-1 text-left">
-                      Đã thanh toán
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5 text-left">
+                      Tổng đã thanh toán
                     </p>
-                    <p className="text-2xl font-medium text-slate-900 text-left">
+                    <p className="text-lg font-black text-slate-800 text-left">
                       {new Intl.NumberFormat("vi-VN").format(
                         user?.customer_profile?.total_spent || 0,
                       )}
-                      đ
+                      ₫
                     </p>
                   </div>
                 </div>
@@ -243,33 +245,34 @@ const Profile = () => {
             </div>
 
             {/* Form / Right Column */}
-            <div className="w-full lg:w-2/3">
-              <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-10 md:p-14">
-                <div className="flex items-center gap-4 mb-12">
-                  <div className="w-12 h-12 bg-black text-white rounded-2xl flex items-center justify-center">
-                    <User size={24} />
+            <div className="w-full lg:w-2/3 space-y-8">
+              {/* Profile Details Form */}
+              <div className="bg-white rounded-3xl border border-slate-100 p-6 md:p-8 shadow-sm">
+                <div className="flex items-center gap-4 mb-8">
+                  <div className="w-12 h-12 bg-sky-600 text-white rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md shadow-sky-500/10">
+                    <User size={20} />
                   </div>
                   <div>
-                    <h3 className="text-3xl font-bold text-slate-900 ">
-                      THÔNG TIN CÁ NHÂN
+                    <h3 className="text-base font-black text-slate-800 uppercase tracking-tight">
+                      Thông tin cá nhân
                     </h3>
-                    <p className="text-gray-400 font-medium">
-                      Cập nhật hồ sơ để nhận nhiều ưu đãi hơn.
+                    <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-0.5">
+                      Cập nhật đầy đủ để nhận nhiều ưu đãi mua sắm hơn
                     </p>
                   </div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-8">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Full Name */}
-                    <div className="space-y-3">
-                      <label className="text-xs font-bold text-gray-700 uppercase ml-2">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">
                         Họ và tên
                       </label>
                       <div className="relative group">
                         <User
-                          className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-700 group-focus-within:text-black transition-colors"
-                          size={20}
+                          className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-sky-600 transition-colors"
+                          size={16}
                         />
                         <input
                           type="text"
@@ -278,39 +281,39 @@ const Profile = () => {
                           onChange={(e) =>
                             setFormData({ ...formData, name: e.target.value })
                           }
-                          className="w-full h-16 bg-gray-50 border border-gray-100 rounded-lg pl-14 pr-6 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-black/5 focus:border-black transition-all"
+                          className="w-full h-12 bg-slate-50 border border-slate-100 rounded-2xl pl-11 pr-4 text-xs font-bold text-slate-700 outline-none focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                         />
                       </div>
                     </div>
 
-                    {/* Email */}
-                    <div className="space-y-3">
-                      <label className="text-xs font-bold text-gray-700 uppercase ml-2">
-                        Email
+                    {/* Email (Disabled) */}
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">
+                        Địa chỉ Email
                       </label>
                       <div className="relative">
                         <Mail
-                          className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-700"
-                          size={20}
+                          className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                          size={16}
                         />
                         <input
                           type="email"
                           disabled
                           value={user?.email}
-                          className="w-full h-16 bg-gray-100 border border-gray-200 rounded-lg pl-14 pr-6 text-sm font-medium text-gray-400 cursor-not-allowed"
+                          className="w-full h-12 bg-slate-100 border border-slate-150 rounded-2xl pl-11 pr-4 text-xs font-bold text-slate-400 cursor-not-allowed"
                         />
                       </div>
                     </div>
 
                     {/* Phone */}
-                    <div className="space-y-3">
-                      <label className="text-xs font-bold text-gray-700 uppercase ml-2">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">
                         Số điện thoại
                       </label>
                       <div className="relative group">
                         <Phone
-                          className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-700 group-focus-within:text-black transition-colors"
-                          size={20}
+                          className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-sky-600 transition-colors"
+                          size={16}
                         />
                         <input
                           type="text"
@@ -318,17 +321,17 @@ const Profile = () => {
                           onChange={(e) =>
                             setFormData({ ...formData, phone: e.target.value })
                           }
-                          className="w-full h-16 bg-gray-50 border border-gray-100 rounded-lg pl-14 pr-6 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-black/5 focus:border-black transition-all"
+                          className="w-full h-12 bg-slate-50 border border-slate-100 rounded-2xl pl-11 pr-4 text-xs font-bold text-slate-700 outline-none focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                         />
                       </div>
                     </div>
 
-                    {/* Gender */}
-                    <div className="space-y-3">
-                      <label className="text-xs font-bold text-gray-700 uppercase ml-2">
+                    {/* Gender Selector */}
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">
                         Giới tính
                       </label>
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2">
                         {["male", "female", "other"].map((g) => (
                           <button
                             key={g}
@@ -336,7 +339,11 @@ const Profile = () => {
                             onClick={() =>
                               setFormData({ ...formData, gender: g })
                             }
-                            className={`flex-1 h-16 rounded-lg font-medium text-sm tracking-tight transition-all border ${formData.gender === g ? "bg-black text-white border-black shadow-xl shadow-black/10" : "bg-gray-50 text-gray-400 border-gray-100 hover:border-gray-300 hover:text-black"}`}
+                            className={`flex-1 h-12 rounded-2xl text-[10px] font-black uppercase tracking-wider transition-all border ${
+                              formData.gender === g
+                                ? "bg-sky-600 text-white border-sky-600 shadow-md shadow-sky-500/10"
+                                : "bg-slate-50 text-slate-500 border-slate-100 hover:bg-slate-100"
+                            }`}
                           >
                             {g === "male"
                               ? "Nam"
@@ -348,15 +355,15 @@ const Profile = () => {
                       </div>
                     </div>
 
-                    {/* DOB */}
-                    <div className="space-y-3">
-                      <label className="text-xs font-bold text-gray-700 uppercase ml-2">
+                    {/* Date of Birth */}
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">
                         Ngày sinh
                       </label>
                       <div className="relative group">
                         <Calendar
-                          className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-700 group-focus-within:text-black transition-colors"
-                          size={20}
+                          className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-sky-600 transition-colors"
+                          size={16}
                         />
                         <input
                           type="date"
@@ -367,52 +374,52 @@ const Profile = () => {
                               date_of_birth: e.target.value,
                             })
                           }
-                          className="w-full h-16 bg-gray-50 border border-gray-100 rounded-lg pl-14 pr-6 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-black/5 focus:border-black transition-all"
+                          className="w-full h-12 bg-slate-50 border border-slate-100 rounded-2xl pl-11 pr-4 text-xs font-bold text-slate-700 outline-none focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                         />
                       </div>
                     </div>
                   </div>
 
                   {/* Address */}
-                  <div className="space-y-3 pt-4 border-t border-gray-100">
-                    <label className="text-xs font-bold text-gray-700 uppercase ml-2">
-                      Địa chỉ giao hàng mặc định
+                  <div className="space-y-2 pt-4 border-t border-slate-50">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">
+                      Địa chỉ nhận hàng mặc định
                     </label>
                     <div className="relative group">
                       <MapPin
-                        className="absolute left-5 top-6 text-gray-700 group-focus-within:text-black transition-colors"
-                        size={20}
+                        className="absolute left-4 top-5 text-slate-400 group-focus-within:text-sky-600 transition-colors"
+                        size={16}
                       />
                       <textarea
                         rows={3}
-                        placeholder="Nhập địa chỉ chi tiết (số nhà, tên đường...)"
+                        placeholder="Nhập địa chỉ nhận hàng chi tiết (số nhà, tên đường, phường/xã...)"
                         value={formData.address}
                         onChange={(e) =>
                           setFormData({ ...formData, address: e.target.value })
                         }
-                        className="w-full bg-gray-50 border border-gray-100 rounded-lg pl-14 pr-6 py-5 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-black/5 focus:border-black transition-all resize-none"
+                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl pl-11 pr-4 py-4 text-xs font-bold text-slate-700 outline-none focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all resize-none"
                       />
                     </div>
                   </div>
 
-                  {/* Submit */}
-                  <div className="pt-8 flex justify-end">
+                  {/* Submit Button */}
+                  <div className="pt-4 flex justify-end">
                     <button
                       type="submit"
                       disabled={saving}
-                      className="group flex items-center gap-3 px-12 py-5 bg-black text-white rounded-lg font-bold transition-all hover:bg-black/90 disabled:opacity-50 shadow-2xl shadow-black/20 hover:-translate-y-1 active:translate-y-0"
+                      className="group flex items-center justify-center gap-2 px-8 py-3.5 bg-sky-600 hover:bg-sky-700 text-white rounded-2xl text-xs font-black uppercase tracking-wider transition-all shadow-md shadow-sky-500/10 hover:-translate-y-0.5 active:scale-95 w-full sm:w-auto"
                     >
                       {saving ? (
                         <>
-                          <Loader2 className="animate-spin" size={22} />
+                          <Loader2 className="animate-spin" size={14} />
                           Đang lưu...
                         </>
                       ) : (
                         <>
                           LƯU THAY ĐỔI
                           <Save
-                            size={20}
-                            className="group-hover:scale-110 transition-transform"
+                            size={14}
+                            className="group-hover:scale-105 transition-transform"
                           />
                         </>
                       )}
@@ -422,37 +429,35 @@ const Profile = () => {
               </div>
 
               {/* Password Section */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-10 md:p-14 mt-12">
-                <div className="flex items-center gap-4 mb-12">
-                  <div className="w-12 h-12 bg-black text-white rounded-2xl flex items-center justify-center">
-                    <Lock size={24} />
+              <div className="bg-white rounded-3xl border border-slate-100 p-6 md:p-8 shadow-sm">
+                <div className="flex items-center gap-4 mb-8">
+                  <div className="w-12 h-12 bg-sky-600 text-white rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md shadow-sky-500/10">
+                    <Lock size={20} />
                   </div>
                   <div>
-                    <h3 className="text-3xl font-bold text-slate-900 ">
-                      {user?.has_password
-                        ? "ĐỔI MẬT KHẨU"
-                        : "THIẾT LẬP MẬT KHẨU"}
+                    <h3 className="text-base font-black text-slate-800 uppercase tracking-tight">
+                      {user?.has_password ? "Đổi mật khẩu" : "Thiết lập mật khẩu"}
                     </h3>
-                    <p className="text-gray-400 font-medium">
+                    <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-0.5">
                       {user?.has_password
-                        ? "Thay đổi mật khẩu thường xuyên để bảo vệ tài khoản."
-                        : "Tài khoản của bạn chưa có mật khẩu. Thiết lập mật khẩu để đăng nhập bằng email."}
+                        ? "Thay đổi mật khẩu định kỳ giúp bảo vệ tài khoản tốt hơn"
+                        : "Thiết lập mật khẩu để đăng nhập trực tiếp bằng email"}
                     </p>
                   </div>
                 </div>
 
-                <form onSubmit={handlePasswordSubmit} className="space-y-8">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <form onSubmit={handlePasswordSubmit} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Old Password */}
                     {user?.has_password && (
-                      <div className="space-y-3">
-                        <label className="text-xs font-bold text-gray-700 uppercase ml-2">
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">
                           Mật khẩu hiện tại
                         </label>
                         <div className="relative group">
                           <Lock
-                            className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-700 group-focus-within:text-black transition-colors"
-                            size={20}
+                            className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-sky-600 transition-colors"
+                            size={16}
                           />
                           <input
                             type={showOldPassword ? "text" : "password"}
@@ -464,40 +469,30 @@ const Profile = () => {
                                 old_password: e.target.value,
                               })
                             }
-                            className="w-full h-16 bg-gray-50 border border-gray-100 rounded-lg pl-14 pr-14 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-black/5 focus:border-black transition-all"
+                            className="w-full h-12 bg-slate-50 border border-slate-100 rounded-2xl pl-11 pr-11 text-xs font-bold text-slate-700 outline-none focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                           />
                           <button
                             type="button"
                             onClick={() => setShowOldPassword(!showOldPassword)}
-                            className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black transition-colors"
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
                           >
-                            {showOldPassword ? (
-                              <EyeOff size={20} />
-                            ) : (
-                              <Eye size={20} />
-                            )}
+                            {showOldPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                           </button>
                         </div>
                       </div>
                     )}
 
-                    <div
-                      className={
-                        user?.has_password
-                          ? "md:col-span-2 invisible h-0"
-                          : "hidden"
-                      }
-                    ></div>
+                    {user?.has_password && <div className="hidden md:block" />}
 
                     {/* New Password */}
-                    <div className="space-y-3">
-                      <label className="text-xs font-bold text-gray-700 uppercase ml-2">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">
                         Mật khẩu mới
                       </label>
                       <div className="relative group">
                         <Lock
-                          className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-700 group-focus-within:text-black transition-colors"
-                          size={20}
+                          className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-sky-600 transition-colors"
+                          size={16}
                         />
                         <input
                           type={showPassword ? "text" : "password"}
@@ -509,31 +504,27 @@ const Profile = () => {
                               password: e.target.value,
                             })
                           }
-                          className="w-full h-16 bg-gray-50 border border-gray-100 rounded-lg pl-14 pr-14 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-black/5 focus:border-black transition-all"
+                          className="w-full h-12 bg-slate-50 border border-slate-100 rounded-2xl pl-11 pr-11 text-xs font-bold text-slate-700 outline-none focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                         />
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black transition-colors"
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
                         >
-                          {showPassword ? (
-                            <EyeOff size={20} />
-                          ) : (
-                            <Eye size={20} />
-                          )}
+                          {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                         </button>
                       </div>
                     </div>
 
                     {/* Confirm Password */}
-                    <div className="space-y-3">
-                      <label className="text-xs font-bold text-gray-700 uppercase ml-2">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">
                         Xác nhận mật khẩu mới
                       </label>
                       <div className="relative group">
                         <Lock
-                          className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-700 group-focus-within:text-black transition-colors"
-                          size={20}
+                          className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-sky-600 transition-colors"
+                          size={16}
                         />
                         <input
                           type={showPasswordConfirmation ? "text" : "password"}
@@ -545,46 +536,38 @@ const Profile = () => {
                               password_confirmation: e.target.value,
                             })
                           }
-                          className="w-full h-16 bg-gray-50 border border-gray-100 rounded-lg pl-14 pr-14 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-black/5 focus:border-black transition-all"
+                          className="w-full h-12 bg-slate-50 border border-slate-100 rounded-2xl pl-11 pr-11 text-xs font-bold text-slate-700 outline-none focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                         />
                         <button
                           type="button"
                           onClick={() =>
-                            setShowPasswordConfirmation(
-                              !showPasswordConfirmation,
-                            )
+                            setShowPasswordConfirmation(!showPasswordConfirmation)
                           }
-                          className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black transition-colors"
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
                         >
-                          {showPasswordConfirmation ? (
-                            <EyeOff size={20} />
-                          ) : (
-                            <Eye size={20} />
-                          )}
+                          {showPasswordConfirmation ? <EyeOff size={16} /> : <Eye size={16} />}
                         </button>
                       </div>
                     </div>
                   </div>
 
-                  <div className="pt-8 flex justify-end">
+                  <div className="pt-4 flex justify-end">
                     <button
                       type="submit"
                       disabled={passwordSaving}
-                      className="group flex items-center gap-3 px-12 py-5 bg-black text-white rounded-lg font-bold transition-all hover:bg-black/90 disabled:opacity-50 shadow-2xl shadow-black/20 hover:-translate-y-1 active:translate-y-0"
+                      className="group flex items-center justify-center gap-2 px-8 py-3.5 bg-sky-600 hover:bg-sky-700 text-white rounded-2xl text-xs font-black uppercase tracking-wider transition-all shadow-md shadow-sky-500/10 hover:-translate-y-0.5 active:scale-95 w-full sm:w-auto"
                     >
                       {passwordSaving ? (
                         <>
-                          <Loader2 className="animate-spin" size={22} />
+                          <Loader2 className="animate-spin" size={14} />
                           Đang lưu...
                         </>
                       ) : (
                         <>
-                          {user?.has_password
-                            ? "CẬP NHẬT MẬT KHẨU"
-                            : "THIẾT LẬP MẬT KHẨU"}
+                          {user?.has_password ? "ĐỔI MẬT KHẨU" : "THIẾT LẬP MẬT KHẨU"}
                           <Save
-                            size={20}
-                            className="group-hover:scale-110 transition-transform"
+                            size={14}
+                            className="group-hover:scale-105 transition-transform"
                           />
                         </>
                       )}
