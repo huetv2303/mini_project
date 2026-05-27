@@ -28,6 +28,10 @@ class AuthService
             throw new \Exception('InvalidCredentials');
         }
 
+        if ($user->customerProfile && !$user->customerProfile->is_active) {
+            throw new \Exception('AccountLocked');
+        }
+
         if ($user->google_id && !$user->password) {
             throw new \Exception('GoogleAccountOnly');
         }

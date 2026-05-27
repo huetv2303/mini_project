@@ -69,6 +69,10 @@ class SocialAuthController extends Controller
             return redirect(env('FRONTEND_URL') . '/login?error=Vui lòng kiểm tra email để xác thực tài khoản trước khi đăng nhập.');
         }
 
+        if ($user->customerProfile && !$user->customerProfile->is_active) {
+            return redirect(env('FRONTEND_URL') . '/login?error=Tài khoản của bạn đã bị khóa. Vui lòng liên hệ ban quản trị để được hỗ trợ.');
+        }
+
         $token = auth('api')->login($user);
 
         return redirect(env('FRONTEND_URL') . '/login?token=' . $token);

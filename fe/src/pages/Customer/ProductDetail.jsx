@@ -241,7 +241,10 @@ const ProductDetail = () => {
       return colorMatch && sizeMatch;
     }) || product?.variants?.[0];
 
-  const isOutOfStock = !activeVariant || !activeVariant.inventory || activeVariant.inventory.available <= 0;
+  const isOutOfStock =
+    !activeVariant ||
+    !activeVariant.inventory ||
+    activeVariant.inventory.available <= 0;
 
   // Smart Selection Handlers
   const handleColorChange = (color) => {
@@ -431,8 +434,9 @@ const ProductDetail = () => {
                             Hết hàng
                           </span>
                         ) : (
-                          <span className="text-emerald-600 text-xs font-extrabold bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-lg">
-                            Còn lại: {activeVariant.inventory.available} sản phẩm
+                          <span className="text-emerald-600 text-[14px] font-medium bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-lg">
+                            Còn lại: {activeVariant.inventory.available} sản
+                            phẩm
                           </span>
                         )}
 

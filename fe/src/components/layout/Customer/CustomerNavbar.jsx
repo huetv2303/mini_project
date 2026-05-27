@@ -98,7 +98,8 @@ const CustomerNavbar = () => {
                 />
               </div>
               <span className="text-xl font-bold tracking-tight text-slate-900 hidden sm:block">
-                TRENDORA<span className="text-gray-400">FASHION</span>
+                <span className="text-blue-400"> TRENDORA</span>
+                <span className="text-gray-400">FASHION</span>
               </span>
             </Link>
 

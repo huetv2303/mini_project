@@ -3,7 +3,6 @@ import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { Mail, Lock, Loader2, Eye, EyeOff, Image } from "lucide-react";
 import IconGoogle from "../../assets/IconGoogle.png";
-import IconFacebook from "../../assets/IconFacebook.png";
 import { setToken } from "../../services/AuthService";
 import toast from "react-hot-toast";
 
@@ -31,7 +30,10 @@ const Login = () => {
         .then((userData) => {
           console.log("Google Login User Data:", userData);
           console.log("Role Code:", userData?.role?.code);
-          if (userData?.role?.code === "admin" || userData?.role?.code === "staff") {
+          if (
+            userData?.role?.code === "admin" ||
+            userData?.role?.code === "staff"
+          ) {
             navigate("/admin/dashboard");
           } else {
             navigate("/");
@@ -233,15 +235,6 @@ const Login = () => {
             >
               <span className="flex items-center justify-center">
                 <img src={IconGoogle} alt="Google" width={20} height={20} />
-              </span>
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 px-4 bg-white border border-gray-300 bg-white hover:border-black"
-            >
-              <span className="flex items-center justify-center">
-                <img src={IconFacebook} alt="Facebook" width={20} height={20} />
               </span>
             </button>
           </div>

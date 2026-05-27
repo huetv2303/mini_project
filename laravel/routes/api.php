@@ -150,7 +150,12 @@ Route::group(['prefix' => 'v1'], function () {
             Route::get('/', [StockReceiptController::class, 'index']);
             Route::post('/', [StockReceiptController::class, 'store']);
             Route::get('/{id}', [StockReceiptController::class, 'show']);
-            Route::post('/{id}/confirm', [StockReceiptController::class, 'confirm']);
+            
+            // Chỉ Quản lý/Admin mới có quyền Duyệt (Xác nhận) hoặc Hủy phiếu nhập kho
+            Route::middleware('permission:admin.manage')->group(function () {
+                Route::post('/{id}/confirm', [StockReceiptController::class, 'confirm']);
+                Route::post('/{id}/cancel', [StockReceiptController::class, 'cancel']);
+            });
         });
 
         Route::prefix('inventory')->group(function () {

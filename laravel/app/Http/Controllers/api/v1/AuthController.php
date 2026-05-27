@@ -49,6 +49,9 @@ class AuthController extends Controller
             } elseif ($e->getMessage() === 'GoogleAccountOnly') {
                 $status = 422;
                 $message = 'Tài khoản này đã đăng ký qua Google. Vui lòng sử dụng tính năng "Đăng nhập với Google".';
+            } elseif ($e->getMessage() === 'AccountLocked') {
+                $status = 403;
+                $message = 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ ban quản trị để được hỗ trợ.';
             }
 
             return response()->json([

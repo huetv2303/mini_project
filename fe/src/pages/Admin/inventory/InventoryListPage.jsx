@@ -14,15 +14,18 @@ import {
   BarChart,
   Loader2,
   AlertCircle,
+  FileText,
 } from "lucide-react";
 import Pagination from "../../../components/common/Pagination";
 import toast from "react-hot-toast";
 import { getImageUrl } from "../../../helper/helper";
+import { useAuth } from "../../../context/AuthContext";
 
 import ImportStockModal from "./components/ImportStockModal";
 import AdjustStockModal from "./components/AdjustStockModal";
 import TransactionHistoryModal from "./components/TransactionHistoryModal";
 import InventoryReportTab from "./components/InventoryReportTab";
+import StockReceiptsTab from "./components/StockReceiptsTab";
 import {
   adjustInventory,
   importInventory,
@@ -37,6 +40,9 @@ const debounce = (func, delay) => {
 };
 
 const InventoryListPage = () => {
+  const { hasPermission } = useAuth();
+  const isAdmin = hasPermission("admin.manage");
+
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -236,7 +242,7 @@ const InventoryListPage = () => {
             className={`flex items-center px-5 py-2.5 rounded-lg text-sm font-semibold transition-all shadow-sm ${
               activeTab === "inventory"
                 ? "bg-emerald-500 text-white hover:bg-emerald-600"
-                : "bg-white text-gray-600 border text-gray-600 border-gray-200 hover:bg-gray-50"
+                : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
             }`}
           >
             <Archive className="w-4 h-4 mr-2" /> Tồn kho
@@ -246,14 +252,24 @@ const InventoryListPage = () => {
             className={`flex items-center px-5 py-2.5 rounded-lg text-sm font-semibold transition-all shadow-sm ${
               activeTab === "report"
                 ? "bg-emerald-500 text-white hover:bg-emerald-600"
-                : "bg-white text-gray-600 border text-gray-600 border-gray-200 hover:bg-gray-50"
+                : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
             }`}
           >
             <BarChart className="w-4 h-4 mr-2" /> Báo cáo tháng
           </button>
+          <button
+            onClick={() => setActiveTab("receipts")}
+            className={`flex items-center px-5 py-2.5 rounded-lg text-sm font-semibold transition-all shadow-sm ${
+              activeTab === "receipts"
+                ? "bg-emerald-500 text-white hover:bg-emerald-600"
+                : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
+            }`}
+          >
+            <FileText className="w-4 h-4 mr-2" /> Phiếu nhập kho
+          </button>
         </div>
 
-        {activeTab === "inventory" ? (
+        {activeTab === "inventory" && (
           <>
             {/* Filters and search */}
             <div className="flex flex-col md:flex-row items-center gap-4">
@@ -552,26 +568,30 @@ const InventoryListPage = () => {
 
                                   <td className="px-4 py-3 text-center">
                                     <div className="flex items-center justify-center gap-1.5 opacity-90">
-                                      <button
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          openImportModal(product, variant);
-                                        }}
-                                        className="p-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded-md transition-colors"
-                                        title="Nhập kho"
-                                      >
-                                        <Plus className="w-3.5 h-3.5" />
-                                      </button>
-                                      <button
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          openAdjustModal(product, variant);
-                                        }}
-                                        className="p-1.5 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-md transition-colors"
-                                        title="Điều chỉnh tồn kho"
-                                      >
-                                        <Edit2 className="w-3.5 h-3.5" />
-                                      </button>
+                                      {isAdmin && (
+                                        <>
+                                          <button
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              openImportModal(product, variant);
+                                            }}
+                                            className="p-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded-md transition-colors"
+                                            title="Nhập kho"
+                                          >
+                                            <Plus className="w-3.5 h-3.5" />
+                                          </button>
+                                          <button
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              openAdjustModal(product, variant);
+                                            }}
+                                            className="p-1.5 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-md transition-colors"
+                                            title="Điều chỉnh tồn kho"
+                                          >
+                                            <Edit2 className="w-3.5 h-3.5" />
+                                          </button>
+                                        </>
+                                      )}
                                       <button
                                         onClick={(e) => {
                                           e.stopPropagation();
@@ -603,11 +623,16 @@ const InventoryListPage = () => {
                 label="sản phẩm"
               />
             </div>
-          </>
-        ) : (
-          <InventoryReportTab />
-        )}
-      </div>
+          </>)}
+
+          {activeTab === "report" && (
+            <InventoryReportTab />
+          )}
+
+          {activeTab === "receipts" && (
+            <StockReceiptsTab />
+          )}
+        </div>
 
       {/* Modals */}
       <ImportStockModal

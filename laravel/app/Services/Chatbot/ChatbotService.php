@@ -16,6 +16,9 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use App\Services\Chatbot\Functions\Customer\SearchProductsFunction;
 use App\Services\Chatbot\Functions\Customer\CheckProductStockFunction;
+use App\Services\Chatbot\Functions\Customer\GetActivePromotionsFunction;
+use App\Services\Chatbot\Functions\Customer\GetMyOrderStatusFunction;
+
 // Tương lai sẽ thêm các function cho admin ở đây
 
 class ChatbotService
@@ -80,8 +83,8 @@ PROMPT;
         if ($role === 'customer' || $role === 'guest') {
             $this->functions[] = new SearchProductsFunction();
             $this->functions[] = new CheckProductStockFunction();
-            $this->functions[] = new \App\Services\Chatbot\Functions\Customer\GetMyOrderStatusFunction();
-            $this->functions[] = new \App\Services\Chatbot\Functions\Customer\GetActivePromotionsFunction();
+            $this->functions[] = new GetMyOrderStatusFunction();
+            $this->functions[] = new GetActivePromotionsFunction();
         } elseif ($role === 'admin') {
             $this->functions[] = new SearchProductsFunction();
             $this->functions[] = new CheckProductStockFunction();
@@ -95,8 +98,8 @@ PROMPT;
             $this->functions[] = new AnalyzeCustomerInquiriesFunction();
             $this->functions[] = new GetProductReviewsFunction();
             $this->functions[] = new GetTaxStatsFunction();
-            $this->functions[] = new \App\Services\Chatbot\Functions\Customer\GetMyOrderStatusFunction();
-            $this->functions[] = new \App\Services\Chatbot\Functions\Customer\GetActivePromotionsFunction();
+            $this->functions[] = new GetMyOrderStatusFunction();
+            $this->functions[] = new GetActivePromotionsFunction();
         }
 
         // 2. Lưu tin nhắn user
