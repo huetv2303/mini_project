@@ -2,11 +2,29 @@ import React, { useState } from "react";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
 import { X } from "lucide-react";
+import { useLocation } from "react-router-dom";
 
 const AdminLayout = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const location = useLocation();
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+
+  const pageTransitionStyle = `
+    @keyframes pageTransitionFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .page-transition-wrapper {
+      animation: pageTransitionFadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+  `;
 
   return (
     <div className="flex flex-col h-screen bg-gray-50 overflow-hidden relative">
@@ -48,7 +66,10 @@ const AdminLayout = ({ children }) => {
 
         {/* Main Content Area */}
         <main className="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent bg-gray-100">
-          <div className="Trendora">{children}</div>
+          <div key={location.pathname} className="Trendora page-transition-wrapper">
+            <style>{pageTransitionStyle}</style>
+            {children}
+          </div>
         </main>
       </div>
     </div>

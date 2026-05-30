@@ -11,10 +11,16 @@ class ProductRepository implements ProductRepositoryInterface
     public function getAll($request = null)
     {
         $query = Product::with(['category', 'supplier', 'images', 'attributes', 'variants.attributes', 'variants.inventories']);
-
         if ($request) {
             if ($request->search) {
-                $query->where('name', 'like', '%' . $request->search . '%');
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', '%' . $search . '%')
+                      ->orWhere('description', 'like', '%' . $search . '%')
+                      ->orWhereHas('variants', function ($v) use ($search) {
+                          $v->where('sku', 'like', '%' . $search . '%');
+                      });
+                });
             }
             if ($request->category) {
                 $category = Category::where('slug', $request->category)->first();
@@ -22,6 +28,28 @@ class ProductRepository implements ProductRepositoryInterface
                     $categoryIds = $this->getAllCategoryIds($category);
                     $query->whereIn('category_id', $categoryIds);
                 }
+            }
+            if ($request->sizes) {
+                $sizes = is_array($request->sizes) ? $request->sizes : explode(',', $request->sizes);
+                $query->whereHas('variants.attributes', function ($q) use ($sizes) {
+                    $q->where('attribute_name', 'Size')
+                      ->whereIn('attribute_value', $sizes);
+                });
+            }
+            if ($request->colors) {
+                $colors = is_array($request->colors) ? $request->colors : explode(',', $request->colors);
+                $query->whereHas('variants.attributes', function ($q) use ($colors) {
+                    $q->where('attribute_name', 'Color')
+                      ->whereIn('attribute_value', $colors);
+                });
+            }
+            if ($request->in_stock !== null && $request->in_stock !== '') {
+                $query->whereHas('variants.inventories', function ($q) {
+                    $q->where('quantity', '>', 0);
+                });
+            }
+            if ($request->on_sale !== null && $request->on_sale !== '') {
+                $query->where('discount', '>', 0);
             }
             if ($request->min_price !== null && $request->min_price !== '') {
                 $query->whereHas('variants', function ($q) use ($request) {

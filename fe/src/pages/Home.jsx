@@ -23,41 +23,116 @@ import { fetchProductsRequest } from "../services/ProductService";
 import { getImageUrl, formatPrice } from "../helper/helper";
 import StarRating from "../components/review/StarRating";
 
+const AnimatedSection = ({ children }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const domRef = useRef();
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+            if (domRef.current) {
+              observer.unobserve(domRef.current);
+            }
+          }
+        });
+      },
+      { threshold: 0.08 }
+    );
+
+    if (domRef.current) {
+      observer.observe(domRef.current);
+    }
+
+    return () => {
+      if (domRef.current) {
+        observer.unobserve(domRef.current);
+      }
+    };
+  }, []);
+
+  return (
+    <div
+      ref={domRef}
+      className={`transition-all duration-1000 ease-out transform ${
+        isVisible
+          ? "opacity-100 translate-y-0"
+          : "opacity-0 translate-y-12"
+      }`}
+    >
+      {children}
+    </div>
+  );
+};
+
 const Home = () => {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
   const [categories, setCategories] = useState([]);
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const [productsLoading, setProductsLoading] = useState(false);
+  const [productsLoaded, setProductsLoaded] = useState(false);
+  const featuredSectionRef = useRef();
   const swiperRef = useRef(null);
 
   useEffect(() => {
-    const loadHomeData = async () => {
+    const loadCategories = async () => {
       try {
         setLoading(true);
-        // Fetch featured categories (assuming we just take the top 4 for now)
+        // Fetch featured categories immediately
         const categoriesRes = await fetchCategoriesRequest();
         if (categoriesRes.status === "success") {
           const list = categoriesRes.data?.data || categoriesRes.data || [];
           setCategories(list.slice(0, 4));
         }
-
-        // Fetch best sellers (popular)
-        const productsRes = await fetchProductsRequest({
-          sort: "popular",
-          limit: 10,
-        });
-        if (productsRes.status === "success") {
-          setFeaturedProducts(productsRes.data?.data || productsRes.data || []);
-        }
       } catch (error) {
-        console.error("Failed to load home data:", error);
+        console.error("Failed to load home categories:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    loadHomeData();
+    loadCategories();
   }, []);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      async (entries) => {
+        const [entry] = entries;
+        if (entry.isIntersecting && !productsLoaded && !productsLoading) {
+          setProductsLoading(true);
+          try {
+            const productsRes = await fetchProductsRequest({
+              sort: "popular",
+              limit: 10,
+            });
+            if (productsRes.status === "success") {
+              setFeaturedProducts(productsRes.data?.data || productsRes.data || []);
+              setProductsLoaded(true);
+            }
+          } catch (err) {
+            console.error("Failed to lazy load featured products:", err);
+          } finally {
+            setProductsLoading(false);
+          }
+        }
+      },
+      { threshold: 0.05 }
+    );
+
+    if (featuredSectionRef.current) {
+      observer.observe(featuredSectionRef.current);
+    }
+
+    return () => {
+      if (featuredSectionRef.current) {
+        observer.unobserve(featuredSectionRef.current);
+      }
+    };
+  }, [productsLoaded, productsLoading]);
 
   // Automatically redirect Admin and Staff to dashboard if they land on Home
   if (!authLoading && isAuthenticated) {
@@ -131,337 +206,368 @@ const Home = () => {
       </section>
 
       {/* Trust Badges */}
-      <section className="py-12 bg-white border-b border-slate-50 text-left">
-        <div className="max-w-7xl mx-auto px-6 md:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="flex items-center gap-4 group">
-              <div className="w-12 h-12 bg-sky-50 text-sky-600 rounded-xl flex items-center justify-center group-hover:bg-sky-600 group-hover:text-white transition-all duration-300 flex-shrink-0">
-                <Truck size={20} />
+      <AnimatedSection>
+        <section className="py-12 bg-white border-b border-slate-50 text-left">
+          <div className="max-w-7xl mx-auto px-6 md:px-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+              <div className="flex items-center gap-4 group">
+                <div className="w-12 h-12 bg-sky-50 text-sky-600 rounded-xl flex items-center justify-center group-hover:bg-sky-600 group-hover:text-white transition-all duration-300 flex-shrink-0">
+                  <Truck size={20} />
+                </div>
+                <div>
+                  <h4 className="font-black text-xs uppercase tracking-wider text-slate-800 mb-0.5">
+                    Giao hàng nhanh
+                  </h4>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    Miễn phí từ 500k
+                  </p>
+                </div>
               </div>
-              <div>
-                <h4 className="font-black text-xs uppercase tracking-wider text-slate-800 mb-0.5">
-                  Giao hàng nhanh
-                </h4>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                  Miễn phí từ 500k
-                </p>
+              <div className="flex items-center gap-4 group">
+                <div className="w-12 h-12 bg-sky-50 text-sky-600 rounded-xl flex items-center justify-center group-hover:bg-sky-600 group-hover:text-white transition-all duration-300 flex-shrink-0">
+                  <ShieldCheck size={20} />
+                </div>
+                <div>
+                  <h4 className="font-black text-xs uppercase tracking-wider text-slate-800 mb-0.5">
+                    Bảo đảm chính hãng
+                  </h4>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    Hoàn tiền 200% nếu giả
+                  </p>
+                </div>
               </div>
-            </div>
-            <div className="flex items-center gap-4 group">
-              <div className="w-12 h-12 bg-sky-50 text-sky-600 rounded-xl flex items-center justify-center group-hover:bg-sky-600 group-hover:text-white transition-all duration-300 flex-shrink-0">
-                <ShieldCheck size={20} />
+              <div className="flex items-center gap-4 group">
+                <div className="w-12 h-12 bg-sky-50 text-sky-600 rounded-xl flex items-center justify-center group-hover:bg-sky-600 group-hover:text-white transition-all duration-300 flex-shrink-0">
+                  <RotateCcw size={20} />
+                </div>
+                <div>
+                  <h4 className="font-black text-xs uppercase tracking-wider text-slate-800 mb-0.5">
+                    Đổi trả 30 ngày
+                  </h4>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    Thủ tục cực kì siêu tốc
+                  </p>
+                </div>
               </div>
-              <div>
-                <h4 className="font-black text-xs uppercase tracking-wider text-slate-800 mb-0.5">
-                  Bảo đảm chính hãng
-                </h4>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                  Hoàn tiền 200% nếu giả
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-4 group">
-              <div className="w-12 h-12 bg-sky-50 text-sky-600 rounded-xl flex items-center justify-center group-hover:bg-sky-600 group-hover:text-white transition-all duration-300 flex-shrink-0">
-                <RotateCcw size={20} />
-              </div>
-              <div>
-                <h4 className="font-black text-xs uppercase tracking-wider text-slate-800 mb-0.5">
-                  Đổi trả 30 ngày
-                </h4>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                  Thủ tục cực kì siêu tốc
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-4 group">
-              <div className="w-12 h-12 bg-sky-50 text-sky-600 rounded-xl flex items-center justify-center group-hover:bg-sky-600 group-hover:text-white transition-all duration-300 flex-shrink-0">
-                <Star size={20} />
-              </div>
-              <div>
-                <h4 className="font-black text-xs uppercase tracking-wider text-slate-800 mb-0.5">
-                  Hỗ trợ 24/7
-                </h4>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                  Tư vấn thời trang tận tâm
-                </p>
+              <div className="flex items-center gap-4 group">
+                <div className="w-12 h-12 bg-sky-50 text-sky-600 rounded-xl flex items-center justify-center group-hover:bg-sky-600 group-hover:text-white transition-all duration-300 flex-shrink-0">
+                  <Star size={20} />
+                </div>
+                <div>
+                  <h4 className="font-black text-xs uppercase tracking-wider text-slate-800 mb-0.5">
+                    Hỗ trợ 24/7
+                  </h4>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    Tư vấn thời trang tận tâm
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </AnimatedSection>
 
       {/* Featured Categories */}
-      <section className="py-20 bg-[#f8fafc] text-left">
-        <div className="max-w-7xl mx-auto px-6 md:px-8">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
-            <div>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">
-                Bộ sưu tập hoàn mỹ
-              </p>
-              <h2 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight uppercase">
-                Danh mục <span className="text-sky-600">cảm hứng</span>
-              </h2>
-            </div>
-            <Link
-              to="/categories"
-              className="group text-xs font-black text-slate-400 hover:text-sky-600 uppercase tracking-wider flex items-center gap-1.5 self-start sm:self-auto transition-colors"
-            >
-              Xem tất cả
-              <ArrowRight
-                size={14}
-                className="group-hover:translate-x-1 transition-transform"
-              />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {categories.map((cat) => (
+      <AnimatedSection>
+        <section className="py-20 bg-[#f8fafc] text-left">
+          <div className="max-w-7xl mx-auto px-6 md:px-8">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
+              <div>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">
+                  Bộ sưu tập hoàn mỹ
+                </p>
+                <h2 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight uppercase">
+                  Danh mục <span className="text-sky-600">cảm hứng</span>
+                </h2>
+              </div>
               <Link
-                to={`/products?category=${cat.id}`}
-                key={cat.id}
-                className="group relative h-80 overflow-hidden rounded-3xl bg-slate-100 flex flex-col justify-end p-6 border border-slate-100"
+                to="/categories"
+                className="group text-xs font-black text-slate-400 hover:text-sky-600 uppercase tracking-wider flex items-center gap-1.5 self-start sm:self-auto transition-colors"
               >
-                <img
-                  src={
-                    getImageUrl(cat.image) ||
-                    "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=800&q=80"
-                  }
-                  alt={cat.name}
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                Xem tất cả
+                <ArrowRight
+                  size={14}
+                  className="group-hover:translate-x-1 transition-transform"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-70 group-hover:opacity-90 transition-opacity duration-300"></div>
-                <div className="relative z-10 transition-transform duration-500 group-hover:-translate-y-1">
-                  <h3 className="text-lg font-black text-white mb-1 tracking-tight uppercase">
-                    {cat.name}
-                  </h3>
-                  <span className="inline-flex items-center gap-1.5 text-[10px] font-black text-white/80 uppercase tracking-widest">
-                    Khám phá ngay <ArrowRight size={11} />
-                  </span>
-                </div>
               </Link>
-            ))}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {categories.map((cat) => (
+                <Link
+                  to={`/products?category=${cat.id}`}
+                  key={cat.id}
+                  className="group relative h-80 overflow-hidden rounded-3xl bg-slate-100 flex flex-col justify-end p-6 border border-slate-100"
+                >
+                  <img
+                    src={
+                      getImageUrl(cat.image) ||
+                      "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=800&q=80"
+                    }
+                    alt={cat.name}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-70 group-hover:opacity-90 transition-opacity duration-300"></div>
+                  <div className="relative z-10 transition-transform duration-500 group-hover:-translate-y-1">
+                    <h3 className="text-lg font-black text-white mb-1 tracking-tight uppercase">
+                      {cat.name}
+                    </h3>
+                    <span className="inline-flex items-center gap-1.5 text-[10px] font-black text-white/80 uppercase tracking-widest">
+                      Khám phá ngay <ArrowRight size={11} />
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </AnimatedSection>
 
       {/* Promotional Banner */}
-      <section className="py-12 bg-white text-left">
-        <div className="max-w-7xl mx-auto px-6 md:px-8">
-          <div className="relative h-[380px] rounded-[32px] overflow-hidden bg-slate-950 flex items-center p-8 md:p-16 group">
-            <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/40 to-transparent z-10"></div>
-            <img
-              src="https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=2000&q=80"
-              alt="Promotion"
-              className="absolute inset-0 w-full h-full object-cover opacity-50 transition-transform duration-1000 group-hover:scale-105"
-            />
+      <AnimatedSection>
+        <section className="py-12 bg-white text-left">
+          <div className="max-w-7xl mx-auto px-6 md:px-8">
+            <div className="relative h-[380px] rounded-[32px] overflow-hidden bg-slate-950 flex items-center p-8 md:p-16 group">
+              <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/40 to-transparent z-10"></div>
+              <img
+                src="https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=2000&q=80"
+                alt="Promotion"
+                className="absolute inset-0 w-full h-full object-cover opacity-50 transition-transform duration-1000 group-hover:scale-105"
+              />
 
-            <div className="relative z-20 space-y-6 max-w-lg">
-              <div className="inline-block px-3 py-1 bg-white/20 backdrop-blur rounded-full text-white text-[9px] font-black uppercase tracking-widest">
-                Siêu ưu đãi tuần này
+              <div className="relative z-20 space-y-6 max-w-lg">
+                <div className="inline-block px-3 py-1 bg-white/20 backdrop-blur rounded-full text-white text-[9px] font-black uppercase tracking-widest">
+                  Siêu ưu đãi tuần này
+                </div>
+                <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter leading-none uppercase">
+                  ƯU ĐÃI KHỦNG <br />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-emerald-400">
+                    GIẢM GIÁ 50%
+                  </span>
+                </h2>
+                <p className="text-slate-300 text-xs font-bold leading-relaxed">
+                  Áp dụng cho tất cả các sản phẩm thời trang trong bộ sưu tập mới
+                  nhất. Sở hữu ngay những siêu phẩm với mức giá không tưởng.
+                </p>
+                <Link
+                  to="/promotions"
+                  className="inline-flex items-center justify-center px-8 py-3.5 bg-sky-600 hover:bg-sky-700 text-white font-black rounded-xl text-xs uppercase tracking-widest transition-all shadow-md shadow-sky-500/20 hover:-translate-y-0.5 active:scale-95"
+                >
+                  LẤY MÃ KHUYẾN MÃI NGAY
+                </Link>
               </div>
-              <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter leading-none uppercase">
-                ƯU ĐÃI KHỦNG <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-emerald-400">
-                  GIẢM GIÁ 50%
-                </span>
-              </h2>
-              <p className="text-slate-300 text-xs font-bold leading-relaxed">
-                Áp dụng cho tất cả các sản phẩm thời trang trong bộ sưu tập mới
-                nhất. Sở hữu ngay những siêu phẩm với mức giá không tưởng.
-              </p>
-              <Link
-                to="/promotions"
-                className="inline-flex items-center justify-center px-8 py-3.5 bg-sky-600 hover:bg-sky-700 text-white font-black rounded-xl text-xs uppercase tracking-widest transition-all shadow-md shadow-sky-500/20 hover:-translate-y-0.5 active:scale-95"
-              >
-                LẤY MÃ KHUYẾN MÃI NGAY
-              </Link>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </AnimatedSection>
 
       {/* Featured Products */}
-      <section className="py-20 bg-[#f8fafc] text-left">
-        <div className="max-w-7xl mx-auto px-6 md:px-8">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
-            <div>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">
-                Bán chạy nhất tuần qua
-              </p>
-              <h2 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight uppercase">
-                Siêu phẩm <span className="text-sky-600">săn đón</span>
-              </h2>
+      <AnimatedSection>
+        <section ref={featuredSectionRef} className="py-20 bg-[#f8fafc] text-left">
+          <div className="max-w-7xl mx-auto px-6 md:px-8">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
+              <div>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">
+                  Bán chạy nhất tuần qua
+                </p>
+                <h2 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight uppercase">
+                  Siêu phẩm <span className="text-sky-600">săn đón</span>
+                </h2>
+              </div>
+              <Link
+                to="/products"
+                className="group text-xs font-black text-slate-400 hover:text-sky-600 uppercase tracking-wider flex items-center gap-1.5 self-start sm:self-auto transition-colors"
+              >
+                Cửa hàng
+                <ArrowRight
+                  size={14}
+                  className="group-hover:translate-x-1 transition-transform"
+                />
+              </Link>
             </div>
-            <Link
-              to="/products"
-              className="group text-xs font-black text-slate-400 hover:text-sky-600 uppercase tracking-wider flex items-center gap-1.5 self-start sm:self-auto transition-colors"
-            >
-              Cửa hàng
-              <ArrowRight
-                size={14}
-                className="group-hover:translate-x-1 transition-transform"
-              />
-            </Link>
-          </div>
 
-          <div className="relative group/swiper">
-            <Swiper
-              modules={[Autoplay, Navigation, Pagination]}
-              spaceBetween={24}
-              slidesPerView={1.2}
-              autoplay={{
-                delay: 5000,
-                disableOnInteraction: false,
-              }}
-              pagination={{
-                clickable: true,
-                dynamicBullets: true,
-              }}
-              onSwiper={(swiper) => {
-                swiperRef.current = swiper;
-              }}
-              breakpoints={{
-                640: { slidesPerView: 2.2 },
-                1024: { slidesPerView: 3.2 },
-                1280: { slidesPerView: 4 },
-              }}
-              className="featured-swiper !pb-14"
-            >
-              {featuredProducts.map((prod) => {
-                const isOutOfStock =
-                  !prod.variants ||
-                  prod.variants.length === 0 ||
-                  prod.variants.every((v) => {
-                    const inv = v.inventory;
-                    if (!inv) return true;
-                    return inv.available <= 0;
-                  });
-
-                return (
-                  <SwiperSlide key={prod.id}>
+            <div className="relative group/swiper">
+              {productsLoading || !productsLoaded ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {[...Array(4)].map((_, i) => (
                     <div
-                      className={`group bg-white rounded-3xl border border-slate-100 p-4 shadow-sm hover:shadow-md hover:border-slate-200/60 transition-all duration-300 flex flex-col justify-between ${isOutOfStock ? "opacity-90" : ""}`}
+                      key={i}
+                      className="animate-pulse bg-white rounded-3xl border border-slate-100 p-4 space-y-4 flex flex-col h-96"
                     >
-                      <Link
-                        to={`/products/${prod.slug}`}
-                        className="relative h-64 mb-4 rounded-xl overflow-hidden bg-slate-50 flex items-center justify-center flex-shrink-0"
-                      >
-                        <img
-                          src={
-                            getImageUrl(prod.image) ||
-                            "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80"
-                          }
-                          alt={prod.name}
-                          className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 ${
-                            isOutOfStock ? "grayscale opacity-75" : ""
-                          }`}
-                        />
-
-                        {isOutOfStock && (
-                          <span className="absolute top-4 left-4 bg-rose-600 text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-wider shadow-sm animate-pulse z-10">
-                            Hết hàng
-                          </span>
-                        )}
-
-                        <span
-                          className={`absolute bottom-4 left-1/2 -translate-x-1/2 translate-y-10 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300 px-5 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-wider flex items-center gap-1.5 shadow-md z-10 whitespace-nowrap ${
-                            isOutOfStock
-                              ? "bg-slate-500 hover:bg-slate-600 text-white shadow-slate-500/20"
-                              : "bg-sky-600 hover:bg-sky-700 text-white shadow-sky-500/20"
-                          }`}
-                        >
-                          <ShoppingBag size={12} />{" "}
-                          {isOutOfStock ? "HẾT HÀNG" : "XEM CHI TIẾT"}
-                        </span>
-                      </Link>
-
-                      <div className="flex flex-col justify-between">
-                        <div className="space-y-1 text-left">
-                          <h3 className="text-[1rem] font-medium text-slate-800  line-clamp-1">
-                            <Link to={`/products/${prod.slug}`}>
-                              {prod.name}
-                            </Link>
-                          </h3>
-                        </div>
-
-                        <div className="pt-2 flex items-center justify-between border-t border-slate-50 mt-2">
-                          <p className="text-[14px] font-medium text-sky-700">
-                            {formatPrice(prod.price)}
-                          </p>
-                          <div>
-                            {prod.review_count > 0 ? (
-                              <div className="flex items-center gap-1">
-                                <StarRating
-                                  rating={prod.average_rating}
-                                  size={12}
-                                />
-                                <span className="text-[14px] font-medium text-slate-400">
-                                  ({Number(prod.average_rating || 0).toFixed(1)}
-                                  )
-                                </span>
-                              </div>
-                            ) : (
-                              <span className="text-[14px] font-medium text-slate-700">
-                                Chưa có đánh giá
-                              </span>
-                            )}
-                          </div>
-                        </div>
+                      <div className="bg-slate-100 rounded-2xl w-full h-64"></div>
+                      <div className="space-y-2">
+                        <div className="h-4 bg-slate-100 rounded w-2/3"></div>
+                        <div className="h-3 bg-slate-50 rounded w-1/2"></div>
                       </div>
                     </div>
-                  </SwiperSlide>
-                );
-              })}
-            </Swiper>
+                  ))}
+                </div>
+              ) : (
+                <Swiper
+                  modules={[Autoplay, Navigation, Pagination]}
+                  spaceBetween={24}
+                  slidesPerView={1.2}
+                  autoplay={{
+                    delay: 5000,
+                    disableOnInteraction: false,
+                  }}
+                  pagination={{
+                    clickable: true,
+                    dynamicBullets: true,
+                  }}
+                  onSwiper={(swiper) => {
+                    swiperRef.current = swiper;
+                  }}
+                  breakpoints={{
+                    640: { slidesPerView: 2.2 },
+                    1024: { slidesPerView: 3.2 },
+                    1280: { slidesPerView: 4 },
+                  }}
+                  className="featured-swiper !pb-14"
+                >
+                  {featuredProducts.map((prod) => {
+                    const isOutOfStock =
+                      !prod.variants ||
+                      prod.variants.length === 0 ||
+                      prod.variants.every((v) => {
+                        const inv = v.inventory;
+                        if (!inv) return true;
+                        return inv.available <= 0;
+                      });
 
-            {/* Custom Navigation Buttons */}
-            <button
-              onClick={() => swiperRef.current?.slidePrev()}
-              className="absolute top-1/2 -left-4 -translate-y-1/2 w-10 h-10 bg-white shadow-md rounded-xl flex items-center justify-center z-50 opacity-0 group-hover/swiper:opacity-100 transition-opacity hover:bg-slate-50 border border-slate-100"
-            >
-              <ChevronLeft
-                size={20}
-                className="text-slate-500 hover:text-sky-600"
-              />
-            </button>
-            <button
-              onClick={() => swiperRef.current?.slideNext()}
-              className="absolute top-1/2 -right-4 -translate-y-1/2 w-12 h-12 bg-white shadow-md rounded-xl flex items-center justify-center z-50 opacity-0 group-hover/swiper:opacity-100 transition-opacity hover:bg-slate-50 border border-slate-100"
-            >
-              <ChevronRight
-                size={20}
-                className="text-slate-500 hover:text-sky-600"
-              />
-            </button>
+                    return (
+                      <SwiperSlide key={prod.id}>
+                        <div
+                          className={`group bg-white rounded-3xl border border-slate-100 p-4 shadow-sm hover:shadow-md hover:border-slate-200/60 transition-all duration-300 flex flex-col justify-between ${isOutOfStock ? "opacity-90" : ""}`}
+                        >
+                          <Link
+                            to={`/products/${prod.slug}`}
+                            className="relative h-64 mb-4 rounded-xl overflow-hidden bg-slate-50 flex items-center justify-center flex-shrink-0"
+                          >
+                            <img
+                              src={
+                                getImageUrl(prod.image) ||
+                                "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80"
+                              }
+                              alt={prod.name}
+                              className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 ${
+                                isOutOfStock ? "grayscale opacity-75" : ""
+                              }`}
+                            />
+
+                            {isOutOfStock && (
+                              <span className="absolute top-4 left-4 bg-rose-600 text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-wider shadow-sm animate-pulse z-10">
+                                Hết hàng
+                              </span>
+                            )}
+
+                            <span
+                              className={`absolute bottom-4 left-1/2 -translate-x-1/2 translate-y-10 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300 px-5 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-wider flex items-center gap-1.5 shadow-md z-10 whitespace-nowrap ${
+                                isOutOfStock
+                                  ? "bg-slate-500 hover:bg-slate-600 text-white shadow-slate-500/20"
+                                  : "bg-sky-600 hover:bg-sky-700 text-white shadow-sky-500/20"
+                              }`}
+                            >
+                              <ShoppingBag size={12} />{" "}
+                              {isOutOfStock ? "HẾT HÀNG" : "XEM CHI TIẾT"}
+                            </span>
+                          </Link>
+
+                          <div className="flex flex-col justify-between">
+                            <div className="space-y-1 text-left">
+                              <h3 className="text-[1rem] font-medium text-slate-800 line-clamp-1">
+                                <Link to={`/products/${prod.slug}`}>
+                                  {prod.name}
+                                </Link>
+                              </h3>
+                            </div>
+
+                            <div className="pt-2 flex items-center justify-between border-t border-slate-50 mt-2">
+                              <p className="text-[14px] font-medium text-sky-700">
+                                {formatPrice(prod.price)}
+                              </p>
+                              <div>
+                                {prod.review_count > 0 ? (
+                                  <div className="flex items-center gap-1">
+                                    <StarRating
+                                      rating={prod.average_rating}
+                                      size={12}
+                                    />
+                                    <span className="text-[14px] font-medium text-slate-400">
+                                      ({Number(prod.average_rating || 0).toFixed(1)}
+                                      )
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <span className="text-[14px] font-medium text-slate-700">
+                                    Chưa có đánh giá
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </SwiperSlide>
+                    );
+                  })}
+                </Swiper>
+              )}
+
+              {/* Custom Navigation Buttons */}
+              {!productsLoading && productsLoaded && (
+                <>
+                  <button
+                    onClick={() => swiperRef.current?.slidePrev()}
+                    className="absolute top-1/2 -left-4 -translate-y-1/2 w-10 h-10 bg-white shadow-md rounded-xl flex items-center justify-center z-50 opacity-0 group-hover/swiper:opacity-100 transition-opacity hover:bg-slate-50 border border-slate-100"
+                  >
+                    <ChevronLeft
+                      size={20}
+                      className="text-slate-500 hover:text-sky-600"
+                    />
+                  </button>
+                  <button
+                    onClick={() => swiperRef.current?.slideNext()}
+                    className="absolute top-1/2 -right-4 -translate-y-1/2 w-12 h-12 bg-white shadow-md rounded-xl flex items-center justify-center z-50 opacity-0 group-hover/swiper:opacity-100 transition-opacity hover:bg-slate-50 border border-slate-100"
+                  >
+                    <ChevronRight
+                      size={20}
+                      className="text-slate-500 hover:text-sky-600"
+                    />
+                  </button>
+                </>
+              )}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </AnimatedSection>
 
       {/* Brand Section */}
-      <section className="py-24 bg-white overflow-hidden border-t border-slate-50">
-        <div className="max-w-7xl mx-auto px-6 md:px-8 text-center space-y-12">
-          <h4 className="text-[9px] font-black text-slate-400 uppercase tracking-[0.4em]">
-            ĐỐI TÁC CHIẾN LƯỢC TOÀN CẦU
-          </h4>
-          <div className="flex flex-wrap items-center justify-center gap-12 md:gap-20 opacity-35 grayscale hover:grayscale-0 transition-all duration-300">
-            <div className="text-2xl font-black italic tracking-tighter text-slate-700">
-              NIKE
-            </div>
-            <div className="text-2xl font-black italic tracking-tighter text-slate-700">
-              ADIDAS
-            </div>
-            <div className="text-2xl font-black italic tracking-tighter text-slate-700">
-              ZARA
-            </div>
-            <div className="text-2xl font-black italic tracking-tighter text-slate-700">
-              APPLE
-            </div>
-            <div className="text-2xl font-black italic tracking-tighter text-slate-700">
-              SONY
+      <AnimatedSection>
+        <section className="py-24 bg-white overflow-hidden border-t border-slate-50">
+          <div className="max-w-7xl mx-auto px-6 md:px-8 text-center space-y-12">
+            <h4 className="text-[9px] font-black text-slate-400 uppercase tracking-[0.4em]">
+              ĐỐI TÁC CHIẾN LƯỢC TOÀN CẦU
+            </h4>
+            <div className="flex flex-wrap items-center justify-center gap-12 md:gap-20 opacity-35 grayscale hover:grayscale-0 transition-all duration-300">
+              <div className="text-2xl font-black italic tracking-tighter text-slate-700">
+                NIKE
+              </div>
+              <div className="text-2xl font-black italic tracking-tighter text-slate-700">
+                ADIDAS
+              </div>
+              <div className="text-2xl font-black italic tracking-tighter text-slate-700">
+                ZARA
+              </div>
+              <div className="text-2xl font-black italic tracking-tighter text-slate-700">
+                APPLE
+              </div>
+              <div className="text-2xl font-black italic tracking-tighter text-slate-700">
+                SONY
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </AnimatedSection>
     </CustomerLayout>
   );
 };

@@ -153,9 +153,6 @@ const CustomerNavbar = () => {
             </div>
 
             <div className="flex items-center gap-2 sm:gap-4">
-              <button className="p-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-full transition-all">
-                <Search size={22} />
-              </button>
               <button
                 onClick={() => setIsCartOpen(true)}
                 className="p-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-full transition-all relative"

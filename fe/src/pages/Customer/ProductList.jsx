@@ -13,13 +13,15 @@ import {
   Heart,
   Home,
   Coins,
+  Search,
 } from "lucide-react";
 import StarRating from "../../components/review/StarRating";
 import { useWishlist } from "../../context/WishlistContext";
 
 const ProductList = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const categorySlug = searchParams.get("category");
+  const initialSearch = searchParams.get("search") || "";
 
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -36,9 +38,22 @@ const ProductList = () => {
     perPage: 12,
   });
 
+  // Advanced search & filter states
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
+  const [selectedSizes, setSelectedSizes] = useState([]);
+  const [selectedColors, setSelectedColors] = useState([]);
+  const [inStockOnly, setInStockOnly] = useState(false);
+  const [onSaleOnly, setOnSaleOnly] = useState(false);
+
   useEffect(() => {
     setCurrentPage(1);
   }, [categorySlug]);
+
+  // Synchronize input query with URL search param
+  const searchQueryParam = searchParams.get("search") || "";
+  useEffect(() => {
+    setSearchQuery(searchQueryParam);
+  }, [searchQueryParam]);
 
   // Price range and rating filters
   const [minPrice, setMinPrice] = useState("");
@@ -53,6 +68,51 @@ const ProductList = () => {
     { label: "500.000đ - 1.000.000đ", min: 500000, max: 1000000 },
     { label: "Trên 1.000.000đ", min: 1000000, max: 99999999 },
   ];
+
+  const availableSizes = [
+    { label: "S", value: "S" },
+    { label: "M", value: "M" },
+    { label: "L", value: "L" },
+    { label: "XL", value: "XL" },
+    { label: "XXL", value: "XXL" },
+  ];
+
+  const pantSizes = [
+    { label: "29", value: "29" },
+    { label: "30", value: "30" },
+    { label: "31", value: "31" },
+    { label: "32", value: "32" },
+    { label: "33", value: "33" },
+  ];
+
+  const availableColors = [
+    { name: "Đen", hex: "#000000", border: false },
+    { name: "Trắng", hex: "#ffffff", border: true },
+    { name: "Xám", hex: "#8e8e93", border: false },
+    { name: "Be", hex: "#f5f5dc", border: true },
+    { name: "Hồng", hex: "#ffc0cb", border: false },
+    { name: "Đỏ", hex: "#e60000", border: false, value: "Đỏ Rượu" },
+    { name: "Xanh Navy", hex: "#000080", border: false },
+    { name: "Nâu", hex: "#8b4513", border: false },
+    { name: "Vàng", hex: "#ffeb3b", border: false, value: "Vàng Nhạt" },
+    { name: "Xanh Dương", hex: "#2196f3", border: false },
+  ];
+
+  const transitionStyle = `
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .animate-fade-in-up {
+      animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+  `;
 
   const sliderStyle = `
     .price-slider-container {
@@ -147,9 +207,15 @@ const ProductList = () => {
           page: currentPage,
         };
 
+        const currentSearch = searchParams.get("search") || "";
+        if (currentSearch.trim()) params.search = currentSearch.trim();
         if (minPrice !== "") params.min_price = minPrice;
         if (maxPrice !== "") params.max_price = maxPrice;
         if (ratingFilter !== "") params.rating = ratingFilter;
+        if (selectedSizes.length > 0) params.sizes = selectedSizes.join(",");
+        if (selectedColors.length > 0) params.colors = selectedColors.join(",");
+        if (inStockOnly) params.in_stock = "true";
+        if (onSaleOnly) params.on_sale = "true";
 
         const productRes = await fetchProductsRequest(params);
         const rawData = productRes?.data;
@@ -172,7 +238,19 @@ const ProductList = () => {
     };
 
     loadData();
-  }, [categorySlug, sortBy, minPrice, maxPrice, ratingFilter, currentPage]);
+  }, [
+    categorySlug,
+    sortBy,
+    minPrice,
+    maxPrice,
+    ratingFilter,
+    currentPage,
+    selectedSizes,
+    selectedColors,
+    inStockOnly,
+    onSaleOnly,
+    searchParams,
+  ]);
 
   const activeCategory = (Array.isArray(categories) ? categories : []).find(
     (c) => c.slug === categorySlug,
@@ -192,12 +270,50 @@ const ProductList = () => {
     setCurrentPage(1);
   };
 
+  const handleSizeToggle = (size) => {
+    setSelectedSizes((prev) =>
+      prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size],
+    );
+    setCurrentPage(1);
+  };
+
+  const handleColorToggle = (color) => {
+    setSelectedColors((prev) =>
+      prev.includes(color) ? prev.filter((c) => c !== color) : [...prev, color],
+    );
+    setCurrentPage(1);
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    const newParams = new URLSearchParams(searchParams);
+    if (searchQuery.trim()) {
+      newParams.set("search", searchQuery.trim());
+    } else {
+      newParams.delete("search");
+    }
+    newParams.set("page", "1");
+    setSearchParams(newParams);
+    setCurrentPage(1);
+  };
+
   const clearFilters = () => {
     setMinVal(0);
     setMaxVal(2000000);
     setMinPrice("");
     setMaxPrice("");
     setRatingFilter("");
+    setSelectedSizes([]);
+    setSelectedColors([]);
+    setInStockOnly(false);
+    setOnSaleOnly(false);
+    setSearchQuery("");
+
+    // Clear URL search params
+    const newParams = new URLSearchParams();
+    if (categorySlug) newParams.set("category", categorySlug);
+    setSearchParams(newParams);
+
     setCurrentPage(1);
   };
 
@@ -230,7 +346,7 @@ const ProductList = () => {
             {/* Sidebar Filters */}
             <aside className="lg:w-1/4 space-y-6">
               {/* Category Card */}
-              <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+              <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-6">
                 <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest mb-5 pb-3 border-b border-slate-50 flex items-center gap-2">
                   <Filter size={14} className="text-sky-500" />
                   Danh mục
@@ -267,8 +383,9 @@ const ProductList = () => {
               </div>
 
               {/* Price filter Card */}
-              <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+              <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-6">
                 <style>{sliderStyle}</style>
+                <style>{transitionStyle}</style>
                 <div className="flex items-center justify-between mb-5 pb-3 border-b border-slate-50">
                   <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
                     <Coins size={14} className="text-sky-500" />
@@ -382,7 +499,7 @@ const ProductList = () => {
               </div>
 
               {/* Ratings filter Card */}
-              <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 mt-6">
+              <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-6 mt-6">
                 <div className="flex items-center justify-between mb-5 pb-3 border-b border-slate-50">
                   <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
                     <span className="text-amber-400 text-sm">★</span> Đánh giá
@@ -436,12 +553,160 @@ const ProductList = () => {
                   })}
                 </div>
               </div>
+
+              {/* Status filter Card */}
+              <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-6 mt-6">
+                <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest mb-5 pb-3 border-b border-slate-50 flex items-center gap-2">
+                  <span className="text-sky-500 font-bold text-sm">✔</span>{" "}
+                  Trạng thái sản phẩm
+                </h3>
+                <div className="space-y-3">
+                  <label className="flex items-center gap-3 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      checked={inStockOnly}
+                      onChange={(e) => {
+                        setInStockOnly(e.target.checked);
+                        setCurrentPage(1);
+                      }}
+                      className="w-4 h-4 rounded text-sky-600 border-slate-300 focus:ring-sky-500/20"
+                    />
+                    <span className="text-sm font-medium text-slate-600 group-hover:text-slate-900 transition-colors">
+                      Còn hàng trong kho
+                    </span>
+                  </label>
+                  <label className="flex items-center gap-3 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      checked={onSaleOnly}
+                      onChange={(e) => {
+                        setOnSaleOnly(e.target.checked);
+                        setCurrentPage(1);
+                      }}
+                      className="w-4 h-4 rounded text-sky-600 border-slate-300 focus:ring-sky-500/20"
+                    />
+                    <span className="text-sm font-medium text-slate-600 group-hover:text-slate-900 transition-colors">
+                      Đang giảm giá (Sale)
+                    </span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Sizes filter Card */}
+              <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-6 mt-6">
+                <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest mb-5 pb-3 border-b border-slate-50 flex items-center gap-2">
+                  <span className="text-sky-500 font-bold text-sm">📐</span>{" "}
+                  Kích thước (Size)
+                </h3>
+
+                <span className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3">
+                  Áo & Váy
+                </span>
+                <div className="flex flex-wrap gap-2 mb-5">
+                  {availableSizes.map((size) => {
+                    const isSelected = selectedSizes.includes(size.value);
+                    return (
+                      <button
+                        key={size.value}
+                        onClick={() => handleSizeToggle(size.value)}
+                        className={`w-10 h-10 rounded-xl text-xs font-bold transition-all border ${
+                          isSelected
+                            ? "bg-sky-600 text-white border-sky-600 shadow-md shadow-sky-500/10"
+                            : "bg-white text-slate-600 border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                        }`}
+                      >
+                        {size.label}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <span className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3">
+                  Quần
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {pantSizes.map((size) => {
+                    const isSelected = selectedSizes.includes(size.value);
+                    return (
+                      <button
+                        key={size.value}
+                        onClick={() => handleSizeToggle(size.value)}
+                        className={`w-10 h-10 rounded-xl text-xs font-bold transition-all border ${
+                          isSelected
+                            ? "bg-sky-600 text-white border-sky-600 shadow-md shadow-sky-500/10"
+                            : "bg-white text-slate-600 border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                        }`}
+                      >
+                        {size.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Colors filter Card */}
+              <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-6 mt-6">
+                <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest mb-5 pb-3 border-b border-slate-50 flex items-center gap-2">
+                  <span className="text-sky-500 font-bold text-sm">🎨</span> Màu
+                  sắc
+                </h3>
+                <div className="grid grid-cols-5 gap-3">
+                  {availableColors.map((color) => {
+                    const dbValue = color.value || color.name;
+                    const isSelected = selectedColors.includes(dbValue);
+                    return (
+                      <button
+                        key={color.name}
+                        onClick={() => handleColorToggle(dbValue)}
+                        title={color.name}
+                        className={`w-9 h-9 rounded-full relative flex items-center justify-center transition-all ${
+                          color.border ? "border border-slate-200" : ""
+                        } hover:scale-110 active:scale-95`}
+                        style={{ backgroundColor: color.hex }}
+                      >
+                        {isSelected && (
+                          <span
+                            className={`text-[12px] font-black ${
+                              color.hex === "#ffffff"
+                                ? "text-slate-800"
+                                : "text-white"
+                            }`}
+                          >
+                            ✓
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </aside>
 
             {/* Main Content */}
             <main className="lg:w-3/4 space-y-6">
+              {/* Premium Search Bar */}
+              <form
+                onSubmit={handleSearchSubmit}
+                className="bg-white p-2 pl-6 rounded-xl border border-slate-100 shadow-sm flex items-center gap-3 focus-within:ring-2 focus-within:ring-sky-500/20 focus-within:border-sky-500 transition-all duration-300"
+              >
+                <Search className="text-slate-400 flex-shrink-0" size={20} />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Tìm kiếm sản phẩm theo tên, từ khóa hoặc mã SKU..."
+                  className="w-full bg-transparent border-none outline-none text-slate-800 text-sm font-medium placeholder-slate-400 py-2"
+                />
+                <button
+                  type="submit"
+                  className="px-4 py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-[13px] font-medium  transition-all shadow-md shadow-sky-500/10 active:scale-95 flex-shrink-0"
+                >
+                  Tìm kiếm
+                </button>
+              </form>
+
               {/* Toolbar */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 rounded-3xl border border-slate-100 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
                 <div className="flex items-center gap-5">
                   <div className="bg-slate-50 p-1.5 rounded-xl flex gap-1 border border-slate-100">
                     <button
@@ -498,7 +763,8 @@ const ProductList = () => {
                   {[...Array(6)].map((_, i) => (
                     <div
                       key={i}
-                      className="animate-pulse bg-white rounded-3xl border border-slate-100 p-4 space-y-4 flex flex-col h-full"
+                      style={{ animationDelay: `${i * 60}ms` }}
+                      className="animate-pulse bg-white rounded-3xl border border-slate-100 p-4 space-y-4 flex flex-col h-full animate-fade-in-up"
                     >
                       <div className="aspect-[3/4] bg-slate-100 rounded-xl w-full"></div>
                       <div className="h-4 bg-slate-100 rounded w-2/3"></div>
@@ -515,7 +781,7 @@ const ProductList = () => {
                       : "grid-cols-1"
                   }`}
                 >
-                  {products.map((prod) => {
+                  {products.map((prod, index) => {
                     // Check if all variants are out of stock (available quantity <= 0)
                     const isOutOfStock =
                       !prod.variants ||
@@ -539,7 +805,8 @@ const ProductList = () => {
                     return (
                       <div
                         key={prod.id}
-                        className={`group bg-white rounded-lg border border-slate-100 shadow-sm overflow-hidden flex flex-col h-full hover:shadow-md hover:border-slate-200/60 transition-all duration-300 ${
+                        style={{ animationDelay: `${(index % 6) * 60}ms` }}
+                        className={`group bg-white rounded-lg border border-slate-100 shadow-sm overflow-hidden flex flex-col h-full hover:shadow-md hover:border-slate-200/60 transition-all duration-300 animate-fade-in-up ${
                           viewMode === "list"
                             ? "flex-col md:flex-row gap-6 p-5"
                             : ""
