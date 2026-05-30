@@ -158,7 +158,14 @@ const App = () => {
 
                   <Route path="/promotions" element={<Promotions />} />
 
-                  <Route path="/checkout" element={<Checkout />} />
+                  <Route
+                    path="/checkout"
+                    element={
+                      <AuthGuard>
+                        <Checkout />
+                      </AuthGuard>
+                    }
+                  />
 
                   <Route
                     path="/orders"

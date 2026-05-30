@@ -36,7 +36,8 @@ const Login = () => {
           ) {
             navigate("/admin/dashboard");
           } else {
-            navigate("/");
+            const from = location.state?.from || "/";
+            navigate(from);
           }
         })
         .catch((err) => {
@@ -84,7 +85,8 @@ const Login = () => {
       if (user.role?.code === "admin" || user.role?.code === "staff") {
         navigate("/admin/dashboard");
       } else {
-        navigate("/");
+        const from = location.state?.from || "/";
+        navigate(from);
       }
     } catch (err) {
       const msg =

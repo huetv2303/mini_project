@@ -63,6 +63,11 @@ Route::group(['prefix' => 'v1'], function () {
         Route::get('/{id}/comments', [CommentController::class, 'index']);
     });
 
+    Route::prefix('promotions')->group(function () {
+        Route::get('/', [PromotionController::class, 'index']);
+        Route::get('/{id}', [PromotionController::class, 'show']);
+    });
+
     Route::middleware('auth:api')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::post('/change-password', [AuthController::class, 'changePassword']);
@@ -97,7 +102,6 @@ Route::group(['prefix' => 'v1'], function () {
         });
 
         Route::prefix('categories')->group(function () {
-            Route::get('/', [CategoryController::class, 'index']); // Public/Staff can view
             Route::middleware('permission:categories.manage')->group(function () {
                 Route::post('/bulk-delete', [CategoryController::class, 'bulkDelete']);
                 Route::post('/', [CategoryController::class, 'store']);
@@ -117,7 +121,6 @@ Route::group(['prefix' => 'v1'], function () {
         });
 
         Route::prefix('products')->group(function () {
-            Route::get('/', [ProductController::class, 'index']); // Public/Staff can view
             Route::middleware('permission:products.create')->post('/', [ProductController::class, 'store']);
             Route::middleware('permission:products.edit')->put('/{slug}', [ProductController::class, 'update']);
             Route::middleware('permission:products.delete')->group(function () {
@@ -203,7 +206,7 @@ Route::group(['prefix' => 'v1'], function () {
         });
 
         // Promotions
-        Route::apiResource('promotions', PromotionController::class);
+        Route::apiResource('promotions', PromotionController::class)->except(['index', 'show']);
         Route::post('promotions/apply', [PromotionController::class, 'apply']);
         Route::post('promotions/eligible', [PromotionController::class, 'getEligiblePromotions']);
 
