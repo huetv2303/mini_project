@@ -206,7 +206,7 @@ const ProductList = () => {
       <div className="pt-32 pb-24 bg-[#f8fafc] min-h-screen text-left">
         <div className="max-w-7xl mx-auto px-10 md:px-20">
           {/* Breadcrumbs */}
-          <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-10 bg-white px-5 py-3 rounded-2xl border border-slate-100 shadow-sm w-fit">
+          <div className="flex items-center gap-2 text-[13px] font-medium text-slate-600  mb-6 bg-white px-5 py-3 rounded-xl border border-slate-100 shadow-sm w-fit">
             <Link
               to="/"
               className="hover:text-sky-600 transition-colors flex items-center gap-1"
@@ -443,7 +443,7 @@ const ProductList = () => {
               {/* Toolbar */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 rounded-3xl border border-slate-100 shadow-sm">
                 <div className="flex items-center gap-5">
-                  <div className="bg-slate-50 p-1.5 rounded-2xl flex gap-1 border border-slate-100">
+                  <div className="bg-slate-50 p-1.5 rounded-xl flex gap-1 border border-slate-100">
                     <button
                       onClick={() => setViewMode("grid")}
                       className={`p-2 rounded-xl transition-all ${
@@ -500,7 +500,7 @@ const ProductList = () => {
                       key={i}
                       className="animate-pulse bg-white rounded-3xl border border-slate-100 p-4 space-y-4 flex flex-col h-full"
                     >
-                      <div className="aspect-[3/4] bg-slate-100 rounded-2xl w-full"></div>
+                      <div className="aspect-[3/4] bg-slate-100 rounded-xl w-full"></div>
                       <div className="h-4 bg-slate-100 rounded w-2/3"></div>
                       <div className="h-3 bg-slate-50 rounded w-1/3"></div>
                       <div className="h-4 bg-slate-100 rounded w-1/2"></div>
@@ -517,11 +517,14 @@ const ProductList = () => {
                 >
                   {products.map((prod) => {
                     // Check if all variants are out of stock (available quantity <= 0)
-                    const isOutOfStock = !prod.variants || prod.variants.length === 0 || prod.variants.every(v => {
-                      const inv = v.inventory;
-                      if (!inv) return true;
-                      return inv.available <= 0;
-                    });
+                    const isOutOfStock =
+                      !prod.variants ||
+                      prod.variants.length === 0 ||
+                      prod.variants.every((v) => {
+                        const inv = v.inventory;
+                        if (!inv) return true;
+                        return inv.available <= 0;
+                      });
 
                     // Generate premium tag logic to match the UI reference
                     const tagType =
@@ -573,20 +576,22 @@ const ProductList = () => {
                                 Hết hàng
                               </span>
                             </div>
-                          ) : tagType && (
-                            <div className="absolute top-4 left-4 z-10">
-                              <span
-                                className={`text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-wider shadow-sm ${
-                                  tagType === "Sale"
-                                    ? "bg-rose-500 text-white"
-                                    : tagType === "Hot"
-                                      ? "bg-amber-500 text-white"
-                                      : "bg-emerald-500 text-white"
-                                }`}
-                              >
-                                {tagType}
-                              </span>
-                            </div>
+                          ) : (
+                            tagType && (
+                              <div className="absolute top-4 left-4 z-10">
+                                <span
+                                  className={`text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-wider shadow-sm ${
+                                    tagType === "Sale"
+                                      ? "bg-rose-500 text-white"
+                                      : tagType === "Hot"
+                                        ? "bg-amber-500 text-white"
+                                        : "bg-emerald-500 text-white"
+                                  }`}
+                                >
+                                  {tagType}
+                                </span>
+                              </div>
+                            )
                           )}
 
                           {/* Wishlist toggle heart icon */}
@@ -630,7 +635,7 @@ const ProductList = () => {
                               to={`/products/${prod.slug}`}
                               className="block"
                             >
-                              <h3 className="text-sm font-bold text-black/80 line-clamp-2 group-hover:text-sky-600 transition-colors uppercase tracking-tight">
+                              <h3 className="text-sm font-medium text-black/80 line-clamp-2 group-hover:text-sky-600 transition-colors">
                                 {prod.name}
                               </h3>
                             </Link>
@@ -701,7 +706,7 @@ const ProductList = () => {
                       setCurrentPage(currentPage - 1);
                       window.scrollTo({ top: 0, behavior: "smooth" });
                     }}
-                    className="w-10 h-10 rounded-2xl bg-white border border-slate-100 text-slate-500 hover:border-sky-600 hover:text-sky-600 shadow-sm flex items-center justify-center transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:-translate-y-0.5"
+                    className="w-10 h-10 rounded-xl bg-white border border-slate-100 text-slate-500 hover:border-sky-600 hover:text-sky-600 shadow-sm flex items-center justify-center transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:-translate-y-0.5"
                   >
                     <ChevronLeft size={16} />
                   </button>
@@ -716,7 +721,7 @@ const ProductList = () => {
                           setCurrentPage(pageNumber);
                           window.scrollTo({ top: 0, behavior: "smooth" });
                         }}
-                        className={`w-10 h-10 rounded-2xl font-black text-xs transition-all hover:-translate-y-0.5 shadow-sm ${
+                        className={`w-10 h-10 rounded-xl font-black text-xs transition-all hover:-translate-y-0.5 shadow-sm ${
                           isActive
                             ? "bg-sky-600 text-white shadow-md shadow-sky-500/10"
                             : "bg-white border border-slate-100 text-slate-500 hover:border-sky-600 hover:text-sky-600"
@@ -733,7 +738,7 @@ const ProductList = () => {
                       setCurrentPage(currentPage + 1);
                       window.scrollTo({ top: 0, behavior: "smooth" });
                     }}
-                    className="w-10 h-10 rounded-2xl bg-white border border-slate-100 text-slate-500 hover:border-sky-600 hover:text-sky-600 shadow-sm flex items-center justify-center transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:-translate-y-0.5"
+                    className="w-10 h-10 rounded-xl bg-white border border-slate-100 text-slate-500 hover:border-sky-600 hover:text-sky-600 shadow-sm flex items-center justify-center transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:-translate-y-0.5"
                   >
                     <ChevronRight size={16} />
                   </button>

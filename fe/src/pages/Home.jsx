@@ -99,7 +99,7 @@ const Home = () => {
             <div className="flex flex-wrap items-center gap-4 pt-4">
               <Link
                 to="/products"
-                className="group px-8 py-3.5 bg-sky-600 hover:bg-sky-700 text-white font-black rounded-2xl flex items-center gap-2 transition-all duration-300 shadow-lg shadow-sky-500/20 hover:-translate-y-0.5 active:scale-95 text-xs uppercase tracking-widest"
+                className="group px-8 py-3.5 bg-sky-600 hover:bg-sky-700 text-white font-black rounded-xl flex items-center gap-2 transition-all duration-300 shadow-lg shadow-sky-500/20 hover:-translate-y-0.5 active:scale-95 text-xs uppercase tracking-widest"
               >
                 KHÁM PHÁ NGAY
                 <ArrowRight
@@ -109,7 +109,7 @@ const Home = () => {
               </Link>
               <Link
                 to="/categories"
-                className="group px-8 py-3.5 bg-white/10 hover:bg-white/20 backdrop-blur border border-white/10 text-white font-black rounded-2xl hover:bg-white/10 transition-all duration-300 flex items-center gap-2 text-xs uppercase tracking-widest"
+                className="group px-8 py-3.5 bg-white/10 hover:bg-white/20 backdrop-blur border border-white/10 text-white font-black rounded-xl hover:bg-white/10 transition-all duration-300 flex items-center gap-2 text-xs uppercase tracking-widest"
               >
                 DANH MỤC
                 <ChevronDown
@@ -135,7 +135,7 @@ const Home = () => {
         <div className="max-w-7xl mx-auto px-6 md:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="flex items-center gap-4 group">
-              <div className="w-12 h-12 bg-sky-50 text-sky-600 rounded-2xl flex items-center justify-center group-hover:bg-sky-600 group-hover:text-white transition-all duration-300 flex-shrink-0">
+              <div className="w-12 h-12 bg-sky-50 text-sky-600 rounded-xl flex items-center justify-center group-hover:bg-sky-600 group-hover:text-white transition-all duration-300 flex-shrink-0">
                 <Truck size={20} />
               </div>
               <div>
@@ -148,7 +148,7 @@ const Home = () => {
               </div>
             </div>
             <div className="flex items-center gap-4 group">
-              <div className="w-12 h-12 bg-sky-50 text-sky-600 rounded-2xl flex items-center justify-center group-hover:bg-sky-600 group-hover:text-white transition-all duration-300 flex-shrink-0">
+              <div className="w-12 h-12 bg-sky-50 text-sky-600 rounded-xl flex items-center justify-center group-hover:bg-sky-600 group-hover:text-white transition-all duration-300 flex-shrink-0">
                 <ShieldCheck size={20} />
               </div>
               <div>
@@ -161,7 +161,7 @@ const Home = () => {
               </div>
             </div>
             <div className="flex items-center gap-4 group">
-              <div className="w-12 h-12 bg-sky-50 text-sky-600 rounded-2xl flex items-center justify-center group-hover:bg-sky-600 group-hover:text-white transition-all duration-300 flex-shrink-0">
+              <div className="w-12 h-12 bg-sky-50 text-sky-600 rounded-xl flex items-center justify-center group-hover:bg-sky-600 group-hover:text-white transition-all duration-300 flex-shrink-0">
                 <RotateCcw size={20} />
               </div>
               <div>
@@ -174,7 +174,7 @@ const Home = () => {
               </div>
             </div>
             <div className="flex items-center gap-4 group">
-              <div className="w-12 h-12 bg-sky-50 text-sky-600 rounded-2xl flex items-center justify-center group-hover:bg-sky-600 group-hover:text-white transition-all duration-300 flex-shrink-0">
+              <div className="w-12 h-12 bg-sky-50 text-sky-600 rounded-xl flex items-center justify-center group-hover:bg-sky-600 group-hover:text-white transition-all duration-300 flex-shrink-0">
                 <Star size={20} />
               </div>
               <div>
@@ -271,7 +271,7 @@ const Home = () => {
               </p>
               <Link
                 to="/promotions"
-                className="inline-flex items-center justify-center px-8 py-3.5 bg-sky-600 hover:bg-sky-700 text-white font-black rounded-2xl text-xs uppercase tracking-widest transition-all shadow-md shadow-sky-500/20 hover:-translate-y-0.5 active:scale-95"
+                className="inline-flex items-center justify-center px-8 py-3.5 bg-sky-600 hover:bg-sky-700 text-white font-black rounded-xl text-xs uppercase tracking-widest transition-all shadow-md shadow-sky-500/20 hover:-translate-y-0.5 active:scale-95"
               >
                 LẤY MÃ KHUYẾN MÃI NGAY
               </Link>
@@ -328,18 +328,23 @@ const Home = () => {
               className="featured-swiper !pb-14"
             >
               {featuredProducts.map((prod) => {
-                const isOutOfStock = !prod.variants || prod.variants.length === 0 || prod.variants.every(v => {
-                  const inv = v.inventory;
-                  if (!inv) return true;
-                  return inv.available <= 0;
-                });
+                const isOutOfStock =
+                  !prod.variants ||
+                  prod.variants.length === 0 ||
+                  prod.variants.every((v) => {
+                    const inv = v.inventory;
+                    if (!inv) return true;
+                    return inv.available <= 0;
+                  });
 
                 return (
                   <SwiperSlide key={prod.id}>
-                    <div className={`group bg-white rounded-3xl border border-slate-100 p-4 shadow-sm hover:shadow-md hover:border-slate-200/60 transition-all duration-300 flex flex-col justify-between ${isOutOfStock ? "opacity-90" : ""}`}>
+                    <div
+                      className={`group bg-white rounded-3xl border border-slate-100 p-4 shadow-sm hover:shadow-md hover:border-slate-200/60 transition-all duration-300 flex flex-col justify-between ${isOutOfStock ? "opacity-90" : ""}`}
+                    >
                       <Link
                         to={`/products/${prod.slug}`}
-                        className="relative h-64 mb-4 rounded-2xl overflow-hidden bg-slate-50 flex items-center justify-center flex-shrink-0"
+                        className="relative h-64 mb-4 rounded-xl overflow-hidden bg-slate-50 flex items-center justify-center flex-shrink-0"
                       >
                         <img
                           src={
@@ -358,55 +363,61 @@ const Home = () => {
                           </span>
                         )}
 
-                        <span className={`absolute bottom-4 left-1/2 -translate-x-1/2 translate-y-10 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300 px-5 py-2.5 rounded-2xl font-black text-[10px] uppercase tracking-wider flex items-center gap-1.5 shadow-md z-10 whitespace-nowrap ${
-                          isOutOfStock
-                            ? "bg-slate-500 hover:bg-slate-600 text-white shadow-slate-500/20"
-                            : "bg-sky-600 hover:bg-sky-700 text-white shadow-sky-500/20"
-                        }`}>
-                          <ShoppingBag size={12} /> {isOutOfStock ? "HẾT HÀNG" : "XEM CHI TIẾT"}
+                        <span
+                          className={`absolute bottom-4 left-1/2 -translate-x-1/2 translate-y-10 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300 px-5 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-wider flex items-center gap-1.5 shadow-md z-10 whitespace-nowrap ${
+                            isOutOfStock
+                              ? "bg-slate-500 hover:bg-slate-600 text-white shadow-slate-500/20"
+                              : "bg-sky-600 hover:bg-sky-700 text-white shadow-sky-500/20"
+                          }`}
+                        >
+                          <ShoppingBag size={12} />{" "}
+                          {isOutOfStock ? "HẾT HÀNG" : "XEM CHI TIẾT"}
                         </span>
                       </Link>
 
-                    <div className="flex flex-col justify-between">
-                      <div className="space-y-1 text-left">
-                        <h3 className="text-[1rem] font-medium text-slate-800  line-clamp-1">
-                          <Link to={`/products/${prod.slug}`}>{prod.name}</Link>
-                        </h3>
-                      </div>
+                      <div className="flex flex-col justify-between">
+                        <div className="space-y-1 text-left">
+                          <h3 className="text-[1rem] font-medium text-slate-800  line-clamp-1">
+                            <Link to={`/products/${prod.slug}`}>
+                              {prod.name}
+                            </Link>
+                          </h3>
+                        </div>
 
-                      <div className="pt-2 flex items-center justify-between border-t border-slate-50 mt-2">
-                        <p className="text-[14px] font-medium text-sky-700">
-                          {formatPrice(prod.price)}
-                        </p>
-                        <div>
-                          {prod.review_count > 0 ? (
-                            <div className="flex items-center gap-1">
-                              <StarRating
-                                rating={prod.average_rating}
-                                size={12}
-                              />
-                              <span className="text-[14px] font-medium text-slate-400">
-                                ({Number(prod.average_rating || 0).toFixed(1)})
+                        <div className="pt-2 flex items-center justify-between border-t border-slate-50 mt-2">
+                          <p className="text-[14px] font-medium text-sky-700">
+                            {formatPrice(prod.price)}
+                          </p>
+                          <div>
+                            {prod.review_count > 0 ? (
+                              <div className="flex items-center gap-1">
+                                <StarRating
+                                  rating={prod.average_rating}
+                                  size={12}
+                                />
+                                <span className="text-[14px] font-medium text-slate-400">
+                                  ({Number(prod.average_rating || 0).toFixed(1)}
+                                  )
+                                </span>
+                              </div>
+                            ) : (
+                              <span className="text-[14px] font-medium text-slate-700">
+                                Chưa có đánh giá
                               </span>
-                            </div>
-                          ) : (
-                            <span className="text-[14px] font-medium text-slate-700">
-                              Chưa có đánh giá
-                            </span>
-                          )}
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </SwiperSlide>
-              );
-            })}
+                  </SwiperSlide>
+                );
+              })}
             </Swiper>
 
             {/* Custom Navigation Buttons */}
             <button
               onClick={() => swiperRef.current?.slidePrev()}
-              className="absolute top-1/2 -left-4 -translate-y-1/2 w-10 h-10 bg-white shadow-md rounded-2xl flex items-center justify-center z-50 opacity-0 group-hover/swiper:opacity-100 transition-opacity hover:bg-slate-50 border border-slate-100"
+              className="absolute top-1/2 -left-4 -translate-y-1/2 w-10 h-10 bg-white shadow-md rounded-xl flex items-center justify-center z-50 opacity-0 group-hover/swiper:opacity-100 transition-opacity hover:bg-slate-50 border border-slate-100"
             >
               <ChevronLeft
                 size={20}
@@ -415,7 +426,7 @@ const Home = () => {
             </button>
             <button
               onClick={() => swiperRef.current?.slideNext()}
-              className="absolute top-1/2 -right-4 -translate-y-1/2 w-12 h-12 bg-white shadow-md rounded-2xl flex items-center justify-center z-50 opacity-0 group-hover/swiper:opacity-100 transition-opacity hover:bg-slate-50 border border-slate-100"
+              className="absolute top-1/2 -right-4 -translate-y-1/2 w-12 h-12 bg-white shadow-md rounded-xl flex items-center justify-center z-50 opacity-0 group-hover/swiper:opacity-100 transition-opacity hover:bg-slate-50 border border-slate-100"
             >
               <ChevronRight
                 size={20}

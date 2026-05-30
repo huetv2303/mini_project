@@ -182,7 +182,7 @@ const SupplierForm = () => {
                         setFormData({ ...formData, name: e.target.value })
                       }
                       placeholder="Nhập tên NCC"
-                      className="w-full pl-11 pr-4 py-4 border border-slate-200 bg-slate-50/50 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-800 font-semibold"
+                      className="w-full pl-11 pr-4 py-4 border border-slate-200 bg-slate-50/50 rounded-xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-800 font-semibold"
                     />
                   </div>
                 </div>
@@ -201,7 +201,7 @@ const SupplierForm = () => {
                         setFormData({ ...formData, tax_code: e.target.value })
                       }
                       placeholder="Mã số doanh nghiệp..."
-                      className="w-full pl-11 pr-4 py-4 border border-slate-200 bg-slate-50/50 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-800 font-semibold"
+                      className="w-full pl-11 pr-4 py-4 border border-slate-200 bg-slate-50/50 rounded-xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-800 font-semibold"
                     />
                   </div>
                 </div>
@@ -220,7 +220,7 @@ const SupplierForm = () => {
                         setFormData({ ...formData, email: e.target.value })
                       }
                       placeholder="Nhập email..."
-                      className="w-full pl-11 pr-4 py-4 border border-slate-200 bg-slate-50/50 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-800 font-semibold font-mono"
+                      className="w-full pl-11 pr-4 py-4 border border-slate-200 bg-slate-50/50 rounded-xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-800 font-semibold font-mono"
                     />
                   </div>
                 </div>
@@ -239,7 +239,7 @@ const SupplierForm = () => {
                         setFormData({ ...formData, phone: e.target.value })
                       }
                       placeholder="Nhập số điện thoại..."
-                      className="w-full pl-11 pr-4 py-4 border border-slate-200 bg-slate-50/50 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-800 font-semibold"
+                      className="w-full pl-11 pr-4 py-4 border border-slate-200 bg-slate-50/50 rounded-xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-800 font-semibold"
                     />
                   </div>
                 </div>
@@ -261,7 +261,7 @@ const SupplierForm = () => {
                         })
                       }
                       placeholder="Họ và tên..."
-                      className="w-full pl-11 pr-4 py-4 border border-slate-200 bg-slate-50/50 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-800 font-semibold"
+                      className="w-full pl-11 pr-4 py-4 border border-slate-200 bg-slate-50/50 rounded-xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-800 font-semibold"
                     />
                   </div>
                 </div>
@@ -283,7 +283,7 @@ const SupplierForm = () => {
                         })
                       }
                       placeholder="Số nhà, Tên đường, Quận/Huyện..."
-                      className="w-full pl-11 pr-4 py-4 border border-slate-200 bg-slate-50/50 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-800 font-semibold"
+                      className="w-full pl-11 pr-4 py-4 border border-slate-200 bg-slate-50/50 rounded-xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-800 font-semibold"
                     />
                   </div>
                 </div>
@@ -301,7 +301,7 @@ const SupplierForm = () => {
                     setFormData({ ...formData, description: e.target.value })
                   }
                   placeholder="Ghi chú về thế mạnh sản phẩm, thời gian giao hàng..."
-                  className="w-full px-5 py-4 border border-slate-200 bg-slate-50/50 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-800 font-semibold resize-none"
+                  className="w-full px-5 py-4 border border-slate-200 bg-slate-50/50 rounded-xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-800 font-semibold resize-none"
                 />
               </div>
             </div>
@@ -345,7 +345,7 @@ const SupplierForm = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`w-full flex items-center justify-center py-4 rounded-2xl text-xs font-extrabold uppercase tracking-wider transition-all shadow-md active:scale-95 ${
+                className={`w-full flex items-center justify-center py-4 rounded-[5px] text-xs font-extrabold uppercase tracking-wider transition-all shadow-md active:scale-95 ${
                   isSubmitting
                     ? "bg-slate-100 text-slate-400 cursor-not-allowed"
                     : "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-blue-500/20 hover:from-blue-700 hover:to-indigo-700"

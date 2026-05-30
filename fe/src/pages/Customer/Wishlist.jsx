@@ -32,7 +32,7 @@ const Wishlist = () => {
       <div className="pt-32 pb-24 bg-[#f8fafc] min-h-screen text-left">
         <div className="max-w-7xl mx-auto px-10 md:px-20">
           {/* Breadcrumbs */}
-          <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-10 bg-white px-5 py-3 rounded-2xl border border-slate-100 shadow-sm w-fit">
+          <div className="flex items-center gap-2 text-[13px] font-medium text-slate-600  mb-6 bg-white px-5 py-3 rounded-xl border border-slate-100 shadow-sm w-fit">
             <Link
               to="/"
               className="hover:text-sky-600 transition-colors flex items-center gap-1"
@@ -45,9 +45,9 @@ const Wishlist = () => {
           </div>
 
           {/* Page Title */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10 bg-white p-6 md:p-8 rounded-3xl border border-slate-100 shadow-sm">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10 bg-white p-5 rounded-xl border border-slate-100 shadow-sm">
             <div>
-              <h1 className="text-2xl md:text-3xl font-black text-slate-800 uppercase tracking-tight mb-2">
+              <h1 className="text-2xl md:text-2xl font-black text-slate-800 uppercase tracking-tight mb-2 mb-2">
                 Danh sách yêu thích
               </h1>
               <p className="text-sm text-slate-500 font-medium">
@@ -61,7 +61,7 @@ const Wishlist = () => {
             {wishlistItems.length > 0 && (
               <Link
                 to="/products"
-                className="inline-flex items-center gap-2 bg-slate-50 border border-slate-100 hover:bg-slate-100 text-slate-600 px-5 py-3 rounded-2xl text-xs font-black uppercase tracking-wider transition-all"
+                className="inline-flex items-center gap-2 bg-slate-50 border border-slate-100 hover:bg-slate-100 text-slate-600 px-5 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all"
               >
                 Tiếp tục mua sắm
                 <ArrowRight size={14} />
@@ -76,7 +76,7 @@ const Wishlist = () => {
                   key={i}
                   className="animate-pulse bg-white rounded-3xl border border-slate-100 p-4 space-y-4 flex flex-col h-full"
                 >
-                  <div className="aspect-[3/4] bg-slate-100 rounded-2xl w-full"></div>
+                  <div className="aspect-[3/4] bg-slate-100 rounded-xl w-full"></div>
                   <div className="h-4 bg-slate-100 rounded w-2/3"></div>
                   <div className="h-3 bg-slate-50 rounded w-1/3"></div>
                   <div className="h-4 bg-slate-100 rounded w-1/2"></div>
@@ -126,7 +126,7 @@ const Wishlist = () => {
 
                   <div className="p-3 flex-1 flex flex-col justify-between space-y-3">
                     <div className="space-y-1">
-                      <h3 className="text-sm font-bold text-black/80 line-clamp-2 group-hover:text-sky-600 transition-colors uppercase tracking-tight">
+                      <h3 className="text-sm font-medium text-black/80 line-clamp-2 group-hover:text-sky-600 transition-colors t">
                         <Link to={`/products/${prod.slug}`}>{prod.name}</Link>
                       </h3>
                     </div>
@@ -168,7 +168,7 @@ const Wishlist = () => {
               </p>
               <Link
                 to="/products"
-                className="inline-flex items-center gap-2 bg-sky-600 text-white px-8 py-3.5 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-sky-700 transition-all shadow-md shadow-sky-500/10 hover:-translate-y-0.5 active:scale-95"
+                className="inline-flex items-center gap-2 bg-sky-600 text-white px-8 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-sky-700 transition-all shadow-md shadow-sky-500/10 hover:-translate-y-0.5 active:scale-95"
               >
                 Khám phá ngay
                 <ArrowRight size={14} />

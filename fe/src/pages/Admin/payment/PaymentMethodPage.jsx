@@ -17,7 +17,6 @@ import {
 import AdminLayout from "../../../components/layout/Admin/AdminLayout";
 import { getImageUrl } from "../../../helper/helper";
 
-
 const PaymentMethodPage = () => {
   const [methods, setMethods] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -124,7 +123,6 @@ const PaymentMethodPage = () => {
     }
   };
 
-
   const filteredMethods = methods.filter(
     (m) =>
       m.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -152,7 +150,7 @@ const PaymentMethodPage = () => {
           </button>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="p-6 border-b border-gray-100 text-left">
             <div className="relative max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -201,74 +199,69 @@ const PaymentMethodPage = () => {
                   ))
                 ) : filteredMethods.length > 0 ? (
                   filteredMethods.map((method) => (
-                      <tr
-                        key={method.id}
-                        className="hover:bg-gray-50/50 transition duration-150"
-                      >
-                        <td className="py-4 px-6">
-                          {method.image ? (
-                            <img
-                              src={getImageUrl(method.image)}
-                              alt={method.name}
-                              className="w-12 h-12 object-contain rounded-lg border bg-white p-1"
-                            />
-                          ) : (
-                            <div className="w-12 h-12 flex items-center justify-center bg-gray-100 rounded-lg text-gray-400">
-                              <ImageIcon className="w-6 h-6" />
-                            </div>
-                          )}
-                        </td>
-                        <td className="py-4 px-6">
-                          <div className="flex flex-col">
-                            <span className=" text-gray-900">
-                              {method.name}
-                            </span>
-                            <span className="text-[10px] text-gray-500 uppercase truncate max-w-[200px]">
-                              {method.description || "Không có mô tả"}
-                            </span>
+                    <tr
+                      key={method.id}
+                      className="hover:bg-gray-50/50 transition duration-150"
+                    >
+                      <td className="py-4 px-6">
+                        {method.image ? (
+                          <img
+                            src={getImageUrl(method.image)}
+                            alt={method.name}
+                            className="w-12 h-12 object-contain rounded-lg border bg-white p-1"
+                          />
+                        ) : (
+                          <div className="w-12 h-12 flex items-center justify-center bg-gray-100 rounded-lg text-gray-400">
+                            <ImageIcon className="w-6 h-6" />
                           </div>
-                        </td>
-                        <td className="py-4 px-6">
-                          <code className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-[10px] font-bold">
-                            {method.code}
-                          </code>
-                        </td>
-                        <td className="py-4 px-6 text-center">
-                          <span
-                            className={`inline-flex px-3 py-1 text-[10px] font-bold rounded-lg uppercase ${
-                              method.is_active
-                                ? "bg-green-100 text-green-700"
-                                : "bg-red-100 text-red-700"
-                            }`}
-                          >
-                            {method.is_active ? "Hoạt động" : "Tạm ngưng"}
+                        )}
+                      </td>
+                      <td className="py-4 px-6">
+                        <div className="flex flex-col">
+                          <span className=" text-gray-900">{method.name}</span>
+                          <span className="text-[10px] text-gray-500 uppercase truncate max-w-[200px]">
+                            {method.description || "Không có mô tả"}
                           </span>
-                        </td>
-                        <td className="py-4 px-6 text-right">
-                          <div className="flex items-center justify-end gap-3">
-                            <button
-                              onClick={() => handleOpenModal(method)}
-                              className="p-2 text-black bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors border border-gray-100"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td
-                        colSpan="5"
-                        className="py-12 text-center text-gray-500"
-                      >
-                        Không tìm thấy dữ liệu.
+                        </div>
+                      </td>
+                      <td className="py-4 px-6">
+                        <code className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-[10px] font-bold">
+                          {method.code}
+                        </code>
+                      </td>
+                      <td className="py-4 px-6 text-center">
+                        <span
+                          className={`inline-flex px-3 py-1 text-[10px] font-bold rounded-lg uppercase ${
+                            method.is_active
+                              ? "bg-green-100 text-green-700"
+                              : "bg-red-100 text-red-700"
+                          }`}
+                        >
+                          {method.is_active ? "Hoạt động" : "Tạm ngưng"}
+                        </span>
+                      </td>
+                      <td className="py-4 px-6 text-right">
+                        <div className="flex items-center justify-end gap-3">
+                          <button
+                            onClick={() => handleOpenModal(method)}
+                            className="p-2 text-black bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors border border-gray-100"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="py-12 text-center text-gray-500">
+                      Không tìm thấy dữ liệu.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {isModalOpen && (
@@ -298,10 +291,10 @@ const PaymentMethodPage = () => {
                       <img
                         src={imagePreview}
                         alt="Preview"
-                        className="w-full h-full object-contain rounded-2xl border-2 border-dashed border-gray-200 p-2"
+                        className="w-full h-full object-contain rounded-xl border-2 border-dashed border-gray-200 p-2"
                       />
                     ) : (
-                      <div className="w-full h-full flex flex-col items-center justify-center bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl text-gray-400 group-hover:bg-gray-100 transition">
+                      <div className="w-full h-full flex flex-col items-center justify-center bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl text-gray-400 group-hover:bg-gray-100 transition">
                         <ImageIcon className="w-8 h-8 mb-2" />
                         <span className="text-[10px] font-bold">TẢI ẢNH</span>
                       </div>
@@ -364,7 +357,7 @@ const PaymentMethodPage = () => {
                   />
                 </div>
 
-                <div className="flex items-center p-4 bg-gray-50 rounded-2xl">
+                <div className="flex items-center p-4 bg-gray-50 rounded-xl">
                   <input
                     type="checkbox"
                     id="isActive"

@@ -29,16 +29,16 @@ class ProductResource extends JsonResource
             'average_rating'    => $this->average_rating,
             'review_count'      => $this->review_count,
             'is_taxable'        => (bool)$this->is_taxable,
-            'category'          => $this->whenLoaded('category', fn() => [
+            'category'          => $this->whenLoaded('category', fn() => $this->category ? [
                 'id'   => $this->category->id,
                 'name' => $this->category->name,
                 'slug' => $this->category->slug,
-            ]),
-            'supplier'          => $this->whenLoaded('supplier', fn() => [
+            ] : null),
+            'supplier'          => $this->whenLoaded('supplier', fn() => $this->supplier ? [
                 'id'   => $this->supplier->id,
                 'name' => $this->supplier->name,
                 'slug' => $this->supplier->slug,
-            ]),
+            ] : null),
             'images' => $this->whenLoaded(
                 'images',
                 fn() =>

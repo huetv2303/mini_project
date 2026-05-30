@@ -170,14 +170,14 @@ const ProductListPage = () => {
           {canManage && (
             <Link
               to="/admin/products/create"
-              className="inline-flex items-center justify-center px-5 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-extrabold uppercase rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md shadow-blue-500/20 active:scale-95"
+              className="inline-flex items-center justify-center px-5 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-extrabold uppercase rounded-[5px] hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md shadow-blue-500/20 active:scale-95"
             >
               <Plus className="w-4 h-4 mr-2" /> Thêm sản phẩm
             </Link>
           )}
         </div>
 
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
           <div className="p-8 border-b border-slate-100 bg-slate-50/50 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -276,11 +276,11 @@ const ProductListPage = () => {
                               {product.images?.length > 0 ? (
                                 <img
                                   src={getImageUrl(product.images[0].url)}
-                                  className="w-16 h-16 rounded-2xl object-cover border border-slate-100 shadow-sm transition-transform group-hover:scale-105"
+                                  className="w-16 h-16 rounded-xl object-cover border border-slate-100 shadow-sm transition-transform group-hover:scale-105"
                                   alt={product.name}
                                 />
                               ) : (
-                                <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center border border-slate-200">
+                                <div className="w-16 h-16 rounded-xl bg-slate-100 flex items-center justify-center border border-slate-200">
                                   <span className="text-slate-400 text-xs font-bold">
                                     No Image
                                   </span>
@@ -335,7 +335,7 @@ const ProductListPage = () => {
                               {canEdit && (
                                 <Link
                                   to={`/admin/products/edit/${product.slug}`}
-                                  className="p-2.5 text-blue-500 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all"
+                                  className="p-2.5 text-blue-500 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
                                 >
                                   <Edit2 className="w-5 h-5" />
                                 </Link>
@@ -345,7 +345,7 @@ const ProductListPage = () => {
                                   onClick={() =>
                                     openDeleteModal(product.slug, product.name)
                                   }
-                                  className="p-2.5 text-rose-500 hover:text-rose-600 hover:bg-rose-50 rounded-2xl transition-all"
+                                  className="p-2.5 text-rose-500 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
                                 >
                                   <Trash2 className="w-5 h-5" />
                                 </button>

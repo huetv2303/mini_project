@@ -15,10 +15,10 @@ class StockReceiptResource extends JsonResource
             'total_amount' => $this->total_amount,
             'note'         => $this->note,
             'received_at'  => $this->received_at?->format('Y-m-d H:i:s'),
-            'supplier'     => [
+            'supplier'     => $this->supplier_id ? [
                 'id'   => $this->supplier_id,
                 'name' => $this->supplier?->name,
-            ],
+            ] : null,
             'created_by'   => [
                 'id'   => $this->user_id,
                 'name' => $this->staff?->name,

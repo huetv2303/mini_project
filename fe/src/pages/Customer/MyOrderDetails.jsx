@@ -221,8 +221,11 @@ const MyOrderDetails = () => {
       <div className="bg-[#f8fafc] min-h-screen pt-32 pb-24 text-left">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           {/* Breadcrumbs */}
-          <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-10 bg-white px-5 py-3 rounded-2xl border border-slate-100 shadow-sm w-fit">
-            <Link to="/" className="hover:text-sky-600 transition-colors flex items-center gap-1">
+          <div className="flex items-center gap-2 text-[13px] font-medium text-slate-600  mb-6 bg-white px-5 py-3 rounded-xl border border-slate-100 shadow-sm w-fit">
+            <Link
+              to="/"
+              className="hover:text-sky-600 transition-colors flex items-center gap-1"
+            >
               <Home size={13} className="text-slate-400" />
               Trang chủ
             </Link>
@@ -238,20 +241,25 @@ const MyOrderDetails = () => {
           <div className="bg-white p-6 md:p-8 rounded-3xl border border-slate-100 shadow-sm mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
             <div className="space-y-2">
               <div className="flex items-center gap-3">
-                <h1 className="text-xl md:text-2xl font-black text-slate-800 uppercase tracking-tight">
-                  Đơn hàng #{order.code}
+                <h1 className="text-[1rem] font-medium text-slate-800 ">
+                  {order.code}
                 </h1>
                 <OrderStatusBadge status={order.status} />
               </div>
-              <div className="flex flex-wrap items-center gap-4 text-xs font-bold text-slate-400 uppercase tracking-wider">
+              <div className="flex flex-wrap items-center gap-4 text-[11px] font-medium text-slate-600  tracking-wider">
                 <span className="flex items-center gap-1.5">
                   <Calendar size={13} className="text-sky-500" />
-                  Đặt lúc: {format(new Date(order.created_at), "dd/MM/yyyy HH:mm")}
+                  Đặt lúc:{" "}
+                  {format(new Date(order.created_at), "dd/MM/yyyy HH:mm")}
                 </span>
                 {order.expected_delivery_date && (
                   <span className="flex items-center gap-1.5">
                     <Truck size={13} className="text-sky-500" />
-                    Dự kiến giao: {format(new Date(order.expected_delivery_date), "dd/MM/yyyy")}
+                    Dự kiến giao:{" "}
+                    {format(
+                      new Date(order.expected_delivery_date),
+                      "dd/MM/yyyy",
+                    )}
                   </span>
                 )}
               </div>
@@ -262,9 +270,11 @@ const MyOrderDetails = () => {
               {isSpecial ? (
                 <div className="flex justify-end">
                   <div
-                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-black uppercase tracking-wider ${specialStatus[displayStatus].bg} ${specialStatus[displayStatus].text} ${specialStatus[displayStatus].border}`}
+                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border text-[11px] font-medium   ${specialStatus[displayStatus].bg} ${specialStatus[displayStatus].text} ${specialStatus[displayStatus].border}`}
                   >
-                    <span className={`w-2 h-2 rounded-full ${specialStatus[displayStatus].dot} animate-pulse`} />
+                    <span
+                      className={`w-2 h-2 rounded-full ${specialStatus[displayStatus].dot} animate-pulse`}
+                    />
                     {specialStatus[displayStatus].label}
                   </div>
                 </div>
@@ -283,7 +293,10 @@ const MyOrderDetails = () => {
                     const isPast = index < currentStepIndex;
                     const isCurrent = index === currentStepIndex;
                     return (
-                      <div key={step.id} className="relative z-10 flex flex-col items-center flex-1">
+                      <div
+                        key={step.id}
+                        className="relative z-10 flex flex-col items-center flex-1"
+                      >
                         <div
                           className={`w-4 h-4 rounded-full border-2 transition-all duration-500 flex items-center justify-center ${
                             isPast
@@ -294,7 +307,7 @@ const MyOrderDetails = () => {
                           }`}
                         />
                         <span
-                          className={`mt-2 text-[9px] font-black uppercase tracking-wider text-center leading-tight whitespace-nowrap ${
+                          className={`mt-2 text-[11px] font-medium text-center leading-tight whitespace-nowrap ${
                             isCurrent ? "text-sky-600" : "text-slate-400"
                           }`}
                         >
@@ -309,12 +322,14 @@ const MyOrderDetails = () => {
           </div>
 
           {/* Quick operations */}
-          {(order.status === "pending" || canReturn || (order.status === "delivered" && order.items?.length > 0)) && (
+          {(order.status === "pending" ||
+            canReturn ||
+            (order.status === "delivered" && order.items?.length > 0)) && (
             <div className="mb-8 flex justify-end gap-3 bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex-wrap">
               {order.status === "pending" && (
                 <button
                   onClick={handleCancelOrder}
-                  className="h-11 px-5 bg-rose-50 hover:bg-rose-500 text-rose-500 hover:text-white rounded-2xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all shadow-md shadow-rose-500/5 active:scale-95"
+                  className="h-11 px-5 bg-rose-50 hover:bg-rose-500 text-rose-500 hover:text-white rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all shadow-md shadow-rose-500/5 active:scale-95"
                 >
                   <Trash2 size={14} />
                   HỦY ĐƠN HÀNG
@@ -324,16 +339,18 @@ const MyOrderDetails = () => {
                 <button
                   onClick={() => setShowReturnModal(true)}
                   disabled={hasPendingReturn}
-                  className="h-11 px-5 bg-rose-50 hover:bg-rose-500 text-rose-500 hover:text-white rounded-2xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all shadow-md shadow-rose-500/5 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+                  className="h-11 px-5 bg-rose-50 hover:bg-rose-500 text-rose-500 hover:text-white rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all shadow-md shadow-rose-500/5 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
                 >
                   <RotateCcw size={14} />
-                  {hasPendingReturn ? "ĐANG XỬ LÝ TRẢ HÀNG" : "TRẢ HÀNG / HOÀN TIỀN"}
+                  {hasPendingReturn
+                    ? "ĐANG XỬ LÝ TRẢ HÀNG"
+                    : "TRẢ HÀNG / HOÀN TIỀN"}
                 </button>
               )}
               {order.status === "delivered" && order.items?.length > 0 && (
                 <Link
                   to={`/products/${order.items[0].product_slug || order.items[0].product_id}?order_id=${order.id}#reviews`}
-                  className="h-11 px-5 bg-amber-50 hover:bg-amber-400 text-amber-600 hover:text-white rounded-2xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all shadow-md shadow-amber-500/5 active:scale-95"
+                  className="h-11 px-5 bg-amber-50 hover:bg-amber-400 text-amber-600 hover:text-white rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all shadow-md shadow-amber-500/5 active:scale-95"
                 >
                   <Star size={14} />
                   ĐÁNH GIÁ ĐƠN HÀNG
@@ -368,25 +385,25 @@ const MyOrderDetails = () => {
                       <div className="flex-grow flex flex-col justify-between">
                         <div>
                           <div className="flex justify-between gap-4">
-                            <h4 className="text-xs font-black text-slate-800 uppercase tracking-tight line-clamp-1 group-hover:text-sky-600 transition-colors">
+                            <h4 className="text-[14px] font-medium text-slate-800  line-clamp-1 group-hover:text-sky-600 transition-colors">
                               {item.product_name}
                             </h4>
-                            <p className="text-xs font-black text-slate-800">
+                            <p className="text-[14px] font-medium text-slate-800">
                               {fmt(item.subtotal)}₫
                             </p>
                           </div>
-                          <p className="text-[10px] font-black text-sky-600 bg-sky-50 px-2 py-0.5 rounded border border-sky-100/50 uppercase tracking-wider w-fit mt-1">
+                          <p className="text-[10px] font-medium text-sky-600 bg-sky-50 px-2 py-0.5 rounded border border-sky-100/50 uppercase tracking-wider w-fit mt-1">
                             {item.variant_name}
                           </p>
                         </div>
 
                         <div className="flex items-center justify-between pt-2">
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                          <span className="text-[12px] font-medium text-slate-600">
                             Đơn giá: {fmt(item.price)}₫ × {item.quantity}
                           </span>
                           <div className="flex items-center gap-2">
                             {item.returned_quantity > 0 && (
-                              <span className="text-[10px] font-black text-rose-500 uppercase tracking-wider bg-rose-50 px-2 py-0.5 rounded-lg border border-rose-100/50">
+                              <span className="text-[12px] font-medium text-rose-500 uppercase tracking-wider bg-rose-50 px-2 py-0.5 rounded-lg border border-rose-100/50">
                                 Đã trả: {item.returned_quantity}
                               </span>
                             )}
@@ -426,17 +443,26 @@ const MyOrderDetails = () => {
                               {ret.return_code}
                             </p>
                             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">
-                              {ret.created_at ? format(new Date(ret.created_at), "dd/MM/yyyy HH:mm") : "—"}
+                              {ret.created_at
+                                ? format(
+                                    new Date(ret.created_at),
+                                    "dd/MM/yyyy HH:mm",
+                                  )
+                                : "—"}
                             </p>
                           </div>
                           <div className="flex flex-wrap gap-1.5">
                             {receiveStatusMap[ret.receive_status] && (
-                              <span className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border ${receiveStatusMap[ret.receive_status].color}`}>
+                              <span
+                                className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border ${receiveStatusMap[ret.receive_status].color}`}
+                              >
                                 {receiveStatusMap[ret.receive_status].label}
                               </span>
                             )}
                             {refundStatusMap[ret.refund_status] && (
-                              <span className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border ${refundStatusMap[ret.refund_status].color}`}>
+                              <span
+                                className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border ${refundStatusMap[ret.refund_status].color}`}
+                              >
                                 {refundStatusMap[ret.refund_status].label}
                               </span>
                             )}
@@ -444,7 +470,7 @@ const MyOrderDetails = () => {
                         </div>
 
                         {ret.reason && (
-                          <div className="bg-slate-50 rounded-2xl p-4 text-xs font-bold text-slate-500 italic border border-slate-100">
+                          <div className="bg-slate-50 rounded-xl p-4 text-xs font-bold text-slate-500 italic border border-slate-100">
                             <span className="not-italic text-slate-400 uppercase tracking-wider block mb-1">
                               Lý do trả hàng:
                             </span>
@@ -455,15 +481,27 @@ const MyOrderDetails = () => {
                         {ret.items && ret.items.length > 0 && (
                           <div className="space-y-1.5 pt-2">
                             {ret.items.map((ri) => {
-                              const orderItem = order.items.find((oi) => oi.id === ri.order_item_id);
+                              const orderItem = order.items.find(
+                                (oi) => oi.id === ri.order_item_id,
+                              );
                               return (
-                                <div key={ri.id} className="flex items-center justify-between text-[11px] font-bold text-slate-500 bg-slate-50/50 rounded-xl px-3 py-2 border border-slate-100">
+                                <div
+                                  key={ri.id}
+                                  className="flex items-center justify-between text-[11px] font-bold text-slate-500 bg-slate-50/50 rounded-xl px-3 py-2 border border-slate-100"
+                                >
                                   <span>
-                                    {orderItem?.product_name ?? `Sản phẩm #${ri.product_id}`}
-                                    {orderItem?.variant_name ? ` — ${orderItem.variant_name}` : ""}
+                                    {orderItem?.product_name ??
+                                      `Sản phẩm #${ri.product_id}`}
+                                    {orderItem?.variant_name
+                                      ? ` — ${orderItem.variant_name}`
+                                      : ""}
                                   </span>
-                                  <span className="text-slate-400">×{ri.quantity}</span>
-                                  <span className="font-black text-slate-800">{fmt(ri.subtotal)}₫</span>
+                                  <span className="text-slate-400">
+                                    ×{ri.quantity}
+                                  </span>
+                                  <span className="font-black text-slate-800">
+                                    {fmt(ri.subtotal)}₫
+                                  </span>
                                 </div>
                               );
                             })}
@@ -490,32 +528,33 @@ const MyOrderDetails = () => {
                   <CreditCard size={15} className="text-sky-500" />
                   THANH TOÁN
                 </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-slate-50 p-5 rounded-xl border border-slate-100">
                   <div className="space-y-2">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                    <p className="text-[12px] font-medium text-slate-600 ">
                       Phương thức thanh toán
                     </p>
-                    <p className="text-xs font-black text-slate-700 uppercase tracking-wider">
+                    <p className="text-[12px] font-medium text-slate-700 ">
                       {order.payment_method?.name || "N/A"}
                     </p>
                   </div>
                   <div className="space-y-2 flex flex-col justify-between sm:items-end">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                    <p className="text-[12px] font-medium text-slate-600 ">
                       Trạng thái thanh toán
                     </p>
                     <PaymentStatusBadge status={order.payment_status} />
                   </div>
                 </div>
 
-                {order.payment_status === "unpaid" && order.payment_method?.code === "bank_transfer" && (
-                  <button
-                    onClick={() => setShowPaymentModal(true)}
-                    className="w-full mt-4 py-3.5 bg-sky-600 hover:bg-sky-700 text-white rounded-2xl text-xs font-black uppercase tracking-wider shadow-md shadow-sky-500/10 active:scale-95 transition-all flex items-center justify-center gap-2"
-                  >
-                    <CreditCard size={14} />
-                    MỞ QR THANH TOÁN TỰ ĐỘNG
-                  </button>
-                )}
+                {order.payment_status === "unpaid" &&
+                  order.payment_method?.code === "bank_transfer" && (
+                    <button
+                      onClick={() => setShowPaymentModal(true)}
+                      className="w-full mt-4 py-3.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-black uppercase tracking-wider shadow-md shadow-sky-500/10 active:scale-95 transition-all flex items-center justify-center gap-2"
+                    >
+                      <CreditCard size={14} />
+                      MỞ QR THANH TOÁN TỰ ĐỘNG
+                    </button>
+                  )}
               </div>
             </div>
 
@@ -529,7 +568,9 @@ const MyOrderDetails = () => {
                 <div className="space-y-3 pt-1">
                   <div className="flex justify-between text-xs font-bold text-slate-500">
                     <span>Tạm tính</span>
-                    <span className="text-slate-800">{fmt(order.total_amount)}₫</span>
+                    <span className="text-slate-800">
+                      {fmt(order.total_amount)}₫
+                    </span>
                   </div>
                   <div className="flex justify-between text-xs font-bold text-rose-500">
                     <span>Giảm giá</span>
@@ -537,22 +578,29 @@ const MyOrderDetails = () => {
                   </div>
                   <div className="flex justify-between text-xs font-bold text-slate-500">
                     <span>Phí vận chuyển</span>
-                    <span className="text-slate-800">{fmt(order.shipping_fee)}₫</span>
+                    <span className="text-slate-800">
+                      {fmt(order.shipping_fee)}₫
+                    </span>
                   </div>
-                  {(Number(order.tax_amount) > 0 || Number(order.tax_rate_snapshot) > 0) && (
+                  {(Number(order.tax_amount) > 0 ||
+                    Number(order.tax_rate_snapshot) > 0) && (
                     <div className="flex justify-between text-xs font-bold text-slate-500">
                       <span>Thuế (VAT {order.tax_rate_snapshot ?? 0}%)</span>
-                      <span className="text-slate-800">{fmt(order.tax_amount)}₫</span>
+                      <span className="text-slate-800">
+                        {fmt(order.tax_amount)}₫
+                      </span>
                     </div>
                   )}
                   <div className="flex justify-between items-center pt-3 border-t border-slate-50 text-xs font-black text-slate-800 uppercase tracking-widest">
                     <span>Tổng đơn hàng</span>
-                    <span className="text-sky-700 text-lg font-black">{fmt(order.final_amount)}₫</span>
+                    <span className="text-sky-700 text-lg font-black">
+                      {fmt(order.final_amount)}₫
+                    </span>
                   </div>
 
                   {order.wallet_amount_used > 0 && (
                     <div className="pt-4 space-y-3">
-                      <div className="flex justify-between items-center text-xs font-black text-sky-600 bg-sky-50 border border-sky-100/50 p-3 rounded-2xl">
+                      <div className="flex justify-between items-center text-xs font-black text-sky-600 bg-sky-50 border border-sky-100/50 p-3 rounded-xl">
                         <span className="flex items-center gap-1">
                           <RotateCcw size={13} className="rotate-180" />
                           ĐÃ TRỪ TỪ VÍ
@@ -560,9 +608,18 @@ const MyOrderDetails = () => {
                         <span>-{fmt(order.wallet_amount_used)}₫</span>
                       </div>
                       <div className="flex justify-between items-center pt-2 text-xs font-black uppercase tracking-widest">
-                        <span className="text-slate-500">Cần thanh toán thêm</span>
+                        <span className="text-slate-500">
+                          Cần thanh toán thêm
+                        </span>
                         <span className="text-rose-500 text-lg font-black">
-                          {fmt(Math.max(0, order.final_amount - (order.wallet_amount_used || 0)))}₫
+                          {fmt(
+                            Math.max(
+                              0,
+                              order.final_amount -
+                                (order.wallet_amount_used || 0),
+                            ),
+                          )}
+                          ₫
                         </span>
                       </div>
                     </div>
@@ -577,13 +634,13 @@ const MyOrderDetails = () => {
                   VẬN CHUYỂN
                 </h3>
 
-                <div className="space-y-5 pt-1">
+                <div className="space-y-3 pt-1">
                   <div className="flex gap-3">
                     <div className="w-9 h-9 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 border border-slate-100/50 flex-shrink-0">
                       <MapPin size={15} />
                     </div>
                     <div>
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">
+                      <p className="text-[14px] font-semibold text-slate-700 ">
                         Địa chỉ nhận hàng
                       </p>
                       <p className="text-xs font-black text-slate-700 uppercase tracking-tight">
@@ -598,15 +655,15 @@ const MyOrderDetails = () => {
                     </div>
                   </div>
 
-                  <div className="flex gap-3 border-t border-slate-50 pt-5">
+                  <div className="flex gap-3 border-t border-slate-50">
                     <div className="w-9 h-9 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 border border-slate-100/50 flex-shrink-0">
-                      <Truck size={15} />
+                      <Truck size={20} />
                     </div>
                     <div>
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">
+                      <p className="text-[1rem] font-semibold text-slate-700 ">
                         Phương thức vận chuyển
                       </p>
-                      <p className="text-xs font-black text-slate-700 uppercase">
+                      <p className="text-[14px] font-medium text-slate-600 ">
                         {order.shipping_method?.name || "Giao hàng mặc định"}
                       </p>
                     </div>
@@ -683,7 +740,7 @@ const BankPaymentModal = ({ isOpen, onClose, bankInfo }) => {
         </div>
 
         <div className="p-6 flex flex-col items-center">
-          <div className="relative p-3 bg-white rounded-2xl shadow-md border border-slate-100 mb-5">
+          <div className="relative p-3 bg-white rounded-xl shadow-md border border-slate-100 mb-5">
             <img
               src={qrUrl}
               alt="SePay QR"

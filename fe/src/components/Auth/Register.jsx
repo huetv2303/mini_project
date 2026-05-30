@@ -80,7 +80,7 @@ const Register = () => {
             </div>
 
             {apiError && (
-              <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400 text-sm flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
+              <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
                 <AlertCircle size={18} />
                 <span>{apiError}</span>
               </div>

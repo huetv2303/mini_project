@@ -34,7 +34,7 @@ const ConfirmModal = ({
           {/* Icon Header */}
           <div
             className={`
-            w-16 h-16 rounded-2xl flex items-center justify-center mb-6 mx-auto
+            w-16 h-16 rounded-xl flex items-center justify-center mb-6 mx-auto
             ${type === "danger" ? "bg-red-50 text-red-500" : "bg-amber-50 text-amber-500"}
           `}
           >
@@ -52,7 +52,7 @@ const ConfirmModal = ({
           <div className="mt-10 flex flex-col sm:flex-row gap-3">
             <button
               onClick={onClose}
-              className="flex-1 px-6 py-4 bg-gray-100 text-gray-700 font-bold rounded-2xl hover:bg-gray-200 transition-all active:scale-95 translate-y-0"
+              className="flex-1 px-6 py-4 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition-all active:scale-95 translate-y-0"
             >
               Hủy bỏ
             </button>
@@ -62,7 +62,7 @@ const ConfirmModal = ({
                 onClose();
               }}
               className={`
-                flex-1 px-6 py-4 text-white font-bold rounded-2xl transition-all shadow-lg active:scale-95
+                flex-1 px-6 py-4 text-white font-bold rounded-xl transition-all shadow-lg active:scale-95
                 ${type === "danger" ? "bg-black hover:bg-black/80 shadow-black/10" : "bg-black hover:bg-black/90 shadow-black/10"}
               `}
             >

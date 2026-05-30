@@ -243,6 +243,14 @@ class ProductService
                         }
                         $variantImg = $this->uploadImageService->uploadFile($request->file("variants.$vIndex.image"), 'products/variants', 400, 400);
                         $variant->update(['image' => $variantImg['path']]);
+                    } else {
+                        // Nếu không tải file mới và không có existing_image, tức là người dùng đã xoá ảnh biến thể
+                        if (!isset($variantData['existing_image'])) {
+                            if ($variant->image) {
+                                $this->uploadImageService->deleteFile($variant->image);
+                            }
+                            $variant->update(['image' => null]);
+                        }
                     }
 
                     $extVAttrIds = $variant->attributes()->pluck('id')->map(fn($id) => (string)$id)->toArray();

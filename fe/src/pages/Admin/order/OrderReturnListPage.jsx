@@ -142,7 +142,7 @@ const OrderReturnListPage = () => {
                 value={searchTerm}
                 onChange={handleSearchChange}
                 placeholder="Tìm mã phiếu, mã đơn hàng..."
-                className="w-full pl-12 pr-4 py-4 bg-white border border-gray-100 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-black/5 transition-all shadow-sm"
+                className="w-full pl-12 pr-4 py-4 bg-white border border-gray-100 rounded-xl text-sm outline-none focus:ring-4 focus:ring-black/5 transition-all shadow-sm"
               />
             </div>
           </div>

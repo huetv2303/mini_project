@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Plus,
-  Edit,
-  Trash2,
-  Search,
-  Loader2,
-} from "lucide-react";
+import { Plus, Edit, Trash2, Search, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import PromotionService from "../../../services/PromotionService";
@@ -76,14 +70,14 @@ const PromotionPage = () => {
         </div>
         <button
           onClick={() => navigate("/admin/promotions/create")}
-          className="inline-flex items-center px-5 py-3 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition shadow-sm whitespace-nowrap"
+          className="inline-flex items-center px-5 py-3 bg-indigo-600 text-white text-sm font-semibold rounded-[5px] hover:bg-indigo-700 transition shadow-sm whitespace-nowrap"
         >
           <Plus className="w-4 h-4 mr-2" />
           Tạo Mã Mới
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
@@ -119,17 +113,12 @@ const PromotionPage = () => {
                 ))
               ) : filtered.length > 0 ? (
                 filtered.map((promo) => (
-                  <tr
-                    key={promo.id}
-                    className="hover:bg-gray-50/50 transition"
-                  >
+                  <tr key={promo.id} className="hover:bg-gray-50/50 transition">
                     <td className="py-4 px-6">
                       <div className="font-bold text-gray-900">
                         {promo.code}
                       </div>
-                      <div className="text-sm text-gray-500">
-                        {promo.name}
-                      </div>
+                      <div className="text-sm text-gray-500">{promo.name}</div>
                     </td>
                     <td className="py-4 px-6 text-center font-bold text-indigo-600">
                       {promo.type === "percent"
@@ -180,7 +169,9 @@ const PromotionPage = () => {
                     <td className="py-4 px-6 text-right">
                       <div className="flex items-center justify-end gap-2">
                         <button
-                          onClick={() => navigate(`/admin/promotions/edit/${promo.id}`)}
+                          onClick={() =>
+                            navigate(`/admin/promotions/edit/${promo.id}`)
+                          }
                           className="p-2 text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition"
                         >
                           <Edit className="w-4 h-4" />

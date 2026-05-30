@@ -82,7 +82,7 @@ const VNPayCallback = () => {
               </div>
               <button
                 onClick={() => navigate("/checkout")}
-                className="w-full bg-black text-white py-4 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-gray-800 transition-all"
+                className="w-full bg-black text-white py-4 rounded-xl font-black text-sm uppercase tracking-widest hover:bg-gray-800 transition-all"
               >
                 Trở lại thanh toán
               </button>

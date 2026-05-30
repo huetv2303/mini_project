@@ -71,7 +71,7 @@ const CommonAttributesSection = ({
     <div className="bg-white rounded-lg p-4 md:p-6 border border-gray-100 shadow-lg shadow-black/5 space-y-8">
       <div className="flex items-center justify-between border-b border-gray-50 ">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center">
+          <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
             <Tag className="w-5 h-5 text-blue-500" />
           </div>
           <h2 className="text-xl font-bold text-gray-900">
@@ -109,7 +109,7 @@ const CommonAttributesSection = ({
       </div>
 
       {activeCategory && (
-        <div className="flex flex-wrap gap-1.5 p-3 bg-indigo-50/30 rounded-2xl border border-indigo-100/50 animate-in fade-in zoom-in-95 duration-200 mt-2">
+        <div className="flex flex-wrap gap-1.5 p-3 bg-indigo-50/30 rounded-xl border border-indigo-100/50 animate-in fade-in zoom-in-95 duration-200 mt-2">
           {ATTRIBUTE_SUGGESTIONS.find(
             (c) => c.name === activeCategory,
           )?.values.map((val) => (

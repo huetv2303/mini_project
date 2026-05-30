@@ -20,7 +20,7 @@ import toast from "react-hot-toast";
 
 export default function ChatbotWidget() {
   const { isAuthenticated, user } = useAuth();
-  
+
   const [isOpen, setIsOpen] = useState(false);
   const [chatMode, setChatMode] = useState("ai"); // "ai" or "human"
 
@@ -33,23 +33,33 @@ export default function ChatbotWidget() {
     // Chỉ kéo bằng chuột trái
     if (e.button !== 0) return;
     // Bỏ qua nếu nhấn vào nút bấm, link hoặc input để giữ nguyên hành vi click mặc định
-    if (e.target.closest("button") || e.target.closest("a") || e.target.closest("input")) return;
+    if (
+      e.target.closest("button") ||
+      e.target.closest("a") ||
+      e.target.closest("input")
+    )
+      return;
 
     setIsDragging(true);
     setDragStart({
       x: e.clientX - position.x,
-      y: e.clientY - position.y
+      y: e.clientY - position.y,
     });
     e.preventDefault();
   };
 
   const handleTouchStart = (e) => {
-    if (e.target.closest("button") || e.target.closest("a") || e.target.closest("input")) return;
+    if (
+      e.target.closest("button") ||
+      e.target.closest("a") ||
+      e.target.closest("input")
+    )
+      return;
     const touch = e.touches[0];
     setIsDragging(true);
     setDragStart({
       x: touch.clientX - position.x,
-      y: touch.clientY - position.y
+      y: touch.clientY - position.y,
     });
   };
 
@@ -59,7 +69,7 @@ export default function ChatbotWidget() {
     const handleMouseMove = (e) => {
       setPosition({
         x: e.clientX - dragStart.x,
-        y: e.clientY - dragStart.y
+        y: e.clientY - dragStart.y,
       });
     };
 
@@ -71,7 +81,7 @@ export default function ChatbotWidget() {
       const touch = e.touches[0];
       setPosition({
         x: touch.clientX - dragStart.x,
-        y: touch.clientY - dragStart.y
+        y: touch.clientY - dragStart.y,
       });
     };
 
@@ -91,7 +101,7 @@ export default function ChatbotWidget() {
       window.removeEventListener("touchend", handleTouchEnd);
     };
   }, [isDragging, dragStart]);
-  
+
   // AI Chat Messages
   const [aiMessages, setAiMessages] = useState([
     {
@@ -147,9 +157,11 @@ export default function ChatbotWidget() {
         const response = await apiClient.get("/support/messages");
         const history = response.data;
         setHumanMessages(history);
-        
+
         // Đếm tin nhắn chưa đọc từ phía admin
-        const unread = history.filter(m => !m.is_read && m.sender_id !== user.id).length;
+        const unread = history.filter(
+          (m) => !m.is_read && m.sender_id !== user.id,
+        ).length;
         setUnreadCount(unread);
       } catch (error) {
         console.warn("Failed to load initial support messages:", error);
@@ -165,7 +177,9 @@ export default function ChatbotWidget() {
   useEffect(() => {
     if (isOpen && chatMode === "human" && isAuthenticated && user) {
       setUnreadCount(0);
-      apiClient.post(`/support/conversations/${user.id}/read`).catch(console.error);
+      apiClient
+        .post(`/support/conversations/${user.id}/read`)
+        .catch(console.error);
     }
   }, [isOpen, chatMode, isAuthenticated, user]);
 
@@ -175,8 +189,9 @@ export default function ChatbotWidget() {
 
     const channelName = `user.${user.id}`;
     console.log(`Customer subscribing globally to channel: ${channelName}`);
-    
-    const channel = echo.private(channelName)
+
+    const channel = echo
+      .private(channelName)
       .stopListening(".support.message.sent")
       .listen(".support.message.sent", (data) => {
         const incomingMsg = data.message;
@@ -194,14 +209,18 @@ export default function ChatbotWidget() {
         if (isFromAdmin) {
           // Nếu đang mở khu chat và đang xem tab tư vấn viên
           if (isOpen && chatMode === "human") {
-            apiClient.post(`/support/conversations/${user.id}/read`).catch(console.error);
+            apiClient
+              .post(`/support/conversations/${user.id}/read`)
+              .catch(console.error);
           } else {
             // Tăng số tin chưa đọc lên 1
             setUnreadCount((prev) => prev + 1);
 
             // Phát âm thanh chime thông báo
             try {
-              const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+              const audioCtx = new (
+                window.AudioContext || window.webkitAudioContext
+              )();
               const osc = audioCtx.createOscillator();
               const gain = audioCtx.createGain();
               osc.connect(gain);
@@ -209,11 +228,17 @@ export default function ChatbotWidget() {
               osc.type = "sine";
               osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
               gain.gain.setValueAtTime(0, audioCtx.currentTime);
-              gain.gain.linearRampToValueAtTime(0.15, audioCtx.currentTime + 0.05);
-              gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+              gain.gain.linearRampToValueAtTime(
+                0.15,
+                audioCtx.currentTime + 0.05,
+              );
+              gain.gain.exponentialRampToValueAtTime(
+                0.001,
+                audioCtx.currentTime + 0.4,
+              );
               osc.start(audioCtx.currentTime);
               osc.stop(audioCtx.currentTime + 0.4);
-              
+
               setTimeout(() => {
                 const osc2 = audioCtx.createOscillator();
                 const gain2 = audioCtx.createGain();
@@ -222,8 +247,14 @@ export default function ChatbotWidget() {
                 osc2.type = "sine";
                 osc2.frequency.setValueAtTime(880, audioCtx.currentTime); // A5
                 gain2.gain.setValueAtTime(0, audioCtx.currentTime);
-                gain2.gain.linearRampToValueAtTime(0.15, audioCtx.currentTime + 0.05);
-                gain2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+                gain2.gain.linearRampToValueAtTime(
+                  0.15,
+                  audioCtx.currentTime + 0.05,
+                );
+                gain2.gain.exponentialRampToValueAtTime(
+                  0.001,
+                  audioCtx.currentTime + 0.5,
+                );
                 osc2.start(audioCtx.currentTime);
                 osc2.stop(audioCtx.currentTime + 0.5);
               }, 80);
@@ -231,14 +262,20 @@ export default function ChatbotWidget() {
 
             // Hiển thị toast thông báo nổi tiếng Việt đẹp mắt
             toast.success(
-              <div onClick={() => { setIsOpen(true); setChatMode("human"); }} className="cursor-pointer">
+              <div
+                onClick={() => {
+                  setIsOpen(true);
+                  setChatMode("human");
+                }}
+                className="cursor-pointer"
+              >
                 <strong>Tư vấn viên Trendora đã trả lời:</strong>
                 <p className="text-xs truncate">{incomingMsg.message}</p>
               </div>,
               {
                 duration: 4000,
                 icon: "💬",
-              }
+              },
             );
           }
         }
@@ -281,7 +318,8 @@ export default function ChatbotWidget() {
         ...prev,
         {
           role: "model",
-          content: "Xin lỗi, hệ thống đang bận. Anh/chị vui lòng thử lại sau nhé! 💚",
+          content:
+            "Xin lỗi, hệ thống đang bận. Anh/chị vui lòng thử lại sau nhé! 💚",
         },
       ]);
     } finally {
@@ -382,16 +420,18 @@ export default function ChatbotWidget() {
       <div
         style={{
           transform: `translate(${position.x}px, ${position.y}px)`,
-          transition: isDragging ? "none" : "transform 0.15s ease, scale 0.3s ease, opacity 0.3s ease, translate 0.3s ease",
+          transition: isDragging
+            ? "none"
+            : "transform 0.15s ease, scale 0.3s ease, opacity 0.3s ease, translate 0.3s ease",
         }}
         className={`${
           isOpen
             ? "scale-100 opacity-100 translate-y-0"
             : "scale-95 opacity-0 translate-y-10 pointer-events-none"
-        } origin-bottom-right absolute bottom-0 right-0 w-[380px] max-w-[calc(100vw-32px)] h-[600px] max-h-[calc(100vh-100px)] bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col border border-gray-100`}
+        } origin-bottom-right absolute bottom-0 right-0 w-[380px] max-w-[calc(100vw-32px)] h-[600px] max-h-[calc(100vh-100px)] bg-white rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col border border-gray-100`}
       >
         {/* Header */}
-        <div 
+        <div
           onMouseDown={handleMouseDown}
           onTouchStart={handleTouchStart}
           className={`bg-gradient-to-r from-green-600 to-emerald-500 p-3 shadow-md relative overflow-hidden flex-shrink-0 cursor-grab ${
@@ -410,7 +450,8 @@ export default function ChatbotWidget() {
               </div>
               <div>
                 <h3 className="font-bold text-white text-sm flex items-center gap-1">
-                  Trendora Support <Sparkles size={12} className="text-yellow-300" />
+                  Trendora Support{" "}
+                  <Sparkles size={12} className="text-yellow-300" />
                 </h3>
               </div>
             </div>
@@ -478,7 +519,7 @@ export default function ChatbotWidget() {
 
                     {/* Bubble */}
                     <div
-                      className={`p-3 rounded-2xl shadow-sm text-sm leading-relaxed ${
+                      className={`p-3 rounded-xl shadow-sm text-sm leading-relaxed ${
                         msg.role === "user"
                           ? "bg-green-600 text-white rounded-br-sm"
                           : "bg-white text-gray-800 border border-gray-100 rounded-bl-sm"
@@ -502,7 +543,7 @@ export default function ChatbotWidget() {
                           <div className="h-[140px] bg-gray-100 overflow-hidden">
                             {prod.feature_image ? (
                               <img
-                                src={`http://localhost:8000/storage/${prod.feature_image}`}
+                                src={`${import.meta.env.VITE_URL_IMAGE}/${prod.feature_image}`}
                                 alt={prod.name}
                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                               />
@@ -533,7 +574,7 @@ export default function ChatbotWidget() {
                   <div className="flex-shrink-0 w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
                     <Bot size={16} className="text-green-600 animate-spin" />
                   </div>
-                  <div className="bg-white border border-gray-100 p-4 rounded-2xl rounded-bl-sm shadow-sm flex items-center gap-1">
+                  <div className="bg-white border border-gray-100 p-4 rounded-xl rounded-bl-sm shadow-sm flex items-center gap-1">
                     <span className="w-2 h-2 bg-green-400 rounded-full animate-bounce"></span>
                     <span className="w-2 h-2 bg-green-400 rounded-full animate-bounce delay-75"></span>
                     <span className="w-2 h-2 bg-green-400 rounded-full animate-bounce delay-150"></span>
@@ -550,9 +591,12 @@ export default function ChatbotWidget() {
                   <div className="bg-emerald-50 p-4 rounded-full text-emerald-600 mb-4 shadow-inner">
                     <Headphones size={40} className="animate-bounce" />
                   </div>
-                  <h4 className="font-bold text-gray-800 text-base mb-2">Đăng nhập để gặp Tư Vấn Viên</h4>
+                  <h4 className="font-bold text-gray-800 text-base mb-2">
+                    Đăng nhập để gặp Tư Vấn Viên
+                  </h4>
                   <p className="text-xs text-gray-500 leading-relaxed mb-6 font-medium">
-                    Nhằm nâng cao chất lượng tư vấn và theo dõi đơn hàng dễ dàng, vui lòng đăng nhập tài khoản của bạn.
+                    Nhằm nâng cao chất lượng tư vấn và theo dõi đơn hàng dễ
+                    dàng, vui lòng đăng nhập tài khoản của bạn.
                   </p>
                   <button
                     onClick={() => {
@@ -569,18 +613,24 @@ export default function ChatbotWidget() {
                   {isHumanLoading ? (
                     <div className="flex flex-col items-center justify-center h-full py-20 gap-2">
                       <Loader2 className="w-8 h-8 text-green-600 animate-spin" />
-                      <p className="text-xs text-gray-400 font-medium">Đang kết nối...</p>
+                      <p className="text-xs text-gray-400 font-medium">
+                        Đang kết nối...
+                      </p>
                     </div>
                   ) : humanMessages.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-20 text-center text-gray-400 my-auto">
                       <Headphones className="w-12 h-12 text-gray-200 mb-2" />
-                      <p className="text-xs font-semibold">Chưa có tin nhắn hỗ trợ</p>
-                      <p className="text-[11px] text-gray-400 mt-1 max-w-[200px]">Gửi lời chào đầu tiên để đội ngũ tư vấn hỗ trợ nhé!</p>
+                      <p className="text-xs font-semibold">
+                        Chưa có tin nhắn hỗ trợ
+                      </p>
+                      <p className="text-[11px] text-gray-400 mt-1 max-w-[200px]">
+                        Gửi lời chào đầu tiên để đội ngũ tư vấn hỗ trợ nhé!
+                      </p>
                     </div>
                   ) : (
                     humanMessages.map((msg) => {
                       const isMe = msg.sender_id === user.id;
-                      
+
                       return (
                         <div
                           key={msg.id}
@@ -594,7 +644,9 @@ export default function ChatbotWidget() {
                             {/* Avatar */}
                             <div
                               className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center shadow-sm ${
-                                isMe ? "bg-green-600 text-white" : "bg-emerald-50 text-emerald-600"
+                                isMe
+                                  ? "bg-green-600 text-white"
+                                  : "bg-emerald-50 text-emerald-600"
                               }`}
                             >
                               {isMe ? (
@@ -606,7 +658,7 @@ export default function ChatbotWidget() {
 
                             {/* Bubble */}
                             <div
-                              className={`p-3 rounded-2xl shadow-sm text-sm leading-relaxed ${
+                              className={`p-3 rounded-xl shadow-sm text-sm leading-relaxed ${
                                 isMe
                                   ? "bg-green-600 text-white rounded-br-sm"
                                   : "bg-white text-gray-800 border border-gray-100 rounded-bl-sm"
@@ -615,22 +667,26 @@ export default function ChatbotWidget() {
                               <p className="font-semibold">{msg.message}</p>
                             </div>
                           </div>
-                          
+
                           {/* Timestamp and ticks */}
-                          <div className={`flex items-center gap-0.5 text-[9px] text-gray-400 font-semibold mt-1 ${isMe ? "mr-1" : "ml-10"}`}>
+                          <div
+                            className={`flex items-center gap-0.5 text-[9px] text-gray-400 font-semibold mt-1 ${isMe ? "mr-1" : "ml-10"}`}
+                          >
                             <span>
-                              {new Date(msg.created_at).toLocaleTimeString("vi-VN", {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })}
+                              {new Date(msg.created_at).toLocaleTimeString(
+                                "vi-VN",
+                                {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                },
+                              )}
                             </span>
-                            {isMe && (
-                              msg.is_read ? (
+                            {isMe &&
+                              (msg.is_read ? (
                                 <CheckCheck className="w-3.5 h-3.5 text-green-500" />
                               ) : (
                                 <Check className="w-3.5 h-3.5 text-gray-300" />
-                              )
-                            )}
+                              ))}
                           </div>
                         </div>
                       );
@@ -645,7 +701,9 @@ export default function ChatbotWidget() {
 
         {/* Khung nhập tin nhắn */}
         <form
-          onSubmit={chatMode === "ai" ? handleSendAiMessage : handleSendHumanMessage}
+          onSubmit={
+            chatMode === "ai" ? handleSendAiMessage : handleSendHumanMessage
+          }
           className="p-3 bg-white border-t border-gray-100 flex-shrink-0"
         >
           {chatMode === "ai" || isAuthenticated ? (
@@ -654,9 +712,15 @@ export default function ChatbotWidget() {
                 type="text"
                 value={chatMode === "ai" ? aiInputValue : humanInputValue}
                 onChange={(e) =>
-                  chatMode === "ai" ? setAiInputValue(e.target.value) : setHumanInputValue(e.target.value)
+                  chatMode === "ai"
+                    ? setAiInputValue(e.target.value)
+                    : setHumanInputValue(e.target.value)
                 }
-                placeholder={chatMode === "ai" ? "Hỏi Trendora AI..." : "Chat với tư vấn viên..."}
+                placeholder={
+                  chatMode === "ai"
+                    ? "Hỏi Trendora AI..."
+                    : "Chat với tư vấn viên..."
+                }
                 className="flex-1 bg-transparent px-4 py-2 outline-none text-[15px] placeholder-gray-400 font-semibold text-slate-800"
                 disabled={chatMode === "ai" ? isAiLoading : isSendingHuman}
               />
@@ -680,10 +744,12 @@ export default function ChatbotWidget() {
             </div>
           ) : (
             <div className="text-center py-2 bg-slate-50 rounded-xl border border-slate-100">
-              <p className="text-xs text-gray-400 font-medium">Vui lòng đăng nhập để gửi tin nhắn</p>
+              <p className="text-xs text-gray-400 font-medium">
+                Vui lòng đăng nhập để gửi tin nhắn
+              </p>
             </div>
           )}
-          
+
           <div className="text-center mt-2 flex justify-center items-center gap-1">
             <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-ping"></span>
             <p className="text-[10px] text-gray-400 font-semibold">

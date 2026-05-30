@@ -141,8 +141,11 @@ const Profile = () => {
       <div className="bg-[#f8fafc] pt-32 pb-24 min-h-screen text-left">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           {/* Breadcrumbs */}
-          <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-10 bg-white px-5 py-3 rounded-2xl border border-slate-100 shadow-sm w-fit">
-            <Link to="/" className="hover:text-sky-600 transition-colors flex items-center gap-1">
+          <div className="flex items-center gap-2 text-[13px] font-medium text-slate-600  mb-6 bg-white px-5 py-3 rounded-xl border border-slate-100 shadow-sm w-fit">
+            <Link
+              to="/"
+              className="hover:text-sky-600 transition-colors flex items-center gap-1"
+            >
               <Home size={13} className="text-slate-400" />
               Trang chủ
             </Link>
@@ -189,7 +192,7 @@ const Profile = () => {
                     <button
                       type="button"
                       onClick={() => fileInputRef.current.click()}
-                      className="absolute bottom-1 right-1 w-10 h-10 bg-sky-600 hover:bg-sky-700 text-white rounded-2xl shadow-md shadow-sky-500/10 flex items-center justify-center transition-all active:scale-90"
+                      className="absolute bottom-1 right-1 w-10 h-10 bg-sky-600 hover:bg-sky-700 text-white rounded-xl shadow-md shadow-sky-500/10 flex items-center justify-center transition-all active:scale-90"
                     >
                       <Camera size={16} />
                     </button>
@@ -198,12 +201,13 @@ const Profile = () => {
                   <h2 className="text-xl font-black text-slate-800 uppercase tracking-tight mb-1">
                     {user?.name}
                   </h2>
-                  <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-6">
-                    Tham gia ngày {new Date(user?.created_at).toLocaleDateString("vi-VN")}
+                  <p className="text-xs text-slate-600 font-medium mb-6">
+                    Tham gia ngày{" "}
+                    {new Date(user?.created_at).toLocaleDateString("vi-VN")}
                   </p>
 
                   <div className="flex items-center justify-center">
-                    <div className="text-center px-4 py-1.5 bg-sky-50 text-sky-600 rounded-full border border-sky-100/50 text-[10px] font-black uppercase tracking-widest">
+                    <div className="text-center px-4 py-1.5 bg-sky-50 text-sky-600 rounded-full border border-sky-100/50 text-[13px] font-medium">
                       Hạng: {user?.customer_profile?.loyalty_tier || "Thường"}
                     </div>
                   </div>
@@ -212,28 +216,28 @@ const Profile = () => {
 
               {/* Stats Card */}
               <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm space-y-4">
-                <div className="flex items-center gap-4 p-3 hover:bg-slate-50 rounded-2xl transition-colors group">
+                <div className="flex items-center gap-4 p-3 hover:bg-slate-50 rounded-xl transition-colors group">
                   <div className="w-12 h-12 bg-sky-50 text-sky-600 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform flex-shrink-0">
                     <Package size={20} />
                   </div>
                   <div>
-                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5 text-left">
+                    <p className="text-[13px] font-medium text-slate-800  mb-0.5 text-left">
                       Tổng đơn hàng
                     </p>
-                    <p className="text-lg font-black text-slate-800 text-left">
+                    <p className="text-lg font-medium text-slate-800 text-left">
                       {user?.customer_profile?.total_orders || 0}
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4 p-3 hover:bg-slate-50 rounded-2xl transition-colors group border-t border-slate-50 pt-4">
+                <div className="flex items-center gap-4 p-3 hover:bg-slate-50 rounded-xl transition-colors group border-t border-slate-50 pt-4">
                   <div className="w-12 h-12 bg-emerald-50 text-emerald-500 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform flex-shrink-0">
                     <CreditCard size={20} />
                   </div>
                   <div>
-                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5 text-left">
+                    <p className="text-[13px] font-medium text-slate-800  mb-0.5 text-left">
                       Tổng đã thanh toán
                     </p>
-                    <p className="text-lg font-black text-slate-800 text-left">
+                    <p className="text-lg font-medium text-slate-800 text-left">
                       {new Intl.NumberFormat("vi-VN").format(
                         user?.customer_profile?.total_spent || 0,
                       )}
@@ -249,14 +253,14 @@ const Profile = () => {
               {/* Profile Details Form */}
               <div className="bg-white rounded-3xl border border-slate-100 p-6 md:p-8 shadow-sm">
                 <div className="flex items-center gap-4 mb-8">
-                  <div className="w-12 h-12 bg-sky-600 text-white rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md shadow-sky-500/10">
+                  <div className="w-12 h-12 bg-sky-600 text-white rounded-xl flex items-center justify-center flex-shrink-0 shadow-md shadow-sky-500/10">
                     <User size={20} />
                   </div>
                   <div>
-                    <h3 className="text-base font-black text-slate-800 uppercase tracking-tight">
+                    <h3 className="text-base font-medium text-slate-800 ">
                       Thông tin cá nhân
                     </h3>
-                    <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-0.5">
+                    <p className="text-xs text-slate-400 font-medium mt-0.5">
                       Cập nhật đầy đủ để nhận nhiều ưu đãi mua sắm hơn
                     </p>
                   </div>
@@ -266,7 +270,7 @@ const Profile = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Full Name */}
                     <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">
+                      <label className="text-[13px] font-medium text-slate-800">
                         Họ và tên
                       </label>
                       <div className="relative group">
@@ -281,14 +285,14 @@ const Profile = () => {
                           onChange={(e) =>
                             setFormData({ ...formData, name: e.target.value })
                           }
-                          className="w-full h-12 bg-slate-50 border border-slate-100 rounded-2xl pl-11 pr-4 text-xs font-bold text-slate-700 outline-none focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
+                          className="w-full h-12 bg-slate-50 border border-slate-100 rounded-xl pl-11 pr-4 text-xs font-bold text-slate-700 outline-none focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                         />
                       </div>
                     </div>
 
                     {/* Email (Disabled) */}
                     <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">
+                      <label className="text-[13px] font-medium text-slate-800">
                         Địa chỉ Email
                       </label>
                       <div className="relative">
@@ -300,14 +304,14 @@ const Profile = () => {
                           type="email"
                           disabled
                           value={user?.email}
-                          className="w-full h-12 bg-slate-100 border border-slate-150 rounded-2xl pl-11 pr-4 text-xs font-bold text-slate-400 cursor-not-allowed"
+                          className="w-full h-12 bg-slate-100 border border-slate-150 rounded-xl pl-11 pr-4 text-xs font-bold text-slate-400 cursor-not-allowed"
                         />
                       </div>
                     </div>
 
                     {/* Phone */}
                     <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">
+                      <label className="text-[13px] font-medium text-slate-800">
                         Số điện thoại
                       </label>
                       <div className="relative group">
@@ -321,14 +325,14 @@ const Profile = () => {
                           onChange={(e) =>
                             setFormData({ ...formData, phone: e.target.value })
                           }
-                          className="w-full h-12 bg-slate-50 border border-slate-100 rounded-2xl pl-11 pr-4 text-xs font-bold text-slate-700 outline-none focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
+                          className="w-full h-12 bg-slate-50 border border-slate-100 rounded-xl pl-11 pr-4 text-xs font-bold text-slate-700 outline-none focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                         />
                       </div>
                     </div>
 
                     {/* Gender Selector */}
                     <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">
+                      <label className="text-[13px] font-medium text-slate-800">
                         Giới tính
                       </label>
                       <div className="flex items-center gap-2">
@@ -339,7 +343,7 @@ const Profile = () => {
                             onClick={() =>
                               setFormData({ ...formData, gender: g })
                             }
-                            className={`flex-1 h-12 rounded-2xl text-[10px] font-black uppercase tracking-wider transition-all border ${
+                            className={`flex-1 h-12 rounded-xl text-[13px] font-medium  transition-all border ${
                               formData.gender === g
                                 ? "bg-sky-600 text-white border-sky-600 shadow-md shadow-sky-500/10"
                                 : "bg-slate-50 text-slate-500 border-slate-100 hover:bg-slate-100"
@@ -357,7 +361,7 @@ const Profile = () => {
 
                     {/* Date of Birth */}
                     <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">
+                      <label className="text-[13px] font-medium text-slate-800">
                         Ngày sinh
                       </label>
                       <div className="relative group">
@@ -374,7 +378,7 @@ const Profile = () => {
                               date_of_birth: e.target.value,
                             })
                           }
-                          className="w-full h-12 bg-slate-50 border border-slate-100 rounded-2xl pl-11 pr-4 text-xs font-bold text-slate-700 outline-none focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
+                          className="w-full h-12 bg-slate-50 border border-slate-100 rounded-xl pl-11 pr-4 text-xs font-bold text-slate-700 outline-none focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                         />
                       </div>
                     </div>
@@ -382,7 +386,7 @@ const Profile = () => {
 
                   {/* Address */}
                   <div className="space-y-2 pt-4 border-t border-slate-50">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">
+                    <label className="text-[13px] font-medium text-slate-800">
                       Địa chỉ nhận hàng mặc định
                     </label>
                     <div className="relative group">
@@ -397,7 +401,7 @@ const Profile = () => {
                         onChange={(e) =>
                           setFormData({ ...formData, address: e.target.value })
                         }
-                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl pl-11 pr-4 py-4 text-xs font-bold text-slate-700 outline-none focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all resize-none"
+                        className="w-full bg-slate-50 border border-slate-100 rounded-xl pl-11 pr-4 py-4 text-sm font-medium text-slate-700 outline-none focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all resize-none"
                       />
                     </div>
                   </div>
@@ -407,7 +411,7 @@ const Profile = () => {
                     <button
                       type="submit"
                       disabled={saving}
-                      className="group flex items-center justify-center gap-2 px-8 py-3.5 bg-sky-600 hover:bg-sky-700 text-white rounded-2xl text-xs font-black uppercase tracking-wider transition-all shadow-md shadow-sky-500/10 hover:-translate-y-0.5 active:scale-95 w-full sm:w-auto"
+                      className="group flex items-center justify-center gap-2 px-8 py-3.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-[13px] font-medium  transition-all shadow-md shadow-sky-500/10 hover:-translate-y-0.5 active:scale-95 w-full sm:w-auto"
                     >
                       {saving ? (
                         <>
@@ -416,7 +420,7 @@ const Profile = () => {
                         </>
                       ) : (
                         <>
-                          LƯU THAY ĐỔI
+                          Lưu thay đổi
                           <Save
                             size={14}
                             className="group-hover:scale-105 transition-transform"
@@ -431,14 +435,16 @@ const Profile = () => {
               {/* Password Section */}
               <div className="bg-white rounded-3xl border border-slate-100 p-6 md:p-8 shadow-sm">
                 <div className="flex items-center gap-4 mb-8">
-                  <div className="w-12 h-12 bg-sky-600 text-white rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md shadow-sky-500/10">
+                  <div className="w-12 h-12 bg-sky-600 text-white rounded-xl flex items-center justify-center flex-shrink-0 shadow-md shadow-sky-500/10">
                     <Lock size={20} />
                   </div>
                   <div>
-                    <h3 className="text-base font-black text-slate-800 uppercase tracking-tight">
-                      {user?.has_password ? "Đổi mật khẩu" : "Thiết lập mật khẩu"}
+                    <h3 className="text-[13px] font-medium text-slate-800 ">
+                      {user?.has_password
+                        ? "Đổi mật khẩu"
+                        : "Thiết lập mật khẩu"}
                     </h3>
-                    <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-0.5">
+                    <p className="text-[13px] text-slate-400  mt-0.5">
                       {user?.has_password
                         ? "Thay đổi mật khẩu định kỳ giúp bảo vệ tài khoản tốt hơn"
                         : "Thiết lập mật khẩu để đăng nhập trực tiếp bằng email"}
@@ -451,7 +457,7 @@ const Profile = () => {
                     {/* Old Password */}
                     {user?.has_password && (
                       <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">
+                        <label className="text-[13px] font-medium text-slate-800">
                           Mật khẩu hiện tại
                         </label>
                         <div className="relative group">
@@ -469,14 +475,18 @@ const Profile = () => {
                                 old_password: e.target.value,
                               })
                             }
-                            className="w-full h-12 bg-slate-50 border border-slate-100 rounded-2xl pl-11 pr-11 text-xs font-bold text-slate-700 outline-none focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
+                            className="w-full h-12 bg-slate-50 border border-slate-100 rounded-xl pl-11 pr-11 text-xs font-bold text-slate-700 outline-none focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                           />
                           <button
                             type="button"
                             onClick={() => setShowOldPassword(!showOldPassword)}
                             className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
                           >
-                            {showOldPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                            {showOldPassword ? (
+                              <EyeOff size={16} />
+                            ) : (
+                              <Eye size={16} />
+                            )}
                           </button>
                         </div>
                       </div>
@@ -486,7 +496,7 @@ const Profile = () => {
 
                     {/* New Password */}
                     <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">
+                      <label className="text-[13px] font-medium text-slate-800">
                         Mật khẩu mới
                       </label>
                       <div className="relative group">
@@ -504,21 +514,25 @@ const Profile = () => {
                               password: e.target.value,
                             })
                           }
-                          className="w-full h-12 bg-slate-50 border border-slate-100 rounded-2xl pl-11 pr-11 text-xs font-bold text-slate-700 outline-none focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
+                          className="w-full h-12 bg-slate-50 border border-slate-100 rounded-xl pl-11 pr-11 text-xs font-bold text-slate-700 outline-none focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                         />
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
                           className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
                         >
-                          {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                          {showPassword ? (
+                            <EyeOff size={16} />
+                          ) : (
+                            <Eye size={16} />
+                          )}
                         </button>
                       </div>
                     </div>
 
                     {/* Confirm Password */}
                     <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">
+                      <label className="text-[13px] font-medium text-slate-800">
                         Xác nhận mật khẩu mới
                       </label>
                       <div className="relative group">
@@ -536,16 +550,22 @@ const Profile = () => {
                               password_confirmation: e.target.value,
                             })
                           }
-                          className="w-full h-12 bg-slate-50 border border-slate-100 rounded-2xl pl-11 pr-11 text-xs font-bold text-slate-700 outline-none focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
+                          className="w-full h-12 bg-slate-50 border border-slate-100 rounded-xl pl-11 pr-11 text-xs font-bold text-slate-700 outline-none focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                         />
                         <button
                           type="button"
                           onClick={() =>
-                            setShowPasswordConfirmation(!showPasswordConfirmation)
+                            setShowPasswordConfirmation(
+                              !showPasswordConfirmation,
+                            )
                           }
                           className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
                         >
-                          {showPasswordConfirmation ? <EyeOff size={16} /> : <Eye size={16} />}
+                          {showPasswordConfirmation ? (
+                            <EyeOff size={16} />
+                          ) : (
+                            <Eye size={16} />
+                          )}
                         </button>
                       </div>
                     </div>
@@ -555,7 +575,7 @@ const Profile = () => {
                     <button
                       type="submit"
                       disabled={passwordSaving}
-                      className="group flex items-center justify-center gap-2 px-8 py-3.5 bg-sky-600 hover:bg-sky-700 text-white rounded-2xl text-xs font-black uppercase tracking-wider transition-all shadow-md shadow-sky-500/10 hover:-translate-y-0.5 active:scale-95 w-full sm:w-auto"
+                      className="group flex items-center justify-center gap-2 px-8 py-3.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-md shadow-sky-500/10 hover:-translate-y-0.5 active:scale-95 w-full sm:w-auto"
                     >
                       {passwordSaving ? (
                         <>
@@ -564,7 +584,9 @@ const Profile = () => {
                         </>
                       ) : (
                         <>
-                          {user?.has_password ? "ĐỔI MẬT KHẨU" : "THIẾT LẬP MẬT KHẨU"}
+                          {user?.has_password
+                            ? "ĐỔI MẬT KHẨU"
+                            : "THIẾT LẬP MẬT KHẨU"}
                           <Save
                             size={14}
                             className="group-hover:scale-105 transition-transform"

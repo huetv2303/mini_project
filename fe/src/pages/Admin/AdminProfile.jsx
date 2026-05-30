@@ -110,7 +110,7 @@ const AdminProfile = () => {
     <AdminLayout>
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Profile Info Card */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="h-32 bg-gradient-to-r from-indigo-600 to-purple-600"></div>
           <div className="px-8 pb-8">
             <div className="relative flex justify-between items-end -mt-12 mb-6">
@@ -122,7 +122,7 @@ const AdminProfile = () => {
                   accept="image/*"
                   onChange={handleImageChange}
                 />
-                <div className="w-32 h-32 rounded-2xl bg-white p-1 shadow-xl">
+                <div className="w-32 h-32 rounded-xl bg-white p-1 shadow-xl">
                   <div className="w-full h-full rounded-xl bg-gray-100 overflow-hidden relative">
                     {previewImage ? (
                       <img
@@ -230,7 +230,7 @@ const AdminProfile = () => {
         {/* Password Card */}
         <div
           id="password-section"
-          className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8"
+          className="bg-white rounded-xl shadow-sm border border-gray-100 p-8"
         >
           <div className="flex items-center gap-4 mb-8">
             <div className="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center">

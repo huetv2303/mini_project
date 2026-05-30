@@ -220,7 +220,7 @@ const PromotionFormPage = () => {
         <div className="flex items-center gap-4 mb-8">
           <button
             onClick={() => navigate("/admin/promotions")}
-            className="p-3 bg-white border border-gray-100 rounded-2xl hover:bg-gray-50 transition-all shadow-sm group"
+            className="p-3 bg-white border border-gray-100 rounded-xl hover:bg-gray-50 transition-all shadow-sm group"
           >
             <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
           </button>
@@ -236,7 +236,7 @@ const PromotionFormPage = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           <form onSubmit={handleSubmit} className="p-8 space-y-8">
             {/* Row 1 */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -352,7 +352,7 @@ const PromotionFormPage = () => {
             </div>
 
             {/* Row 3: Scope and Channel */}
-            <div className="bg-indigo-50/50 p-6 rounded-2xl border border-indigo-100">
+            <div className="bg-indigo-50/50 p-6 rounded-xl border border-indigo-100">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-semibold text-indigo-900 mb-2">

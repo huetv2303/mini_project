@@ -186,58 +186,67 @@ const ProductDetail = () => {
     );
   }
 
-  // Get gallery images
-  const fallbackImage =
-    "https://placehold.co/600x600/e2e8f0/475569?text=No+Image";
-  const images =
-    product.images?.length > 0
-      ? product.images.map((img) => img.url)
-      : product.image
-        ? [getImageUrl(product.image)]
-        : [fallbackImage];
-
   // Helper to check if a color+size combination exists in variants
   const isColorAvailable = (color, size) => {
     if (!product || !product.variants) return false;
+
+    const hasColorAttrs = availableColors.length > 0;
+    const hasSizeAttrs = availableSizes.length > 0;
+
     return product.variants.some((v) => {
-      const cMatch = v.attributes?.some((a) => {
-        const n = a.attribute_name?.toLowerCase() || "";
-        return (
-          (n.includes("color") || n.includes("màu") || n.includes("mầu")) &&
-          a.attribute_value === color
-        );
-      });
-      const sMatch = v.attributes?.some((a) => {
-        const n = a.attribute_name?.toLowerCase() || "";
-        return (
-          (n.includes("size") || n.includes("kích") || n.includes("cỡ")) &&
-          a.attribute_value === size
-        );
-      });
+      // If product has color options, match the color. Otherwise, assume match.
+      const cMatch =
+        !hasColorAttrs ||
+        v.attributes?.some((a) => {
+          const n = a.attribute_name?.toLowerCase() || "";
+          return (
+            (n.includes("color") || n.includes("màu") || n.includes("mầu")) &&
+            a.attribute_value === color
+          );
+        });
+
+      // If product has size options, match the size. Otherwise, assume match.
+      const sMatch =
+        !hasSizeAttrs ||
+        v.attributes?.some((a) => {
+          const n = a.attribute_name?.toLowerCase() || "";
+          return (
+            (n.includes("size") || n.includes("kích") || n.includes("cỡ")) &&
+            a.attribute_value === size
+          );
+        });
+
       return cMatch && sMatch;
     });
   };
 
   const activeVariant =
     product?.variants?.find((v) => {
-      const colorMatch = v.attributes?.some((a) => {
-        const attrName = a.attribute_name?.toLowerCase() || "";
-        return (
-          (attrName.includes("color") ||
-            attrName.includes("màu") ||
-            attrName.includes("mầu")) &&
-          a.attribute_value === selectedColor
-        );
-      });
-      const sizeMatch = v.attributes?.some((a) => {
-        const attrName = a.attribute_name?.toLowerCase() || "";
-        return (
-          (attrName.includes("size") ||
-            attrName.includes("kích") ||
-            attrName.includes("cỡ")) &&
-          a.attribute_value === selectedSize
-        );
-      });
+      const hasColorAttrs = availableColors.length > 0;
+      const hasSizeAttrs = availableSizes.length > 0;
+
+      const colorMatch =
+        !hasColorAttrs ||
+        v.attributes?.some((a) => {
+          const attrName = a.attribute_name?.toLowerCase() || "";
+          return (
+            (attrName.includes("color") ||
+              attrName.includes("màu") ||
+              attrName.includes("mầu")) &&
+            a.attribute_value === selectedColor
+          );
+        });
+      const sizeMatch =
+        !hasSizeAttrs ||
+        v.attributes?.some((a) => {
+          const attrName = a.attribute_name?.toLowerCase() || "";
+          return (
+            (attrName.includes("size") ||
+              attrName.includes("kích") ||
+              attrName.includes("cỡ")) &&
+            a.attribute_value === selectedSize
+          );
+        });
       return colorMatch && sizeMatch;
     }) || product?.variants?.[0];
 
@@ -246,9 +255,41 @@ const ProductDetail = () => {
     !activeVariant.inventory ||
     activeVariant.inventory.available <= 0;
 
+  // Get gallery images
+  const fallbackImage =
+    "https://placehold.co/600x600/e2e8f0/475569?text=No+Image";
+
+  const variantImage = activeVariant?.image
+    ? getImageUrl(activeVariant.image)
+    : null;
+  const images = [];
+
+  if (variantImage) {
+    images.push(variantImage);
+  }
+
+  if (product.images && product.images.length > 0) {
+    product.images.forEach((img) => {
+      const imgUrl = getImageUrl(img.url);
+      if (imgUrl !== variantImage) {
+        images.push(imgUrl);
+      }
+    });
+  } else if (product.image) {
+    const mainImg = getImageUrl(product.image);
+    if (mainImg !== variantImage) {
+      images.push(mainImg);
+    }
+  }
+
+  if (images.length === 0) {
+    images.push(fallbackImage);
+  }
+
   // Smart Selection Handlers
   const handleColorChange = (color) => {
     setSelectedColor(color);
+    setActiveImage(0); // Reset main image viewer to show the selected variant image
     if (!isColorAvailable(color, selectedSize)) {
       const firstValidSize = availableSizes.find((s) =>
         isColorAvailable(color, s),
@@ -259,6 +300,7 @@ const ProductDetail = () => {
 
   const handleSizeChange = (size) => {
     setSelectedSize(size);
+    setActiveImage(0); // Reset main image viewer to show the selected variant image
     if (!isColorAvailable(selectedColor, size)) {
       const firstValidColor = availableColors.find((c) =>
         isColorAvailable(c, size),
@@ -275,18 +317,18 @@ const ProductDetail = () => {
     const finalTotal = Math.max(0, subtotal - (discountAmount || 0));
 
     return (
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-4 flex-wrap bg-sky-50/50 border border-sky-100/50 p-5 rounded-xl ">
-          <span className="text-2xl font-medium text-sky-700">
+      <div className="flex flex-col gap-1">
+        <div className="flex items-center gap-3.5 flex-wrap bg-sky-50/40 border border-sky-100/30 px-4 py-3 rounded-xl ">
+          <span className="text-xl font-semibold text-sky-700">
             {formatPrice(finalTotal)}
           </span>
           {discountAmount > 0 && unitPrice > 0 && (
-            <span className="text-sm text-slate-400 line-through font-bold">
+            <span className="text-xs text-slate-400 line-through font-bold">
               {formatPrice(unitPrice * quantity)}
             </span>
           )}
           {discountAmount > 0 && (
-            <span className="px-3 py-1 bg-emerald-500 text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md shadow-emerald-500/10">
+            <span className="px-2.5 py-0.5 bg-emerald-500 text-white text-[10px] font-black uppercase tracking-wider rounded-lg shadow-md shadow-emerald-500/10">
               Tiết kiệm {formatPrice(discountAmount)}
             </span>
           )}
@@ -355,7 +397,7 @@ const ProductDetail = () => {
           />
 
           {/* Breadcrumbs */}
-          <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-10 bg-white px-5 py-3 rounded-2xl border border-slate-100 shadow-sm w-fit">
+          <div className="flex items-center gap-2 text-[13px] font-medium text-slate-600  mb-6 bg-white px-5 py-3 rounded-xl border border-slate-100 shadow-sm w-fit">
             <Link
               to="/"
               className="hover:text-sky-600 transition-colors flex items-center gap-1"
@@ -376,17 +418,17 @@ const ProductDetail = () => {
             </span>
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
+          <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start justify-center">
             {/* Left: Image Gallery */}
-            <div className="flex flex-row gap-6 lg:w-[58%]">
+            <div className="flex flex-row gap-6 lg:w-[40%] w-full flex-shrink-0">
               {/* Vertical Thumbnails */}
               {images.length > 1 && (
-                <div className="flex flex-col gap-4 w-20 hidden md:flex">
+                <div className="flex flex-col gap-4 w-20 hidden md:flex flex-shrink-0">
                   {images.slice(0, 5).map((img, i) => (
                     <button
                       key={i}
                       onClick={() => setActiveImage(i)}
-                      className={`aspect-[3/4] border overflow-hidden transition-all duration-300 ${
+                      className={`aspect-[3/4] border overflow-hidden transition-all duration-300 rounded-xl ${
                         activeImage === i
                           ? "border-sky-600 shadow-md shadow-sky-500/10 scale-105"
                           : "border-slate-100 opacity-60 hover:opacity-100 hover:border-slate-300"
@@ -403,7 +445,7 @@ const ProductDetail = () => {
               )}
 
               {/* Main Image */}
-              <div className="flex-1 aspect-square overflow-hidden bg-white rounded-3xl border border-slate-100 shadow-sm">
+              <div className="flex-1 max-w-[360px] aspect-square overflow-hidden bg-white rounded-3xl border border-slate-100 shadow-sm mx-auto lg:mx-0">
                 <img
                   src={images[activeImage] || images[0]}
                   alt={product.name}
@@ -413,9 +455,9 @@ const ProductDetail = () => {
             </div>
 
             {/* Right: Product Details */}
-            <div className="lg:w-[42%] space-y-6 lg:sticky lg:top-32 h-fit bg-white border border-slate-100 rounded-3xl p-6 md:p-7 shadow-sm">
+            <div className="lg:w-[40%] w-full space-y-5 lg:sticky lg:top-32 h-fit bg-white border border-slate-100 rounded-3xl p-5 md:p-6 shadow-sm">
               <div className="space-y-4">
-                <h1 className="text-2xl  font-medium text-slate-800  tracking-tight leading-snug">
+                <h1 className="text-xl font-semibold text-slate-800 tracking-tight leading-snug">
                   {product.name}
                 </h1>
 
@@ -464,7 +506,7 @@ const ProductDetail = () => {
 
               {/* Voucher Promotion Input */}
               <div className="space-y-2">
-                <div className="flex gap-2 relative bg-slate-50 border border-slate-100 p-2 rounded-2xl">
+                <div className="flex gap-2 relative bg-slate-50 border border-slate-100 p-2 rounded-xl">
                   <input
                     type="text"
                     value={promotionCode}
@@ -509,7 +551,7 @@ const ProductDetail = () => {
                     );
                     if (data) setIsPromotionModalOpen(true);
                   }}
-                  className="w-full py-4 border border-dashed border-sky-200 bg-sky-50/20 text-sky-600 hover:bg-sky-50 hover:border-sky-300 rounded-2xl text-[14px] font-medium  transition-all flex items-center justify-center gap-2"
+                  className="w-full py-2.5 border border-dashed border-sky-200 bg-sky-50/20 text-sky-600 hover:bg-sky-50 hover:border-sky-300 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-2"
                 >
                   {isLoadingEligible ? (
                     <Loader2 className="w-3 h-3 animate-spin" />
@@ -520,7 +562,7 @@ const ProductDetail = () => {
                 </button>
 
                 {appliedPromotion && (
-                  <div className="p-4 bg-emerald-50/50 border border-emerald-100 rounded-2xl flex justify-between items-center animate-in slide-in-from-top-2">
+                  <div className="p-4 bg-emerald-50/50 border border-emerald-100 rounded-xl flex justify-between items-center animate-in slide-in-from-top-2">
                     <div>
                       <p className="text-[10px] text-emerald-600 font-black uppercase mb-1 tracking-wider">
                         Mã được áp dụng:
@@ -543,20 +585,20 @@ const ProductDetail = () => {
               </div>
 
               {/* Selection Options */}
-              <div className="space-y-6 pt-2">
+              <div className="space-y-4 pt-1">
                 {/* Color Selector */}
                 <div className="space-y-2">
-                  <h4 className="text-[1rem] font-medium text-slate-800 ">
+                  <h4 className="text-sm font-semibold text-slate-700">
                     Màu sắc:
                   </h4>
-                  <div className="flex flex-wrap gap-3">
+                  <div className="flex flex-wrap gap-2.5">
                     {availableColors.map((color, i) => {
                       const isAvailable = isColorAvailable(color, selectedSize);
                       return (
                         <button
                           key={i}
                           onClick={() => handleColorChange(color)}
-                          className={`min-w-[48px] h-12 px-3 border rounded-lg font-medium text-[13px] transition-all duration-300 ${
+                          className={`min-w-[44px] h-10 px-3.5 border rounded-xl font-medium text-xs transition-all duration-300 ${
                             selectedColor === color
                               ? "bg-sky-600 text-white border-sky-600 shadow-md shadow-sky-500/10 hover:bg-sky-700 hover:border-sky-700"
                               : "bg-white text-slate-600 border-slate-200 hover:border-sky-600 hover:text-sky-600"
@@ -576,17 +618,17 @@ const ProductDetail = () => {
 
                 {/* Size Selector */}
                 <div className="space-y-2">
-                  <h4 className="text-[1rem] font-medium text-slate-800 ">
+                  <h4 className="text-sm font-semibold text-slate-700">
                     Kích thước:
                   </h4>
-                  <div className="flex flex-wrap gap-3">
+                  <div className="flex flex-wrap gap-2.5">
                     {availableSizes.map((size) => {
                       const isAvailable = isColorAvailable(selectedColor, size);
                       return (
                         <button
                           key={size}
                           onClick={() => handleSizeChange(size)}
-                          className={`min-w-[48px] h-12 px-3 border rounded-lg font-medium text-[13px] transition-all duration-300 ${
+                          className={`min-w-[44px] h-10 px-3.5 border rounded-xl font-medium text-xs transition-all duration-300 ${
                             selectedSize === size
                               ? "bg-sky-600 text-white border-sky-600 shadow-md shadow-sky-500/10 hover:bg-sky-700 hover:border-sky-700"
                               : "bg-white text-slate-600 border-slate-200 hover:border-sky-600 hover:text-sky-600"
@@ -605,11 +647,11 @@ const ProductDetail = () => {
                 </div>
 
                 {/* Quantity */}
-                <div className="space-y-2">
-                  <h4 className="text-[1rem] font-medium text-slate-800 ">
+                <div className="space-y-2 flex items-center gap-2 ">
+                  <h4 className="text-sm font-semibold text-slate-700">
                     Số lượng:
                   </h4>
-                  <div className="flex items-center gap-6 px-4 py-2 bg-slate-50 rounded-2xl border border-slate-100 h-12 w-fit">
+                  <div className="flex items-center gap-4 px-3 bg-slate-50 rounded-xl border border-slate-100 h-10 w-fit">
                     <button
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
                       className="text-slate-400 hover:text-slate-800 transition-colors"
@@ -629,35 +671,35 @@ const ProductDetail = () => {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-4">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
                   <button
                     onClick={handleToggleWishlist}
-                    className={`hidden sm:flex w-16 h-16 items-center justify-center rounded-2xl transition-all duration-300 shadow-sm ${
+                    className={`hidden sm:flex w-10 h-10 items-center justify-center rounded-xl transition-all duration-300 shadow-sm ${
                       isInWishlist(product.id)
                         ? "bg-rose-50 text-rose-500 border border-rose-100 hover:bg-rose-100"
                         : "bg-white text-slate-400 border border-slate-200 hover:border-rose-500 hover:text-rose-500"
                     }`}
                   >
                     <Heart
-                      size={20}
+                      size={16}
                       fill={isInWishlist(product.id) ? "currentColor" : "none"}
                     />
                   </button>
                   <button
                     onClick={handleAddToCart}
                     disabled={isOutOfStock}
-                    className={`hidden sm:flex w-16 h-16 border items-center justify-center rounded-2xl transition-all duration-300 shadow-sm ${
+                    className={`hidden sm:flex w-10 h-10 border items-center justify-center rounded-xl transition-all duration-300 shadow-sm ${
                       isOutOfStock
                         ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
                         : "border-slate-200 bg-white hover:border-sky-600 hover:text-sky-600 text-slate-500"
                     }`}
                   >
-                    <ShoppingCart size={20} />
+                    <ShoppingCart size={16} />
                   </button>
                   <button
                     onClick={handleBuyNow}
                     disabled={isOutOfStock}
-                    className={`flex-1 p-5 h-16 text-white text-xs font-black uppercase tracking-widest transition-all rounded-2xl shadow-md ${
+                    className={`flex-1 h-10 text-white text-xs font-bold uppercase tracking-wider transition-all rounded-xl shadow-md ${
                       isOutOfStock
                         ? "bg-slate-400 cursor-not-allowed shadow-none"
                         : "bg-sky-600 hover:bg-sky-700 hover:-translate-y-0.5 shadow-sky-500/10"
@@ -669,7 +711,7 @@ const ProductDetail = () => {
                   <div className="sm:hidden grid grid-cols-2 gap-4">
                     <button
                       onClick={handleToggleWishlist}
-                      className={`h-14 flex items-center justify-center rounded-2xl border transition-all ${
+                      className={`h-14 flex items-center justify-center rounded-xl border transition-all ${
                         isInWishlist(product.id)
                           ? "bg-rose-50 text-rose-500 border-rose-100"
                           : "bg-white text-slate-500 border-slate-200"
@@ -689,7 +731,7 @@ const ProductDetail = () => {
                     <button
                       onClick={handleAddToCart}
                       disabled={isOutOfStock}
-                      className={`h-14 flex items-center justify-center rounded-2xl border transition-all ${
+                      className={`h-14 flex items-center justify-center rounded-xl border transition-all ${
                         isOutOfStock
                           ? "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed"
                           : "border-slate-200 bg-white text-slate-500"
@@ -759,7 +801,7 @@ const ProductDetail = () => {
               </button>
               {openSections.sizeGuide && (
                 <div className="pb-6 animate-in slide-in-from-top-2 duration-300">
-                  <div className="p-4 bg-slate-50 rounded-2xl">
+                  <div className="p-4 bg-slate-50 rounded-xl">
                     <p className="text-xs text-slate-500 font-medium">
                       Hướng dẫn chọn kích thước chuẩn xác nhất theo chiều cao và
                       cân nặng.
@@ -776,12 +818,12 @@ const ProductDetail = () => {
           {relatedProducts.length > 0 && (
             <div className="mt-40 space-y-12">
               <div className="flex items-end justify-between border-b border-slate-100 pb-5">
-                <h2 className="text-xl font-black text-slate-800 uppercase tracking-wider">
+                <h2 className="text-xl font-medium text-slate-800 uppercase tracking-wider">
                   Có thể bạn thích
                 </h2>
                 <Link
                   to="/products"
-                  className="text-xs font-black text-sky-600 hover:text-sky-700 transition-colors uppercase tracking-widest border-b border-sky-600 pb-1"
+                  className="text-[14px] font-medium text-sky-600 hover:text-sky-700 transition-colors   border-b border-sky-600 pb-1"
                 >
                   Xem tất cả
                 </Link>
@@ -795,7 +837,7 @@ const ProductDetail = () => {
                   >
                     <Link
                       to={`/products/${prod.slug}`}
-                      className="relative h-64 mb-4 rounded-2xl overflow-hidden bg-slate-50 flex items-center justify-center flex-shrink-0"
+                      className="relative h-64 mb-4 rounded-xl overflow-hidden bg-slate-50 flex items-center justify-center flex-shrink-0"
                     >
                       <img
                         src={

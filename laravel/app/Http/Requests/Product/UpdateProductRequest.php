@@ -27,8 +27,8 @@ class UpdateProductRequest extends FormRequest
 
         $rules = [
             'name'              => 'required|string|unique:products,name' . ($productId ? ',' . $productId : ''),
-            'category_id'       => 'required|exists:categories,id',
-            'supplier_id'       => 'required|exists:suppliers,id',
+            'category_id'       => 'nullable|exists:categories,id',
+            'supplier_id'       => 'nullable|exists:suppliers,id',
             'short_description' => 'nullable|string',
             'description'       => 'nullable|string',
             'status'            => 'in:active,inactive,draft',
@@ -64,6 +64,7 @@ class UpdateProductRequest extends FormRequest
             'variants.*.inventory.quantity' => 'required|integer|min:0',
             'variants.*.inventory.min_quantity' => 'nullable|integer|min:0',
             'variants.*.cost_price' => 'nullable|numeric|min:0',
+            'variants.*.existing_image' => 'nullable|string',
         ];
 
         if ($this->has('variants') && is_array($this->input('variants'))) {

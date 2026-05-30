@@ -23,7 +23,7 @@ class StoreStockReceiptRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'supplier_id'        => 'required|exists:suppliers,id',
+            'supplier_id'        => 'nullable|exists:suppliers,id',
             'note'               => 'nullable|string',
             'received_at'        => 'nullable|date',
             'items'              => 'required|array|min:1',

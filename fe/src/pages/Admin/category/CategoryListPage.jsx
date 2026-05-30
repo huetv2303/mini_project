@@ -357,7 +357,7 @@ const CategoryListPage = () => {
             {canManage && selectedIds.size > 0 && (
               <button
                 onClick={openBulkDeleteModal}
-                className="inline-flex items-center justify-center px-6 py-3 bg-red-500 text-white text-sm font-bold rounded-2xl hover:bg-red-600 transition-all shadow-lg shadow-red-500/20 active:scale-95 animate-in slide-in-from-right-4"
+                className="inline-flex items-center justify-center px-6 py-3 bg-red-500 text-white text-sm font-bold rounded-xl hover:bg-red-600 transition-all shadow-lg shadow-red-500/20 active:scale-95 animate-in slide-in-from-right-4"
               >
                 <Trash2 className="w-5 h-5 mr-2" />
                 Xóa {selectedIds.size} mục đã chọn
@@ -366,7 +366,7 @@ const CategoryListPage = () => {
             {canManage && (
               <Link
                 to="/admin/categories/create"
-                className="inline-flex items-center justify-center px-5 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-extrabold uppercase rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md shadow-blue-500/20 active:scale-95"
+                className="inline-flex items-center justify-center px-5 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-extrabold uppercase rounded-[5px] hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md shadow-blue-500/20 active:scale-95"
               >
                 <Plus className="w-4 h-4 mr-2" /> Thêm danh mục
               </Link>
@@ -374,7 +374,7 @@ const CategoryListPage = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
           <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -383,7 +383,7 @@ const CategoryListPage = () => {
                 value={searchTerm}
                 onChange={handleSearchChange}
                 placeholder="Tìm kiếm theo tên hoặc đường dẫn..."
-                className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all shadow-sm"
+                className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all shadow-sm"
               />
             </div>
             {selectedIds.size > 0 && (

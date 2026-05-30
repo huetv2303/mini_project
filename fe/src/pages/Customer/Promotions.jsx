@@ -83,7 +83,7 @@ const Promotions = () => {
       <div className="group relative bg-white rounded-lg border border-slate-100 p-6 shadow-sm hover:shadow-md hover:border-slate-200/60 transition-all duration-300 flex flex-col justify-between h-full">
         <div>
           <div className="flex justify-between items-start mb-5">
-            <div className="w-12 h-12 bg-sky-50 rounded-2xl flex items-center justify-center text-sky-600 group-hover:scale-105 transition-transform duration-300">
+            <div className="w-12 h-12 bg-sky-50 rounded-xl flex items-center justify-center text-sky-600 group-hover:scale-105 transition-transform duration-300">
               {promo.type === "percent" ? (
                 <Percent size={20} />
               ) : (
@@ -140,7 +140,7 @@ const Promotions = () => {
         </div>
 
         <div>
-          <div className="space-y-2 mb-6 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+          <div className="space-y-2 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100">
             <div className="flex items-center gap-2.5 text-xs font-bold text-slate-700">
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />
               <span>
@@ -178,7 +178,7 @@ const Promotions = () => {
 
           {/* Dotted code copier holder */}
           <div className="flex gap-2">
-            <div className="flex-1 bg-sky-50/50 border-2 border-dashed border-sky-200 rounded-2xl px-4 py-2.5 flex items-center justify-between">
+            <div className="flex-1 bg-sky-50/50 border-2 border-dashed border-sky-200 rounded-xl px-4 py-2.5 flex items-center justify-between">
               <span className="text-base font-black tracking-widest text-sky-800 uppercase">
                 {promo.code}
               </span>
@@ -208,7 +208,7 @@ const Promotions = () => {
       <div className="pt-32 pb-24 bg-[#f8fafc] min-h-screen text-left">
         <div className="max-w-7xl mx-auto px-10 md:px-20">
           {/* Breadcrumbs */}
-          <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-10 bg-white px-5 py-3 rounded-2xl border border-slate-100 shadow-sm w-fit">
+          <div className="flex items-center gap-2 text-[13px] font-medium text-slate-600  mb-6 bg-white px-5 py-3 rounded-xl border border-slate-100 shadow-sm w-fit">
             <Link
               to="/"
               className="hover:text-sky-600 transition-colors flex items-center gap-1"
@@ -221,9 +221,9 @@ const Promotions = () => {
           </div>
 
           {/* Top Banner */}
-          <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-8 md:p-12 mb-12 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-white p-6 md:p-8 rounded-3xl border border-slate-100 shadow-sm">
             <div className="space-y-3 max-w-2xl">
-              <h1 className="text-2xl md:text-3xl font-black text-slate-800 uppercase tracking-tight">
+              <h1 className="text-2xl md:text-2xl font-black text-slate-800 uppercase tracking-tight mb-2">
                 Ưu Đãi Tuyệt Vời Dành Riêng Cho Bạn
               </h1>
               <p className="text-slate-400 text-sm leading-relaxed font-medium">
@@ -234,7 +234,7 @@ const Promotions = () => {
             </div>
             <Link
               to="/products"
-              className="inline-flex items-center gap-2 bg-sky-600 hover:bg-sky-700 text-white px-6 py-3.5 rounded-2xl text-xs font-black uppercase tracking-wider shadow-md shadow-sky-500/10 transition-all hover:-translate-y-0.5 active:scale-95 whitespace-nowrap self-start md:self-auto"
+              className="inline-flex items-center gap-2 bg-sky-600 hover:bg-sky-700 text-white px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-md shadow-sky-500/10 transition-all hover:-translate-y-0.5 active:scale-95 whitespace-nowrap self-start md:self-auto"
             >
               Xem sản phẩm
               <ArrowRight size={14} />
@@ -249,11 +249,11 @@ const Promotions = () => {
                   className="animate-pulse bg-white rounded-3xl border border-slate-100 p-6 space-y-4 h-[320px] flex flex-col justify-between"
                 >
                   <div className="space-y-3">
-                    <div className="w-12 h-12 bg-slate-100 rounded-2xl"></div>
+                    <div className="w-12 h-12 bg-slate-100 rounded-xl"></div>
                     <div className="h-4 bg-slate-100 rounded w-2/3"></div>
                     <div className="h-3 bg-slate-50 rounded w-full"></div>
                   </div>
-                  <div className="h-10 bg-slate-100 rounded-2xl w-full"></div>
+                  <div className="h-10 bg-slate-100 rounded-xl w-full"></div>
                 </div>
               ))}
             </div>
@@ -266,7 +266,7 @@ const Promotions = () => {
                       {/* Section Title */}
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 bg-white p-5 rounded-3xl border border-slate-100 shadow-sm">
                         <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 bg-sky-50 rounded-2xl flex items-center justify-center text-sky-600 shadow-sm">
+                          <div className="w-12 h-12 bg-sky-50 rounded-xl flex items-center justify-center text-sky-600 shadow-sm">
                             {scopeInfo[scope].icon}
                           </div>
                           <div>
@@ -307,7 +307,7 @@ const Promotions = () => {
               </p>
               <Link
                 to="/products"
-                className="inline-flex items-center gap-2 bg-sky-600 text-white px-8 py-3.5 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-sky-700 transition-all shadow-md shadow-sky-500/10 hover:-translate-y-0.5 active:scale-95"
+                className="inline-flex items-center gap-2 bg-sky-600 text-white px-8 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-sky-700 transition-all shadow-md shadow-sky-500/10 hover:-translate-y-0.5 active:scale-95"
               >
                 Tiếp tục mua sắm
                 <ChevronRight size={14} />

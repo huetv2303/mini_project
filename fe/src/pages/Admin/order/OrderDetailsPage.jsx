@@ -279,7 +279,7 @@ const OrderDetailsPage = () => {
         <div className="flex items-center gap-4 mb-8">
           <button
             onClick={() => navigate("/admin/orders")}
-            className="p-3 bg-white border border-gray-100 rounded-2xl hover:bg-gray-50 transition-all shadow-sm group"
+            className="p-3 bg-white border border-gray-100 rounded-xl hover:bg-gray-50 transition-all shadow-sm group"
           >
             <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
           </button>
@@ -613,7 +613,7 @@ const OrderDetailsPage = () => {
                   />
                 </div>
                 {order.created_by && (
-                  <div className="flex items-center gap-4 p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100/50">
+                  <div className="flex items-center gap-4 p-4 bg-indigo-50/50 rounded-xl border border-indigo-100/50">
                     <div className="w-10 h-10 text-white flex items-center justify-center ">
                       {order.created_by.avatar ? (
                         <img
@@ -661,7 +661,7 @@ const OrderDetailsPage = () => {
                         className="rounded-full"
                       />
                     ) : (
-                      <div className="w-12 h-12 bg-black text-white rounded-2xl flex items-center justify-center shadow-lg">
+                      <div className="w-12 h-12 bg-black text-white rounded-xl flex items-center justify-center shadow-lg">
                         <User className="w-6 h-6" />
                       </div>
                     )}
@@ -734,8 +734,8 @@ const OrderDetailsPage = () => {
             )}
 
             {/* Status & Payment Action */}
-            <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-              <div className="px-6 py-5 border-b border-slate-100 bg-slate-50 flex items-center gap-3">
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
+              <div className="px-6 py-5 border-b border-slate-100 bg-slate-50 flex items-center gap-3 rounded-t-xl">
                 <Save size={18} className="text-slate-700" />
                 <span className="font-semibold text-slate-900">
                   Xử lý đơn hàng
@@ -788,7 +788,7 @@ const OrderDetailsPage = () => {
               </div>
 
               {order.status === "cancelled" && (
-                <div className="mt-6 p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl flex gap-3 text-rose-400">
+                <div className="mt-6 p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl flex gap-3 text-rose-400">
                   <AlertTriangle className="w-5 h-5 shrink-0" />
                   <p className="text-[10px] font-bold leading-relaxed">
                     Đơn hàng này đã bị hủy. Bạn không thể thực hiện thêm thay
@@ -966,7 +966,7 @@ const InvoiceModal = ({ isOpen, onClose, order }) => {
 
         {/* Receipt Area */}
         <div className="flex-1 overflow-y-auto p-6 bg-slate-50 border-b border-slate-100">
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-4 max-w-[340px] mx-auto">
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200/60 p-4 max-w-[340px] mx-auto">
             <div id="order-detail-receipt-print-area">
               <POSReceipt order={order} />
             </div>
@@ -1020,13 +1020,13 @@ const BankPaymentModal = ({ isOpen, onClose, bankInfo }) => {
         </div>
 
         <div className="p-8 flex flex-col items-center">
-          <div className="relative p-4 bg-white rounded-2xl shadow-lg border border-gray-100 mb-6 group">
+          <div className="relative p-4 bg-white rounded-xl shadow-lg border border-gray-100 mb-6 group">
             <img
               src={qrUrl}
               alt="SePay QR"
               className="w-64 h-64 object-contain transition-transform group-hover:scale-105 duration-300"
             />
-            <div className="absolute inset-0 border-2 border-blue-500/20 rounded-2xl pointer-events-none" />
+            <div className="absolute inset-0 border-2 border-blue-500/20 rounded-xl pointer-events-none" />
           </div>
 
           <div className="w-full space-y-4">

@@ -11,7 +11,7 @@ const ProductVariantToggle = ({
   return (
     <div className="bg-white rounded-lg p-6 border border-gray-100 shadow-xl shadow-black/5 flex items-center justify-between">
       <div className="flex items-center gap-4">
-        <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center">
+        <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
           <Layers className="w-6 h-6 text-emerald-500" />
         </div>
         <div>

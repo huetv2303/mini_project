@@ -103,7 +103,7 @@ const SelectSearch = ({
 
       {/* Menu xổ xuống */}
       {isOpen && (
-        <div className="absolute top-[calc(100%+8px)] left-0 w-full bg-white border border-gray-100 rounded-2xl shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="absolute top-[calc(100%+8px)] left-0 w-full bg-white border border-gray-100 rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
           {/* Ô input tìm kiếm */}
           <div className="p-3 border-b border-gray-50 flex items-center bg-gray-50/50">
             <Search className="w-4 h-4 text-gray-400 mr-2" />

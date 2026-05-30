@@ -123,7 +123,7 @@ const ShippingMethodPage = () => {
           </button>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="p-6 border-b border-gray-100">
             <div className="relative max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -172,68 +172,65 @@ const ShippingMethodPage = () => {
                   ))
                 ) : filteredMethods.length > 0 ? (
                   filteredMethods.map((method) => (
-                      <tr
-                        key={method.id}
-                        className="hover:bg-gray-50/50 transition duration-150"
-                      >
-                        <td className="py-4 px-6">
-                          <span className="font-semibold text-gray-900">
-                            {method.name}
-                          </span>
-                        </td>
-                        <td className="py-4 px-6 text-right text-gray-700">
-                          {new Intl.NumberFormat("vi-VN").format(method.cost)}
-                        </td>
-                        <td className="py-4 px-6 text-center text-gray-600">
-                          {method.estimated_days} ngày
-                        </td>
-                        <td className="py-4 px-6 text-center">
-                          <span
-                            className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${
-                              method.is_active
-                                ? "bg-green-100 text-green-700"
-                                : "bg-red-100 text-red-700"
-                            }`}
+                    <tr
+                      key={method.id}
+                      className="hover:bg-gray-50/50 transition duration-150"
+                    >
+                      <td className="py-4 px-6">
+                        <span className="font-semibold text-gray-900">
+                          {method.name}
+                        </span>
+                      </td>
+                      <td className="py-4 px-6 text-right text-gray-700">
+                        {new Intl.NumberFormat("vi-VN").format(method.cost)}
+                      </td>
+                      <td className="py-4 px-6 text-center text-gray-600">
+                        {method.estimated_days} ngày
+                      </td>
+                      <td className="py-4 px-6 text-center">
+                        <span
+                          className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${
+                            method.is_active
+                              ? "bg-green-100 text-green-700"
+                              : "bg-red-100 text-red-700"
+                          }`}
+                        >
+                          {method.is_active ? "Hoạt động" : "Tạm ngưng"}
+                        </span>
+                      </td>
+                      <td className="py-4 px-6 text-right">
+                        <div className="flex items-center justify-end gap-3">
+                          <button
+                            onClick={() => handleOpenModal(method)}
+                            className="p-2 text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors"
                           >
-                            {method.is_active ? "Hoạt động" : "Tạm ngưng"}
-                          </span>
-                        </td>
-                        <td className="py-4 px-6 text-right">
-                          <div className="flex items-center justify-end gap-3">
-                            <button
-                              onClick={() => handleOpenModal(method)}
-                              className="p-2 text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => handleDelete(method.id)}
-                              className="p-2 text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td
-                        colSpan="5"
-                        className="py-12 text-center text-gray-500"
-                      >
-                        Không tìm thấy dữ liệu.
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(method.id)}
+                            className="p-2 text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="py-12 text-center text-gray-500">
+                      Không tìm thấy dữ liệu.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {isModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-            <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh]">
               <div className="px-6 py-4 border-b border-gray-100">
                 <h2 className="text-xl font-bold text-gray-900">
                   {editingMethod ? "Cập Nhật" : "Thêm Mới"} Phương Thức

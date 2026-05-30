@@ -108,7 +108,7 @@ const ReturnOrderModal = ({ isOpen, onClose, order, onRefresh }) => {
             {items.map((item) => (
               <div
                 key={item.id}
-                className={`p-4 rounded-2xl border transition-all ${
+                className={`p-4 rounded-xl border transition-all ${
                   item.returnQuantity > 0
                     ? "border-indigo-200 bg-indigo-50/30 shadow-indigo-100/50 shadow-lg"
                     : "border-gray-100 bg-white"
@@ -158,7 +158,7 @@ const ReturnOrderModal = ({ isOpen, onClose, order, onRefresh }) => {
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="VD: Sản phẩm lỗi, sai màu sắc..."
-              className="w-full p-4 bg-gray-50 rounded-2xl border-none text-sm min-h-[100px] outline-none transition-all"
+              className="w-full p-4 bg-gray-50 rounded-xl border-none text-sm min-h-[100px] outline-none transition-all"
             />
           </div>
         </div>

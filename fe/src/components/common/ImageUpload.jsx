@@ -85,10 +85,10 @@ const ImageUpload = ({
                   alt={`preview-${index}`}
                   className="w-full h-full object-cover"
                 />
-                {/* Overlay cho ảnh đầu tiên (Ảnh đại diện) */}
+                {/* Overlay cho ảnh đầu tiên (Ảnh chính album) */}
                 {index === 0 && (
                   <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[10px] py-1 text-center font-medium">
-                    Ảnh đại diện
+                    Ảnh chính album
                   </div>
                 )}
                 {/* Nút xóa */}
@@ -102,7 +102,9 @@ const ImageUpload = ({
               </div>
             ))
           : images && (
-              <div className="relative group w-full aspect-square rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
+              <div
+                className={`relative group ${width} ${height} rounded-xl overflow-hidden border border-gray-100 shadow-sm`}
+              >
                 <img
                   src={images.preview}
                   alt="preview"
@@ -124,7 +126,7 @@ const ImageUpload = ({
             type="button"
             onClick={triggerInput}
             className={`
-              flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-2xl cursor-pointer hover:border-blue-400 hover:bg-blue-50/10 transition-all group/btn
+              flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:border-blue-400 hover:bg-blue-50/10 transition-all group/btn
               ${multiple ? "w-24 h-24 sm:w-28 sm:h-28" : `${width} ${height}`}
             `}
           >

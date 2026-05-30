@@ -96,7 +96,10 @@ const StaffListPage = () => {
   const total = filteredStaffs.length;
   const lastPage = Math.ceil(total / itemsPerPage) || 1;
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedStaffs = filteredStaffs.slice(startIndex, startIndex + itemsPerPage);
+  const paginatedStaffs = filteredStaffs.slice(
+    startIndex,
+    startIndex + itemsPerPage,
+  );
 
   const paginationObj = {
     currentPage,
@@ -119,7 +122,7 @@ const StaffListPage = () => {
           </div>
           <button
             onClick={handleAddNew}
-            className="flex items-center justify-center gap-2 px-5 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-extrabold uppercase rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md shadow-blue-500/20 active:scale-95"
+            className="flex items-center justify-center gap-2 px-5 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-medium uppercase rounded-[5px] hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md shadow-blue-500/20 active:scale-95"
           >
             <UserPlus size={16} />
             Thêm nhân viên
@@ -127,7 +130,7 @@ const StaffListPage = () => {
         </div>
 
         {/* Filters */}
-        <div className="bg-white p-4 mb-6 rounded-2xl border border-slate-100 shadow-sm">
+        <div className="bg-white p-4 mb-6 rounded-xl border border-slate-100 shadow-sm">
           <div className="relative max-w-md">
             <Search
               className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
@@ -147,7 +150,7 @@ const StaffListPage = () => {
         </div>
 
         {/* Table */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>

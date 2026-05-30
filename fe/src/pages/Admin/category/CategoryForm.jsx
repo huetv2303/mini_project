@@ -187,7 +187,7 @@ const CategoryForm = () => {
                       setFormData({ ...formData, name: e.target.value })
                     }
                     placeholder="Ví dụ: Điện tử, Thời trang..."
-                    className="w-full px-5 py-4 border border-slate-200 bg-slate-50/50 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-800 font-semibold"
+                    className="w-full px-5 py-4 border border-slate-200 bg-slate-50/50 rounded-xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-800 font-semibold"
                   />
                 </div>
 
@@ -212,7 +212,7 @@ const CategoryForm = () => {
                       setFormData({ ...formData, description: e.target.value })
                     }
                     placeholder="Mô tả giúp hệ thống nhận diện danh mục tốt hơn..."
-                    className="w-full px-5 py-4 border border-slate-200 bg-slate-50/50 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-800 font-semibold resize-none"
+                    className="w-full px-5 py-4 border border-slate-200 bg-slate-50/50 rounded-xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all text-slate-800 font-semibold resize-none"
                   />
                 </div>
               </div>
@@ -232,7 +232,7 @@ const CategoryForm = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`w-full flex items-center justify-center py-4 rounded-2xl font-extrabold text-sm uppercase tracking-wide transition-all shadow-md active:scale-95 ${
+                className={`w-full flex items-center justify-center py-4 rounded-[5px] font-extrabold text-sm uppercase tracking-wide transition-all shadow-md active:scale-95 ${
                   isSubmitting
                     ? "bg-slate-100 text-slate-400 cursor-not-allowed"
                     : "bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 shadow-blue-500/20"

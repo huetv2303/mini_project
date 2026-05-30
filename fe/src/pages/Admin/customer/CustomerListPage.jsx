@@ -163,7 +163,8 @@ const CustomerListPage = () => {
         if (formData.phone) payload.append("phone", formData.phone);
         if (formData.address) payload.append("address", formData.address);
         if (formData.gender) payload.append("gender", formData.gender);
-        if (formData.date_of_birth) payload.append("date_of_birth", formData.date_of_birth);
+        if (formData.date_of_birth)
+          payload.append("date_of_birth", formData.date_of_birth);
         payload.append("image", formData.image);
       } else {
         payload = {
@@ -182,7 +183,9 @@ const CustomerListPage = () => {
       resetFormData();
       fetchCustomers();
     } catch (error) {
-      const errorMsg = error.response?.data?.message || "Có lỗi xảy ra khi cập nhật khách hàng!";
+      const errorMsg =
+        error.response?.data?.message ||
+        "Có lỗi xảy ra khi cập nhật khách hàng!";
       toast.error(errorMsg);
     }
   };
@@ -249,7 +252,7 @@ const CustomerListPage = () => {
 
         {/* Stats Summary */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
+          <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex items-center gap-4">
             <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
               <Users size={24} />
             </div>
@@ -262,7 +265,7 @@ const CustomerListPage = () => {
               </h3>
             </div>
           </div>
-          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
+          <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex items-center gap-4">
             <div className="w-12 h-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center">
               <ShieldCheck size={24} />
             </div>
@@ -275,7 +278,7 @@ const CustomerListPage = () => {
               </h3>
             </div>
           </div>
-          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
+          <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex items-center gap-4">
             <div className="w-12 h-12 bg-red-50 text-red-600 rounded-xl flex items-center justify-center">
               <ShieldAlert size={24} />
             </div>
@@ -291,7 +294,7 @@ const CustomerListPage = () => {
         </div>
 
         {/* Filters & Bulk Actions */}
-        <div className="bg-white p-4 mb-6 rounded-2xl border border-gray-100 shadow-sm space-y-4">
+        <div className="bg-white p-4 mb-6 rounded-xl border border-gray-100 shadow-sm space-y-4">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div className="flex flex-1 items-center gap-4 max-w-2xl">
               <div className="relative flex-1">
@@ -354,7 +357,7 @@ const CustomerListPage = () => {
         </div>
 
         {/* Table */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -473,12 +476,15 @@ const CustomerListPage = () => {
                           </div>
                           <div className="flex items-center gap-2 text-xs text-gray-500 font-medium">
                             <Phone size={14} className="text-gray-300" />
-                            {customer.customer_profile?.phone || "Chưa cập nhật"}
+                            {customer.customer_profile?.phone ||
+                              "Chưa cập nhật"}
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 text-center font-semibold text-slate-700">
-                        {formatPrice(customer.customer_profile?.total_spent || 0)}
+                        {formatPrice(
+                          customer.customer_profile?.total_spent || 0,
+                        )}
                       </td>
                       <td className="px-6 py-4 text-center font-medium text-slate-600">
                         {customer.customer_profile?.total_orders || 0}
@@ -522,13 +528,22 @@ const CustomerListPage = () => {
                             <Edit size={17} />
                           </button>
                           <button
-                            onClick={() => handleToggleStatus(customer.id, customer.customer_profile?.is_active)}
+                            onClick={() =>
+                              handleToggleStatus(
+                                customer.id,
+                                customer.customer_profile?.is_active,
+                              )
+                            }
                             className={`p-2 rounded-lg transition-all ${
                               customer.customer_profile?.is_active === 1
                                 ? "text-gray-400 hover:text-red-600 hover:bg-red-50"
                                 : "text-gray-400 hover:text-green-600 hover:bg-green-50"
                             }`}
-                            title={customer.customer_profile?.is_active === 1 ? "Khóa tài khoản" : "Mở khóa tài khoản"}
+                            title={
+                              customer.customer_profile?.is_active === 1
+                                ? "Khóa tài khoản"
+                                : "Mở khóa tài khoản"
+                            }
                           >
                             {customer.customer_profile?.is_active === 1 ? (
                               <Lock size={17} />
@@ -573,7 +588,7 @@ const CustomerListPage = () => {
 
             {/* Profile Header */}
             <div className="flex items-center gap-5 pb-6 border-b border-gray-100">
-              <div className="w-16 h-16 rounded-2xl bg-neutral-100 overflow-hidden ring-4 ring-neutral-50 flex-shrink-0">
+              <div className="w-16 h-16 rounded-xl bg-neutral-100 overflow-hidden ring-4 ring-neutral-50 flex-shrink-0">
                 {selectedCustomer.avatar ? (
                   <img
                     src={getImageUrl(selectedCustomer.avatar)}
@@ -587,13 +602,16 @@ const CustomerListPage = () => {
                 )}
               </div>
               <div>
-                <h3 className="text-lg font-black text-slate-900">{selectedCustomer.name}</h3>
+                <h3 className="text-lg font-black text-slate-900">
+                  {selectedCustomer.name}
+                </h3>
                 <p className="text-xs text-gray-400 font-bold mt-0.5">
                   Mã KH: #{selectedCustomer.id.toString().padStart(4, "0")}
                 </p>
                 <div className="mt-2 flex items-center gap-2">
                   <span className="px-3 py-1 bg-amber-50 text-amber-700 text-[9px] font-black rounded-full uppercase tracking-widest">
-                    {selectedCustomer.customer_profile?.loyalty_tier || "BRONZE"}
+                    {selectedCustomer.customer_profile?.loyalty_tier ||
+                      "BRONZE"}
                   </span>
                   {selectedCustomer.customer_profile?.is_active === 1 ? (
                     <span className="px-3 py-1 bg-green-50 text-green-600 text-[9px] font-black rounded-full uppercase tracking-widest">
@@ -609,13 +627,15 @@ const CustomerListPage = () => {
             </div>
 
             {/* Financial Stats */}
-            <div className="grid grid-cols-2 gap-4 my-6 p-4 bg-gray-50 rounded-2xl">
+            <div className="grid grid-cols-2 gap-4 my-6 p-4 bg-gray-50 rounded-xl">
               <div>
                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">
                   Tổng chi tiêu
                 </span>
                 <span className="text-lg font-black text-slate-800">
-                  {formatPrice(selectedCustomer.customer_profile?.total_spent || 0)}
+                  {formatPrice(
+                    selectedCustomer.customer_profile?.total_spent || 0,
+                  )}
                 </span>
               </div>
               <div>
@@ -650,7 +670,10 @@ const CustomerListPage = () => {
                   <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block leading-none mb-1">
                     Số điện thoại
                   </span>
-                  <span>{selectedCustomer.customer_profile?.phone || "Chưa cập nhật"}</span>
+                  <span>
+                    {selectedCustomer.customer_profile?.phone ||
+                      "Chưa cập nhật"}
+                  </span>
                 </div>
               </div>
 
@@ -662,7 +685,10 @@ const CustomerListPage = () => {
                   <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block leading-none mb-1">
                     Địa chỉ
                   </span>
-                  <span>{selectedCustomer.customer_profile?.address || "Chưa cập nhật"}</span>
+                  <span>
+                    {selectedCustomer.customer_profile?.address ||
+                      "Chưa cập nhật"}
+                  </span>
                 </div>
               </div>
 
@@ -675,7 +701,9 @@ const CustomerListPage = () => {
                     <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block leading-none mb-1">
                       Giới tính
                     </span>
-                    <span>{selectedCustomer.customer_profile?.gender || "Khác"}</span>
+                    <span>
+                      {selectedCustomer.customer_profile?.gender || "Khác"}
+                    </span>
                   </div>
                 </div>
 
@@ -687,7 +715,10 @@ const CustomerListPage = () => {
                     <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block leading-none mb-1">
                       Ngày sinh
                     </span>
-                    <span>{selectedCustomer.customer_profile?.date_of_birth || "Chưa cập nhật"}</span>
+                    <span>
+                      {selectedCustomer.customer_profile?.date_of_birth ||
+                        "Chưa cập nhật"}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -720,13 +751,17 @@ const CustomerListPage = () => {
             </button>
 
             <div className="mb-6">
-              <h3 className="text-lg font-black text-slate-900">Chỉnh sửa hồ sơ</h3>
-              <p className="text-xs text-gray-400 mt-1 font-medium">Thay đổi thông tin hồ sơ của khách hàng {selectedCustomer.name}.</p>
+              <h3 className="text-lg font-black text-slate-900">
+                Chỉnh sửa hồ sơ
+              </h3>
+              <p className="text-xs text-gray-400 mt-1 font-medium">
+                Thay đổi thông tin hồ sơ của khách hàng {selectedCustomer.name}.
+              </p>
             </div>
 
             <form onSubmit={handleUpdateCustomer} className="space-y-4">
               {/* Avatar Upload Preview */}
-              <div className="flex items-center gap-4 p-3 bg-slate-50 rounded-2xl border border-gray-100">
+              <div className="flex items-center gap-4 p-3 bg-slate-50 rounded-xl border border-gray-100">
                 <div className="w-14 h-14 rounded-xl bg-gray-100 overflow-hidden relative flex-shrink-0">
                   {formData.image ? (
                     <img
@@ -747,47 +782,63 @@ const CustomerListPage = () => {
                   )}
                 </div>
                 <div>
-                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1.5">Ảnh đại diện</span>
+                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1.5">
+                    Ảnh đại diện
+                  </span>
                   <input
                     type="file"
                     accept="image/*"
                     className="text-xs font-semibold text-slate-600 block file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-[10px] file:font-black file:bg-black file:text-white hover:file:bg-neutral-800 file:cursor-pointer"
-                    onChange={(e) => setFormData({ ...formData, image: e.target.files[0] })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, image: e.target.files[0] })
+                    }
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">Họ và tên *</label>
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">
+                  Họ và tên *
+                </label>
                 <input
                   type="text"
                   required
                   placeholder="Nhập họ và tên khách hàng..."
                   className="w-full h-12 bg-gray-50 border border-gray-100 rounded-xl px-4 text-sm focus:ring-2 focus:ring-black/5 outline-none transition-all"
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
                 />
               </div>
 
               <div>
-                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">Địa chỉ Email *</label>
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">
+                  Địa chỉ Email *
+                </label>
                 <input
                   type="email"
                   required
                   placeholder="name@example.com"
                   className="w-full h-12 bg-gray-50 border border-gray-100 rounded-xl px-4 text-sm focus:ring-2 focus:ring-black/5 outline-none transition-all"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">Giới tính</label>
+                  <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">
+                    Giới tính
+                  </label>
                   <select
                     className="w-full h-12 bg-gray-50 border border-gray-100 rounded-xl px-3 text-sm focus:ring-2 focus:ring-black/5 outline-none transition-all"
                     value={formData.gender}
-                    onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, gender: e.target.value })
+                    }
                   >
                     <option value="Male">Nam</option>
                     <option value="Female">Nữ</option>
@@ -796,35 +847,50 @@ const CustomerListPage = () => {
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">Ngày sinh</label>
+                  <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">
+                    Ngày sinh
+                  </label>
                   <input
                     type="date"
                     className="w-full h-12 bg-gray-50 border border-gray-100 rounded-xl px-3 text-sm focus:ring-2 focus:ring-black/5 outline-none transition-all"
                     value={formData.date_of_birth}
-                    onChange={(e) => setFormData({ ...formData, date_of_birth: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        date_of_birth: e.target.value,
+                      })
+                    }
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">Số điện thoại</label>
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">
+                  Số điện thoại
+                </label>
                 <input
                   type="tel"
                   placeholder="Nhập số điện thoại..."
                   className="w-full h-12 bg-gray-50 border border-gray-100 rounded-xl px-4 text-sm focus:ring-2 focus:ring-black/5 outline-none transition-all"
                   value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, phone: e.target.value })
+                  }
                 />
               </div>
 
               <div>
-                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">Địa chỉ</label>
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-2">
+                  Địa chỉ
+                </label>
                 <input
                   type="text"
                   placeholder="Nhập địa chỉ của khách hàng..."
                   className="w-full h-12 bg-gray-50 border border-gray-100 rounded-xl px-4 text-sm focus:ring-2 focus:ring-black/5 outline-none transition-all"
                   value={formData.address}
-                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, address: e.target.value })
+                  }
                 />
               </div>
 

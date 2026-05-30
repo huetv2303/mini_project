@@ -126,7 +126,7 @@ const CustomerNavbar = () => {
                   </Link>
 
                   {category.children && category.children.length > 0 && (
-                    <div className="absolute top-full left-0 min-w-[220px] bg-white border border-gray-100 shadow-2xl rounded-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 p-3 translate-y-2 group-hover:translate-y-0">
+                    <div className="absolute top-full left-0 min-w-[220px] bg-white border border-gray-100 shadow-2xl rounded-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 p-3 translate-y-2 group-hover:translate-y-0">
                       <div className="flex flex-col gap-1">
                         {category.children.map((child) => (
                           <Link
@@ -223,7 +223,7 @@ const CustomerNavbar = () => {
                         className="fixed inset-0 z-10"
                         onClick={() => setIsUserDropdownOpen(false)}
                       ></div>
-                      <div className="absolute right-0 mt-3 w-64 bg-white border border-gray-100 shadow-xl rounded-2xl z-20 py-2 p-1 animate-in fade-in slide-in-from-top-2">
+                      <div className="absolute right-0 mt-3 w-64 bg-white border border-gray-100 shadow-xl rounded-xl z-20 py-2 p-1 animate-in fade-in slide-in-from-top-2">
                         <div className="px-4 py-3 border-b border-gray-100 mb-2">
                           <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">
                             Tài khoản của tôi
@@ -291,13 +291,7 @@ const CustomerNavbar = () => {
                           <Heart size={18} />
                           Yêu thích
                         </Link>
-                        <Link
-                          to="/settings"
-                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 rounded-xl transition-colors"
-                        >
-                          <Settings size={18} />
-                          Cài đặt
-                        </Link>
+
                         <div className="border-t border-gray-50 mt-2 pt-2">
                           <button
                             onClick={handleLogout}
@@ -389,7 +383,7 @@ const CustomerNavbar = () => {
               <Link
                 to="/products"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl group transition-all active:scale-[0.98]"
+                className="flex items-center justify-between p-4 bg-gray-50 rounded-xl group transition-all active:scale-[0.98]"
               >
                 <div className="flex items-center gap-3">
                   <Package size={20} className="text-gray-400" />
@@ -401,7 +395,7 @@ const CustomerNavbar = () => {
               </Link>
 
               {/* Mobile Categories Accordion */}
-              <div className="bg-gray-50 rounded-2xl overflow-hidden">
+              <div className="bg-gray-50 rounded-xl overflow-hidden">
                 <button
                   onClick={() =>
                     setExpandedMobileCategory(
@@ -495,7 +489,7 @@ const CustomerNavbar = () => {
               <Link
                 to="/promotions"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl transition-all active:scale-[0.98]"
+                className="flex items-center justify-between p-4 bg-gray-50 rounded-xl transition-all active:scale-[0.98]"
               >
                 <div className="flex items-center gap-3">
                   <Ticket size={20} className="text-gray-400" />
@@ -509,7 +503,7 @@ const CustomerNavbar = () => {
               <Link
                 to="/profile"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl transition-all active:scale-[0.98]"
+                className="flex items-center justify-between p-4 bg-gray-50 rounded-xl transition-all active:scale-[0.98]"
               >
                 <div className="flex items-center gap-3">
                   <User size={20} className="text-gray-400" />
@@ -529,21 +523,21 @@ const CustomerNavbar = () => {
                 <Link
                   to="/login"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="py-4 text-center text-sm font-bold border border-gray-200 rounded-2xl hover:bg-gray-50 transition-colors"
+                  className="py-4 text-center text-sm font-bold border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
                 >
                   Đăng nhập
                 </Link>
                 <Link
                   to="/register"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="py-4 text-center text-sm font-bold bg-black text-white rounded-2xl hover:bg-black/90 shadow-lg shadow-black/10 transition-all"
+                  className="py-4 text-center text-sm font-bold bg-black text-white rounded-xl hover:bg-black/90 shadow-lg shadow-black/10 transition-all"
                 >
                   Đăng ký
                 </Link>
               </div>
             ) : (
               <div className="space-y-4">
-                <div className="flex items-center gap-4 p-3 bg-gray-50 rounded-2xl">
+                <div className="flex items-center gap-4 p-3 bg-gray-50 rounded-xl">
                   <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-200 border border-white shadow-sm">
                     {user.avatar ? (
                       <img
@@ -568,7 +562,7 @@ const CustomerNavbar = () => {
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="w-full py-4 text-center text-sm font-bold bg-rose-50 text-rose-500 rounded-2xl hover:bg-rose-100 transition-colors flex items-center justify-center gap-2"
+                  className="w-full py-4 text-center text-sm font-bold bg-rose-50 text-rose-500 rounded-xl hover:bg-rose-100 transition-colors flex items-center justify-center gap-2"
                 >
                   <LogOut size={18} />
                   Đăng xuất

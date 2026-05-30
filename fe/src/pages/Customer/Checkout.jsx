@@ -1136,7 +1136,7 @@ const BankPaymentModal = ({
         {/* Header */}
         <div className="bg-white border-b border-slate-100 px-6 py-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-slate-50 text-slate-800 rounded-2xl border border-slate-100">
+            <div className="p-2.5 bg-slate-50 text-slate-800 rounded-xl border border-slate-100">
               <CreditCard size={20} />
             </div>
             <div>
@@ -1271,7 +1271,7 @@ const BankPaymentModal = ({
                     </div>
                   </div>
 
-                  <div className="bg-slate-50 rounded-2xl p-4 mt-4 flex items-center justify-between border border-slate-100">
+                  <div className="bg-slate-50 rounded-xl p-4 mt-4 flex items-center justify-between border border-slate-100">
                     <span className="text-xs text-slate-400 font-semibold">
                       Số tiền cần chuyển
                     </span>

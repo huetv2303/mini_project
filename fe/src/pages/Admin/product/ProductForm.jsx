@@ -391,6 +391,8 @@ const ProductForm = () => {
 
       if (v.image?.file) {
         data.append(`variants[${idx}][image]`, v.image.file);
+      } else if (v.image?.isExisting) {
+        data.append(`variants[${idx}][existing_image]`, v.image.url || "");
       }
 
       const vAttrs = v.attributes || [];
@@ -444,7 +446,7 @@ const ProductForm = () => {
           <div className="flex items-center gap-6">
             <Link
               to="/admin/products"
-              className="w-12 h-12 bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-300 hover:shadow-sm transition-all active:scale-90"
+              className="w-12 h-12 bg-white border border-slate-200 rounded-xl flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-300 hover:shadow-sm transition-all active:scale-90"
             >
               <ArrowLeft className="w-5 h-5" />
             </Link>
@@ -460,7 +462,7 @@ const ProductForm = () => {
               type="submit"
               form="product-form"
               disabled={isSubmitting}
-              className={`inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-extrabold uppercase rounded-2xl shadow-md shadow-blue-500/20 transition-all active:scale-95 ${isSubmitting ? "opacity-50 cursor-not-allowed" : "hover:from-blue-700 hover:to-indigo-700"}`}
+              className={`inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-extrabold uppercase rounded-xl shadow-md shadow-blue-500/20 transition-all active:scale-95 ${isSubmitting ? "opacity-50 cursor-not-allowed" : "hover:from-blue-700 hover:to-indigo-700"}`}
             >
               {isSubmitting ? (
                 <Loader2 className="w-5 h-5 animate-spin mr-2" />

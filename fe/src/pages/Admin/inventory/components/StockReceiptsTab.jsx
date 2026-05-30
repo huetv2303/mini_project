@@ -21,6 +21,7 @@ import {
   Trash
 } from "lucide-react";
 import toast from "react-hot-toast";
+import SelectSearch from "../../../../components/common/SelectSearch";
 
 const StockReceiptsTab = () => {
   const { hasPermission } = useAuth();
@@ -145,7 +146,7 @@ const StockReceiptsTab = () => {
                       {receipt.code}
                     </td>
                     <td className="px-6 py-4 font-medium text-gray-800">
-                      {receipt.supplier?.name}
+                      {receipt.supplier?.name || <span className="text-gray-400 italic">Không có</span>}
                     </td>
                     <td className="px-6 py-4 text-gray-600">
                       {receipt.staff?.name || "Hệ thống"}
@@ -340,10 +341,6 @@ const CreateReceiptModal = ({ isOpen, onClose, onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!supplierId) {
-      toast.error("Vui lòng chọn nhà cung cấp");
-      return;
-    }
     if (items.length === 0) {
       toast.error("Danh sách sản phẩm nhập không được trống");
       return;
@@ -352,7 +349,7 @@ const CreateReceiptModal = ({ isOpen, onClose, onSuccess }) => {
     setLoading(true);
     try {
       await createStockReceipt({
-        supplier_id: parseInt(supplierId),
+        supplier_id: supplierId ? parseInt(supplierId) : null,
         note,
         received_at: receivedAt || null,
         items: items.map((it) => ({
@@ -389,23 +386,14 @@ const CreateReceiptModal = ({ isOpen, onClose, onSuccess }) => {
         <div className="p-6 overflow-y-auto space-y-6 flex-1">
           {/* Main Info */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
-                Nhà cung cấp <span className="text-red-500">*</span>
-              </label>
-              <select
+            <div className="relative z-20">
+              <SelectSearch
+                label="Nhà cung cấp"
+                placeholder="-- Chọn nhà cung cấp --"
+                options={suppliers.map((s) => ({ value: s.id, label: s.name }))}
                 value={supplierId}
-                onChange={(e) => setSupplierId(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 bg-white"
-                required
-              >
-                <option value="">-- Chọn nhà cung cấp --</option>
-                {suppliers.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name}
-                  </option>
-                ))}
-              </select>
+                onChange={(val) => setSupplierId(val)}
+              />
             </div>
             <div>
               <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
@@ -436,24 +424,19 @@ const CreateReceiptModal = ({ isOpen, onClose, onSuccess }) => {
           <div className="border border-gray-200 rounded-xl p-4 bg-gray-50/50 space-y-4">
             <h4 className="font-bold text-sm text-gray-800">Thêm sản phẩm nhập kho</h4>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
-              <div className="md:col-span-2">
-                <label className="block text-xs text-gray-500 font-semibold mb-1">
-                  Chọn biến thể sản phẩm
-                </label>
-                <select
-                  value={selectedVariantId}
-                  onChange={(e) => setSelectedVariantId(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 bg-white"
-                >
-                  <option value="">-- Tìm kiếm & Chọn sản phẩm --</option>
-                  {allProducts.map((p) =>
-                    p.variants?.map((v) => (
-                      <option key={v.id} value={v.id}>
-                        {p.name} ({v.name || "Mặc định"}) - {v.sku}
-                      </option>
-                    ))
+              <div className="md:col-span-2 relative z-10">
+                <SelectSearch
+                  label="Chọn biến thể sản phẩm"
+                  placeholder="-- Tìm kiếm & Chọn sản phẩm --"
+                  options={allProducts.flatMap((p) =>
+                    (p.variants || []).map((v) => ({
+                      value: v.id,
+                      label: `${p.name} (${v.name || "Mặc định"}) - ${v.sku}`,
+                    }))
                   )}
-                </select>
+                  value={selectedVariantId}
+                  onChange={(val) => setSelectedVariantId(val)}
+                />
               </div>
               <div>
                 <label className="block text-xs text-gray-500 font-semibold mb-1">
@@ -638,7 +621,7 @@ const ReceiptDetailsModal = ({ receipt, onClose }) => {
             <div className="border border-gray-100 rounded-xl p-3 bg-gray-50/40">
               <span className="text-[10px] font-bold text-gray-400 uppercase block tracking-wider">Nhà cung cấp</span>
               <div className="text-sm font-semibold text-gray-800 mt-1 truncate">
-                {receipt.supplier?.name}
+                {receipt.supplier?.name || "Không có"}
               </div>
             </div>
 

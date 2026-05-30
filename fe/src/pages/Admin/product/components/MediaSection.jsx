@@ -10,14 +10,16 @@ const MediaSection = ({
 }) => {
   return (
     <div className="space-y-8">
-      {/* <ImageUpload
-        label={showLabel ? "Ảnh đại diện (Bìa)" : ""}
-        images={featureImage}
-        setImages={setFeatureImage}
-        multiple={false}
-        width="w-40"
-        height="h-40"
-      /> */}
+      <div className="bg-white rounded-lg p-4 border border-gray-100 shadow-xl shadow-black/5">
+        <ImageUpload
+          label={showLabel ? "Ảnh đại diện chính (Ảnh bìa)" : "Ảnh đại diện chính"}
+          images={featureImage}
+          setImages={setFeatureImage}
+          multiple={false}
+          width="w-64"
+          height="h-64"
+        />
+      </div>
       <div className="bg-white rounded-lg p-4 border border-gray-100 shadow-xl shadow-black/5">
         <ImageUpload
           label={showLabel ? "Thư viện ảnh khác" : ""}

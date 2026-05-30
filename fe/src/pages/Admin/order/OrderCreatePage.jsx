@@ -489,7 +489,9 @@ const OrderCreatePage = () => {
 
     if (idx > -1) {
       if (items[idx].quantity >= available) {
-        toast.error(`Không thể tăng thêm. Số lượng khả dụng tối đa trong kho là ${available}`);
+        toast.error(
+          `Không thể tăng thêm. Số lượng khả dụng tối đa trong kho là ${available}`,
+        );
         return;
       }
       items[idx].quantity += 1;
@@ -524,7 +526,9 @@ const OrderCreatePage = () => {
     const available = item.available !== undefined ? item.available : 99999;
 
     if (delta > 0 && item.quantity >= available) {
-      toast.error(`Không thể tăng thêm. Số lượng khả dụng tối đa trong kho là ${available}`);
+      toast.error(
+        `Không thể tăng thêm. Số lượng khả dụng tối đa trong kho là ${available}`,
+      );
       return;
     }
 
@@ -739,7 +743,7 @@ const OrderCreatePage = () => {
     <AdminLayout>
       <div className="pb-20 max-w-[1400px] mx-auto text-left space-y-6">
         {/* TAB BAR */}
-        <div className="bg-slate-50 border border-slate-100 p-2 rounded-2xl flex gap-2 overflow-x-auto no-scrollbar shadow-sm">
+        <div className="bg-slate-50 border border-slate-100 p-2 rounded-xl flex gap-2 overflow-x-auto no-scrollbar shadow-sm">
           {sessions.map((s) => {
             const isActive = s.id === activeSessionId;
             return (
@@ -788,7 +792,7 @@ const OrderCreatePage = () => {
         </div>
 
         {/* HEADER BAR */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white border border-slate-100 p-5 rounded-2xl shadow-sm">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white border border-slate-100 p-5 rounded-xl shadow-sm">
           <div className="flex items-center gap-3">
             <div className="p-3 bg-blue-50 rounded-xl">
               <ShoppingCart className="w-6 h-6 text-blue-600" />
@@ -841,7 +845,7 @@ const OrderCreatePage = () => {
           <button
             onClick={handlePlaceOrder}
             disabled={submitting || activeSession.selectedItems.length === 0}
-            className="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold text-xs shadow-md shadow-blue-500/20 hover:from-blue-700 hover:to-indigo-700 disabled:from-slate-200 disabled:to-slate-300 disabled:text-slate-400 disabled:shadow-none hover:shadow-lg hover:shadow-blue-500/30 flex items-center justify-center gap-2 active:scale-95 transition-all duration-200"
+            className="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-[5px] font-bold text-xs shadow-md shadow-blue-500/20 hover:from-blue-700 hover:to-indigo-700 disabled:from-slate-200 disabled:to-slate-300 disabled:text-slate-400 disabled:shadow-none hover:shadow-lg hover:shadow-blue-500/30 flex items-center justify-center gap-2 active:scale-95 transition-all duration-200"
           >
             {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
             <span>XÁC NHẬN LÊN ĐƠN HÀNG</span>
@@ -852,7 +856,7 @@ const OrderCreatePage = () => {
           <div className="lg:col-span-8 space-y-6">
             {/* PRODUCT SEARCH */}
             <div className="relative" ref={searchResultsRef}>
-              <div className="flex items-center gap-3 bg-white border border-slate-100 rounded-2xl px-5 py-4 shadow-sm hover:shadow-md focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 transition-all duration-300">
+              <div className="flex items-center gap-3 bg-white border border-slate-100 rounded-xl px-5 py-4 shadow-sm hover:shadow-md focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 transition-all duration-300">
                 <Search size={18} className="text-blue-500 shrink-0" />
                 <input
                   type="text"
@@ -876,7 +880,7 @@ const OrderCreatePage = () => {
               </div>
 
               {showResults && (
-                <div className="absolute top-full left-0 w-full mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl p-5 max-h-[500px] overflow-y-auto z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="absolute top-full left-0 w-full mt-2 bg-white border border-slate-100 rounded-xl shadow-2xl p-5 max-h-[500px] overflow-y-auto z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                   <div className="flex justify-between items-center mb-4 pb-2 border-b border-slate-100/50">
                     <p className="text-[10px] font-bold text-slate-400 uppercase ">
                       Kết quả tìm kiếm ({searchResults.length})
@@ -893,7 +897,7 @@ const OrderCreatePage = () => {
                       {searchResults.map((p) => (
                         <div
                           key={p.id}
-                          className="p-4 bg-slate-50 border border-slate-100 hover:border-blue-200 hover:bg-white rounded-2xl hover:shadow-md transition-all duration-200 flex flex-col justify-between"
+                          className="p-4 bg-slate-50 border border-slate-100 hover:border-blue-200 hover:bg-white rounded-xl hover:shadow-md transition-all duration-200 flex flex-col justify-between"
                         >
                           <div className="flex items-start gap-3 mb-3">
                             <img
@@ -932,7 +936,7 @@ const OrderCreatePage = () => {
             </div>
 
             {/* CART TABLE */}
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden h-[520px] flex flex-col">
+            <div className="bg-white rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden h-[520px] flex flex-col">
               <div className="flex justify-between items-center px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-blue-50/50 to-white shrink-0">
                 <div className="flex items-center gap-2.5">
                   <div className="p-2 bg-blue-100/50 rounded-lg">
@@ -1040,7 +1044,7 @@ const OrderCreatePage = () => {
 
             {/* FULFILLMENT FORM */}
             {activeSession.selectedItems.length > 0 && (
-              <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm hover:shadow-md transition-all duration-300 space-y-5">
+              <div className="bg-white rounded-xl border border-slate-100 p-6 shadow-sm hover:shadow-md transition-all duration-300 space-y-5">
                 <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100/50">
                   <div className="p-2 bg-blue-100/50 rounded-lg">
                     <Truck className="w-4.5 h-4.5 text-blue-600" />
@@ -1174,7 +1178,7 @@ const OrderCreatePage = () => {
 
           <div className="lg:col-span-4 space-y-6">
             {/* CUSTOMER SIDEBAR */}
-            <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm hover:shadow-md transition-all duration-300 space-y-6">
+            <div className="bg-white rounded-xl border border-slate-100 p-6 shadow-sm hover:shadow-md transition-all duration-300 space-y-6">
               {/* Customer section */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2.5 pb-2 border-b border-slate-100/50">
@@ -1361,7 +1365,7 @@ const OrderCreatePage = () => {
               </div>
 
               {/* Order breakdown */}
-              <div className="space-y-3.5 p-5 bg-slate-50 border border-slate-100 rounded-2xl">
+              <div className="space-y-3.5 p-5 bg-slate-50 border border-slate-100 rounded-xl">
                 <div className="flex justify-between text-xs font-bold text-slate-500">
                   <span>Tạm tính</span>
                   <span className="text-slate-800">
@@ -1499,13 +1503,13 @@ const BankPaymentModal = ({ isOpen, onClose, bankInfo }) => {
         </div>
 
         <div className="p-8 flex flex-col items-center">
-          <div className="relative p-4 bg-white rounded-2xl shadow-lg border border-slate-100 mb-6 group">
+          <div className="relative p-4 bg-white rounded-xl shadow-lg border border-slate-100 mb-6 group">
             <img
               src={qrUrl}
               alt="SePay QR"
               className="w-60 h-60 object-contain transition-transform group-hover:scale-105 duration-300"
             />
-            <div className="absolute inset-0 border-2 border-blue-500/20 rounded-2xl pointer-events-none" />
+            <div className="absolute inset-0 border-2 border-blue-500/20 rounded-xl pointer-events-none" />
           </div>
 
           <div className="w-full space-y-3.5">

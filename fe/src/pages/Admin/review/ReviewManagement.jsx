@@ -158,7 +158,7 @@ const ReviewManagement = () => {
     <AdminLayout>
       <div className="flex flex-col gap-6 animate-in fade-in duration-500">
         {/* Header and Filter */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white p-5 rounded-xl border border-slate-100 shadow-sm">
           <div>
             <h1 className="text-xl font-bold text-slate-800">
               Quản lý đánh giá
@@ -209,7 +209,10 @@ const ReviewManagement = () => {
         <div className="space-y-4">
           {loading ? (
             [...Array(3)].map((_, i) => (
-              <div key={i} className="bg-white rounded-2xl border border-slate-100 p-5 animate-pulse space-y-4 shadow-sm">
+              <div
+                key={i}
+                className="bg-white rounded-xl border border-slate-100 p-5 animate-pulse space-y-4 shadow-sm"
+              >
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-slate-50"></div>
                   <div className="space-y-2 flex-1">
@@ -217,10 +220,11 @@ const ReviewManagement = () => {
                     <div className="h-3 bg-slate-50/50 rounded w-1/6"></div>
                   </div>
                 </div>
-                <div className="h-16 bg-slate-50 rounded-2xl"></div>
+                <div className="h-16 bg-slate-50 rounded-xl"></div>
               </div>
-            ))) : reviews.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-dashed border-slate-200 text-center">
+            ))
+          ) : reviews.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 bg-white rounded-xl border border-dashed border-slate-200 text-center">
               <MessageSquare className="w-12 h-12 text-slate-200 mb-3" />
               <p className="text-slate-500 font-bold">
                 Không tìm thấy đánh giá nào
@@ -233,7 +237,7 @@ const ReviewManagement = () => {
             reviews.map((review) => (
               <div
                 key={review.id}
-                className={`bg-white rounded-2xl border p-5 transition-all shadow-sm ${
+                className={`bg-white rounded-xl border p-5 transition-all shadow-sm ${
                   review.is_hidden
                     ? "border-rose-100 bg-rose-50/10"
                     : "border-slate-100"
@@ -311,13 +315,13 @@ const ReviewManagement = () => {
                       </div>
                     </div>
 
-                    <div className="text-sm text-slate-700 bg-slate-50/30 p-4 rounded-2xl italic leading-relaxed mb-4 border border-slate-100">
+                    <div className="text-sm text-slate-700 bg-slate-50/30 p-4 rounded-xl italic leading-relaxed mb-4 border border-slate-100">
                       "{review.content}"
                     </div>
 
                     {/* Admin Reply Area */}
                     {review.admin_reply ? (
-                      <div className="bg-blue-50/30 p-4 rounded-2xl border border-blue-100 relative">
+                      <div className="bg-blue-50/30 p-4 rounded-xl border border-blue-100 relative">
                         <div className="absolute -top-2 left-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[9px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                           Phản hồi từ Admin
                         </div>
@@ -367,7 +371,7 @@ const ReviewManagement = () => {
         </div>
 
         {/* Pagination */}
-        <div className=" bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+        <div className=" bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
           <Pagination
             pagination={pagination}
             onPageChange={handlePageChange}

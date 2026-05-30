@@ -39,9 +39,11 @@ export const checkCanReviewRequest = async (productId) => {
 /**
  * Lấy danh sách đánh giá của tôi
  */
-export const fetchMyCommentsRequest = async () => {
+export const fetchMyCommentsRequest = async (page = 1) => {
   try {
-    const response = await api.get("/comments/my-comments");
+    const response = await api.get("/comments/my-comments", {
+      params: { page },
+    });
     return response.data;
   } catch (error) {
     throw error;

@@ -145,7 +145,7 @@ const MyOrders = () => {
       <div className="bg-[#f8fafc] min-h-screen pt-32 pb-24 text-left">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           {/* Breadcrumbs */}
-          <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-10 bg-white px-5 py-3 rounded-2xl border border-slate-100 shadow-sm w-fit">
+          <div className="flex items-center gap-2 text-xs font-medium text-slate-600 uppercase tracking-widest mb-10 bg-white px-5 py-3 rounded-xl border border-slate-100 shadow-sm w-fit">
             <Link
               to="/"
               className="hover:text-sky-600 transition-colors flex items-center gap-1"
@@ -158,9 +158,9 @@ const MyOrders = () => {
           </div>
 
           {/* Title Area and Search */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 bg-white p-6 md:p-8 rounded-3xl border border-slate-100 shadow-sm">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 bg-white p-5 rounded-xl border border-slate-100 shadow-sm">
             <div>
-              <h1 className="text-2xl md:text-3xl font-black text-slate-800 uppercase tracking-tight mb-2">
+              <h1 className="text-xl md:text-xl font-black text-slate-800 uppercase tracking-tight mb-2">
                 Đơn hàng của tôi
               </h1>
               <p className="text-sm text-slate-400 font-medium">
@@ -181,13 +181,13 @@ const MyOrders = () => {
                     onChange={(e) =>
                       setFilters({ ...filters, search: e.target.value })
                     }
-                    className="w-full h-12 pl-11 pr-4 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-black uppercase outline-none focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all placeholder:text-slate-300"
+                    className="w-full h-12 pl-11 pr-4 bg-slate-50 border border-slate-100 rounded-xl text-xs font-medium uppercase outline-none focus:bg-white focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all placeholder:text-slate-300"
                   />
                 </form>
               </div>
               <button
                 onClick={() => setIsFilterOpen(!isFilterOpen)}
-                className={`h-12 px-4 rounded-2xl border text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all active:scale-95 ${
+                className={`h-12 px-4 rounded-xl border text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all active:scale-95 ${
                   isFilterOpen
                     ? "bg-sky-600 text-white border-sky-600 shadow-md shadow-sky-500/10"
                     : "bg-white text-slate-600 border-slate-100 hover:bg-slate-50"
@@ -333,13 +333,13 @@ const MyOrders = () => {
                   >
                     <div className="p-5 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
                       <div className="flex items-start gap-5">
-                        <div className="w-14 h-14 bg-sky-50 rounded-2xl flex items-center justify-center text-sky-600 group-hover:scale-105 transition-transform duration-300 border border-sky-100/50 flex-shrink-0">
+                        <div className="w-14 h-14 bg-sky-50 rounded-xl flex items-center justify-center text-sky-600 group-hover:scale-105 transition-transform duration-300 border border-sky-100/50 flex-shrink-0">
                           <Package size={22} />
                         </div>
                         <div>
                           <div className="flex flex-wrap items-center gap-3 mb-1.5">
-                            <h3 className="text-xs font-black uppercase tracking-wider text-slate-800">
-                              #{order.code}
+                            <h3 className="text-[13px] font-medium tracking-wider text-slate-800">
+                              {order.code}
                             </h3>
                             <OrderStatusBadge status={order.status} />
                           </div>
@@ -362,7 +362,7 @@ const MyOrders = () => {
                           )}
                           <div className="flex items-center gap-2">
                             <PaymentStatusBadge status={order.payment_status} />
-                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2.5 border-l border-slate-100">
+                            <span className="text-[12px] font-medium text-slate-600 uppercase px-2.5 border-l border-slate-100">
                               {order.payment_method?.name || "N/A"}
                             </span>
                           </div>
@@ -370,7 +370,7 @@ const MyOrders = () => {
                       </div>
 
                       <div className="flex flex-col md:items-end gap-1 px-1">
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-left md:text-right">
+                        <p className="text-[12px] font-medium text-slate-600 tracking-widest text-left md:text-right">
                           Tổng thanh toán
                         </p>
                         <p className="text-lg font-black text-sky-700">
@@ -385,7 +385,7 @@ const MyOrders = () => {
                       <div className="flex items-center gap-1.5 border-t md:border-t-0 md:border-l border-slate-50 pt-4 md:pt-0 md:pl-6">
                         <Link
                           to={`/orders/${order.id}`}
-                          className="w-10 h-10 hover:bg-sky-50 text-slate-400 hover:text-sky-600 rounded-2xl flex items-center justify-center transition-all active:scale-90"
+                          className="w-10 h-10 hover:bg-sky-50 text-slate-400 hover:text-sky-600 rounded-xl flex items-center justify-center transition-all active:scale-90"
                           title="Xem chi tiết"
                         >
                           <Eye size={16} />
@@ -393,7 +393,7 @@ const MyOrders = () => {
                         {order.status === "pending" && (
                           <button
                             onClick={() => handleCancelOrder(order.id)}
-                            className="w-10 h-10 hover:bg-rose-50 text-slate-400 hover:text-rose-500 rounded-2xl flex items-center justify-center transition-all active:scale-90"
+                            className="w-10 h-10 hover:bg-rose-50 text-slate-400 hover:text-rose-500 rounded-xl flex items-center justify-center transition-all active:scale-90"
                             title="Hủy đơn hàng"
                           >
                             <Trash2 size={16} />
@@ -424,7 +424,7 @@ const MyOrders = () => {
                           </div>
                         )}
                       </div>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-wide italic max-w-sm line-clamp-1">
+                      <p className="text-[12px] font-medium text-slate-600  max-w-sm line-clamp-1">
                         {order.items?.length} sản phẩm -{" "}
                         {order.items
                           ?.map((i) => i.product_name)
@@ -442,11 +442,11 @@ const MyOrders = () => {
                     <button
                       disabled={page === 1}
                       onClick={() => setPage(page - 1)}
-                      className="w-10 h-10 flex items-center justify-center bg-white border border-slate-100 rounded-2xl text-slate-400 disabled:opacity-30 disabled:cursor-not-allowed hover:text-sky-600 hover:bg-slate-50 transition-all shadow-sm active:scale-90"
+                      className="w-10 h-10 flex items-center justify-center bg-white border border-slate-100 rounded-xl text-slate-400 disabled:opacity-30 disabled:cursor-not-allowed hover:text-sky-600 hover:bg-slate-50 transition-all shadow-sm active:scale-90"
                     >
                       <ChevronLeft size={18} />
                     </button>
-                    <div className="h-10 px-4 bg-white border border-slate-100 rounded-2xl flex items-center justify-center shadow-sm">
+                    <div className="h-10 px-4 bg-white border border-slate-100 rounded-xl flex items-center justify-center shadow-sm">
                       <span className="text-[11px] font-black text-slate-600 uppercase tracking-widest">
                         Trang {page} / {Math.ceil(total / 10)}
                       </span>
@@ -454,7 +454,7 @@ const MyOrders = () => {
                     <button
                       disabled={page >= Math.ceil(total / 10)}
                       onClick={() => setPage(page + 1)}
-                      className="w-10 h-10 flex items-center justify-center bg-white border border-slate-100 rounded-2xl text-slate-400 disabled:opacity-30 disabled:cursor-not-allowed hover:text-sky-600 hover:bg-slate-50 transition-all shadow-sm active:scale-90"
+                      className="w-10 h-10 flex items-center justify-center bg-white border border-slate-100 rounded-xl text-slate-400 disabled:opacity-30 disabled:cursor-not-allowed hover:text-sky-600 hover:bg-slate-50 transition-all shadow-sm active:scale-90"
                     >
                       <ChevronRight size={18} />
                     </button>
@@ -475,7 +475,7 @@ const MyOrders = () => {
                 </p>
                 <Link
                   to="/products"
-                  className="inline-flex items-center gap-2 bg-sky-600 text-white px-8 py-3.5 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-sky-700 transition-all shadow-md shadow-sky-500/10 hover:-translate-y-0.5 active:scale-95"
+                  className="inline-flex items-center gap-2 bg-sky-600 text-white px-8 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-sky-700 transition-all shadow-md shadow-sky-500/10 hover:-translate-y-0.5 active:scale-95"
                 >
                   Bắt đầu mua sắm
                   <ArrowRight size={14} />

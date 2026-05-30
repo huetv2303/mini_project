@@ -169,7 +169,7 @@ const SupplierListPage = () => {
             {canManage && selectedIds.size > 0 && (
               <button
                 onClick={openBulkDeleteModal}
-                className="inline-flex items-center px-6 py-3 bg-rose-500 text-white text-sm font-bold rounded-2xl hover:bg-rose-600 transition-all shadow-md shadow-rose-500/20 active:scale-95 animate-in slide-in-from-right-4"
+                className="inline-flex items-center px-6 py-3 bg-rose-500 text-white text-sm font-bold rounded-xl hover:bg-rose-600 transition-all shadow-md shadow-rose-500/20 active:scale-95 animate-in slide-in-from-right-4"
               >
                 <Trash2 className="w-5 h-5 mr-2" /> Xóa {selectedIds.size}
               </button>
@@ -177,7 +177,7 @@ const SupplierListPage = () => {
             {canManage && (
               <Link
                 to="/admin/suppliers/create"
-                className="inline-flex items-center px-5 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-extrabold uppercase rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md shadow-blue-500/20 active:scale-95"
+                className="inline-flex items-center px-5 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-extrabold uppercase rounded-[5px] hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md shadow-blue-500/20 active:scale-95"
               >
                 <Plus className="w-5 h-5 mr-2" /> Thêm NCC
               </Link>
@@ -185,7 +185,7 @@ const SupplierListPage = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
           <div className="p-8 border-b border-slate-100 bg-slate-50/50 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -194,7 +194,7 @@ const SupplierListPage = () => {
                 value={searchTerm}
                 onChange={handleSearchChange}
                 placeholder="Tìm tên, email hoặc mã số thuế..."
-                className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all shadow-sm text-slate-800 font-semibold"
+                className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all shadow-sm text-slate-800 font-semibold"
               />
             </div>
             {selectedIds.size > 0 && (
@@ -279,7 +279,7 @@ const SupplierListPage = () => {
                                 ? `${import.meta.env.VITE_URL_IMAGE}/${sup.image}`
                                 : "/no-image.png"
                             }
-                            className="w-14 h-14 rounded-2xl object-cover border border-slate-200 shadow-sm transition-transform group-hover:scale-105"
+                            className="w-14 h-14 rounded-xl object-cover border border-slate-200 shadow-sm transition-transform group-hover:scale-105"
                             alt={sup.name}
                           />
                           <div>

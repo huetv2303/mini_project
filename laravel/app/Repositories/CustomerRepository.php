@@ -79,13 +79,27 @@ class CustomerRepository implements CustomerRepositoryInterface
             } else {
                 $user->customerProfile()->create(array_merge(['user_id' => $user->id], $profileData));
             }
+
+            if (isset($profileData['is_active'])) {
+                $userUpdate = ['is_active' => $profileData['is_active']];
+                if ($profileData['is_active']) {
+                    $userUpdate['failed_attempts'] = 0;
+                }
+                $user->update($userUpdate);
+            }
         }
 
         return $user->refresh()->load('customerProfile');
     }
     public function bulkUpdateStatus(array $ids, bool $isActive)
     {
-        return CustomerProfile::whereIn('user_id', $ids)->update(['is_active' => $isActive]);
+        CustomerProfile::whereIn('user_id', $ids)->update(['is_active' => $isActive]);
+        
+        $userUpdate = ['is_active' => $isActive];
+        if ($isActive) {
+            $userUpdate['failed_attempts'] = 0;
+        }
+        return User::whereIn('id', $ids)->update($userUpdate);
     }
 
     public function deleteCustomer($id)

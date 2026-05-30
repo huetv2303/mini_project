@@ -16,7 +16,7 @@ const CustomerFooter = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-16 mb-24">
           <div className="lg:col-span-2 space-y-8">
             <Link to="/" className="  flex items-center gap-3">
-              <div className="w-12 h-12 bg-black flex items-center justify-center rounded-2xl shadow-xl shadow-black/10">
+              <div className="w-12 h-12 bg-black flex items-center justify-center rounded-xl shadow-xl shadow-black/10">
                 <img
                   src={LogoTrendora}
                   className="w-10 h-10 object-contain contrast-125"
@@ -35,7 +35,7 @@ const CustomerFooter = () => {
                 <a
                   key={i}
                   href="#"
-                  className="w-12 h-12 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center hover:bg-black hover:text-white hover:-translate-y-1 transition-all duration-300 shadow-sm"
+                  className="w-12 h-12 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center hover:bg-black hover:text-white hover:-translate-y-1 transition-all duration-300 shadow-sm"
                 >
                   <Icon size={20} />
                 </a>
@@ -102,7 +102,7 @@ const CustomerFooter = () => {
               <input
                 type="email"
                 placeholder="Email của bạn"
-                className="w-full h-16 bg-slate-50 border border-slate-100 rounded-2xl px-6 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-black/5 focus:border-black transition-all"
+                className="w-full h-16 bg-slate-50 border border-slate-100 rounded-xl px-6 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-black/5 focus:border-black transition-all"
               />
               <button className="absolute right-2 top-2 w-12 h-12 bg-black text-white rounded-xl flex items-center justify-center hover:bg-slate-800 transition-all shadow-lg active:scale-95">
                 <ArrowRight size={20} />

@@ -27,7 +27,7 @@ const GeneralInfoSection = ({
   return (
     <div className="bg-white rounded-lg p-4 md:p-6 border border-gray-100 shadow-lg shadow-black/5 space-y-8 transition-all hover:shadow-2xl hover:shadow-black/5">
       <div className="flex items-center gap-3 border-b border-gray-50 pb-6">
-        <div className="w-10 h-10 bg-indigo-50 rounded-2xl flex items-center justify-center">
+        <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center">
           <Package className="w-5 h-5 text-indigo-500" />
         </div>
         <h2 className="text-xl font-bold text-gray-900">Thông tin định danh</h2>
@@ -61,7 +61,7 @@ const GeneralInfoSection = ({
                 value={variants[0]?.sku}
                 onChange={(e) => updateVariant(0, "sku", e.target.value)}
                 placeholder="SKU sản phẩm..."
-                className="w-full px-4 py-3 bg-white outline-none border border-gray-100 rounded-2xl focus:border-black transition-all text-sm font-bold"
+                className="w-full px-4 py-3 bg-white outline-none border border-gray-100 rounded-xl focus:border-black transition-all text-sm font-bold"
               />
             </div>
             <div className="space-y-2">
@@ -73,7 +73,7 @@ const GeneralInfoSection = ({
                 value={formatPrice(variants[0]?.price)}
                 onChange={(e) => onPriceChange(e, 0, "price")}
                 placeholder="Giá bán..."
-                className="w-full px-4 py-3 bg-white outline-none border border-gray-100 rounded-2xl focus:border-black transition-all text-sm font-bold text-emerald-600"
+                className="w-full px-4 py-3 bg-white outline-none border border-gray-100 rounded-xl focus:border-black transition-all text-sm font-bold text-emerald-600"
               />
             </div>
             <div className="space-y-2">
@@ -85,7 +85,7 @@ const GeneralInfoSection = ({
                 value={formatPrice(variants[0]?.compare_price)}
                 onChange={(e) => onPriceChange(e, 0, "compare_price")}
                 placeholder="Giá niêm yết..."
-                className="w-full px-4 py-3 bg-white outline-none border border-gray-100 rounded-2xl focus:border-black transition-all text-sm font-medium"
+                className="w-full px-4 py-3 bg-white outline-none border border-gray-100 rounded-xl focus:border-black transition-all text-sm font-medium"
               />
             </div>
             <div className="space-y-2">
@@ -99,7 +99,7 @@ const GeneralInfoSection = ({
                   updateVariant(0, "inventory.quantity", e.target.value)
                 }
                 placeholder="0"
-                className="w-full px-4 py-3 bg-white outline-none border border-gray-100 rounded-2xl focus:border-black transition-all text-sm font-bold text-indigo-600"
+                className="w-full px-4 py-3 bg-white outline-none border border-gray-100 rounded-xl focus:border-black transition-all text-sm font-bold text-indigo-600"
               />
             </div>
           </div>

@@ -69,8 +69,9 @@ class SocialAuthController extends Controller
             return redirect(env('FRONTEND_URL') . '/login?error=Vui lòng kiểm tra email để xác thực tài khoản trước khi đăng nhập.');
         }
 
-        if ($user->customerProfile && !$user->customerProfile->is_active) {
-            return redirect(env('FRONTEND_URL') . '/login?error=Tài khoản của bạn đã bị khóa. Vui lòng liên hệ ban quản trị để được hỗ trợ.');
+        if (!$user->is_active || ($user->customerProfile && !$user->customerProfile->is_active)) {
+            $adminPhone = env('ADMIN_PHONE', '0987654321');
+            return redirect(env('FRONTEND_URL') . '/login?error=Tài khoản của bạn đã bị khóa. Vui lòng liên hệ Admin qua SĐT: ' . $adminPhone . ' để được hỗ trợ.');
         }
 
         $token = auth('api')->login($user);

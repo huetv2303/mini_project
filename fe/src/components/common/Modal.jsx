@@ -66,7 +66,7 @@ const Modal = ({
             {onClose && (
               <button
                 onClick={onClose}
-                className="p-2.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-2xl transition-all active:scale-90"
+                className="p-2.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all active:scale-90"
               >
                 <X className="w-5 h-5" strokeWidth={2.5} />
               </button>

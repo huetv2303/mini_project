@@ -90,7 +90,7 @@ const OrderReturnDetailsPage = () => {
         <div className="flex items-center gap-4 mb-8">
           <button
             onClick={() => navigate("/admin/order-returns")}
-            className="p-3 bg-white border border-gray-100 rounded-2xl hover:bg-gray-50 transition-all shadow-sm group"
+            className="p-3 bg-white border border-gray-100 rounded-xl hover:bg-gray-50 transition-all shadow-sm group"
           >
             <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
           </button>
@@ -183,7 +183,7 @@ const OrderReturnDetailsPage = () => {
                 <FileText className="w-4 h-4" />
                 Lý do trả hàng
               </h3>
-              <p className="text-sm font-medium text-gray-600 bg-gray-50 p-6 rounded-2xl border border-gray-100 leading-relaxed italic">
+              <p className="text-sm font-medium text-gray-600 bg-gray-50 p-6 rounded-xl border border-gray-100 leading-relaxed italic">
                 "{orderReturn.reason || "Không có lý do cụ thể"}"
               </p>
 
@@ -253,7 +253,7 @@ const OrderReturnDetailsPage = () => {
                 Người thực hiện
               </h3>
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-black text-white rounded-2xl flex items-center justify-center font-black shadow-lg">
+                <div className="w-12 h-12 bg-black text-white rounded-xl flex items-center justify-center font-black shadow-lg">
                   {orderReturn.staff?.name?.charAt(0)}
                 </div>
                 <div>

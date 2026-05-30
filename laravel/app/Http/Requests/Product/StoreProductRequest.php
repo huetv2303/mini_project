@@ -24,8 +24,8 @@ class StoreProductRequest extends FormRequest
     {
         return [
             'name'              => 'required|string|unique:products,name',
-            'category_id'       => 'required|exists:categories,id',
-            'supplier_id'       => 'required|exists:suppliers,id',
+            'category_id'       => 'nullable|exists:categories,id',
+            'supplier_id'       => 'nullable|exists:suppliers,id',
             'short_description' => 'nullable|string',
             'description'       => 'nullable|string',
             'status'            => 'in:active,inactive,draft',
@@ -54,6 +54,7 @@ class StoreProductRequest extends FormRequest
 
             'variants.*.inventory.quantity'     => 'required|integer|min:0',
             'variants.*.inventory.min_quantity' => 'nullable|integer|min:0',
+            'variants.*.existing_image'         => 'nullable|string',
         ];
     }
 }

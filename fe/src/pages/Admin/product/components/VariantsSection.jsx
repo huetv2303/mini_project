@@ -108,7 +108,7 @@ const VariantsSection = ({
     return (
       <div className="bg-white rounded-lg p-4 md:p-6 border border-gray-100 shadow-xl shadow-black/5 space-y-6">
         <div className="flex items-center gap-3 border-b border-gray-50 pb-6">
-          <div className="w-10 h-10 bg-indigo-50 rounded-2xl flex items-center justify-center">
+          <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center">
             <Settings className="w-5 h-5 text-indigo-500" />
           </div>
           <h2 className="text-xl font-bold text-gray-900 uppercase">
@@ -179,7 +179,7 @@ const VariantsSection = ({
       {/* HEADER */}
       <div className="flex items-center justify-between border-b border-gray-50 pb-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-indigo-50 rounded-2xl flex items-center justify-center">
+          <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center">
             <Settings className="w-5 h-5 text-indigo-500" />
           </div>
           <h2 className="text-xl font-black text-gray-900 uppercase">

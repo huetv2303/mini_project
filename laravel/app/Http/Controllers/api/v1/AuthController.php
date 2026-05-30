@@ -42,16 +42,23 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             $status = 401;
             $message = 'Tài khoản hoặc mật khẩu không chính xác.';
+            $exceptionMessage = $e->getMessage();
 
-            if ($e->getMessage() === 'EmailNotVerified') {
+            if ($exceptionMessage === 'EmailNotVerified') {
                 $status = 403;
                 $message = 'Vui lòng xác nhận email trước khi đăng nhập.';
-            } elseif ($e->getMessage() === 'GoogleAccountOnly') {
+            } elseif ($exceptionMessage === 'GoogleAccountOnly') {
                 $status = 422;
                 $message = 'Tài khoản này đã đăng ký qua Google. Vui lòng sử dụng tính năng "Đăng nhập với Google".';
-            } elseif ($e->getMessage() === 'AccountLocked') {
+            } elseif ($exceptionMessage === 'AccountLocked') {
                 $status = 403;
-                $message = 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ ban quản trị để được hỗ trợ.';
+                $adminPhone = env('ADMIN_PHONE', '0987654321');
+                $message = "Tài khoản của bạn đã bị khóa do nhập sai mật khẩu quá 5 lần. Vui lòng liên hệ Admin qua SĐT: {$adminPhone} để được hỗ trợ.";
+            } elseif (str_starts_with($exceptionMessage, 'InvalidCredentials|')) {
+                $status = 401;
+                $parts = explode('|', $exceptionMessage);
+                $remaining = $parts[1] ?? 0;
+                $message = "Mật khẩu không chính xác. Bạn còn {$remaining} lần thử trước khi tài khoản bị khóa.";
             }
 
             return response()->json([

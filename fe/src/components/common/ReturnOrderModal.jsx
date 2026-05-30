@@ -150,7 +150,7 @@ const ReturnOrderModal = ({ order, onClose, onSuccess }) => {
           <h2 className="text-lg font-bold text-slate-900">
             Yêu cầu trả hàng đã được gửi!
           </h2>
-          <div className="bg-slate-50 rounded-2xl p-5 text-left space-y-3 text-sm">
+          <div className="bg-slate-50 rounded-xl p-5 text-left space-y-3 text-sm">
             <Row label="Mã phiếu trả" value={result.return_code} mono />
             <Row
               label="Tổng hoàn dự kiến"
@@ -222,7 +222,7 @@ const ReturnOrderModal = ({ order, onClose, onSuccess }) => {
             </div>
 
             {returnableItems.length === 0 ? (
-              <div className="flex items-center gap-3 p-4 bg-amber-50 rounded-2xl border border-amber-100">
+              <div className="flex items-center gap-3 p-4 bg-amber-50 rounded-xl border border-amber-100">
                 <AlertCircle
                   size={18}
                   className="text-amber-500 flex-shrink-0"
@@ -239,7 +239,7 @@ const ReturnOrderModal = ({ order, onClose, onSuccess }) => {
                   return (
                     <label
                       key={item.id}
-                      className={`flex items-center gap-4 p-3 rounded-2xl border cursor-pointer transition-all ${
+                      className={`flex items-center gap-4 p-3 rounded-xl border cursor-pointer transition-all ${
                         sel?.checked
                           ? "border-purple-300 bg-purple-50"
                           : "border-gray-100 bg-slate-50 hover:border-gray-200"
@@ -349,7 +349,7 @@ const ReturnOrderModal = ({ order, onClose, onSuccess }) => {
           </div>
 
           {selectedItems.length > 0 && (
-            <div className="bg-rose-50 rounded-2xl border border-rose-100 p-4 flex items-center justify-between">
+            <div className="bg-rose-50 rounded-xl border border-rose-100 p-4 flex items-center justify-between">
               <div>
                 <p className="text-xs text-rose-400 font-medium">
                   Tổng tiền hoàn dự kiến

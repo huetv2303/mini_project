@@ -47,7 +47,7 @@ class StockReceiptService
 
             $receipt = $this->receiptRepo->create([
                 'code'         => $code,
-                'supplier_id'  => $data['supplier_id'],
+                'supplier_id'  => $data['supplier_id'] ?? null,
                 'user_id'      => $userId,
                 'status'       => 'pending',
                 'total_amount' => $totalAmount,

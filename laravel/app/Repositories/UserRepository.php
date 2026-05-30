@@ -51,7 +51,7 @@ class UserRepository implements UserRepositoryInterface
     public function updateUser($id, array $data)
     {
         $user = User::findOrFail($id);
-        
+
         $updateData = [
             'name' => $data['name'] ?? $user->name,
             'email' => $data['email'] ?? $user->email,
@@ -63,6 +63,13 @@ class UserRepository implements UserRepositoryInterface
 
         if (isset($data['role_id'])) {
             $updateData['role_id'] = $data['role_id'];
+        }
+
+        if (isset($data['is_active'])) {
+            $updateData['is_active'] = $data['is_active'];
+            if ($data['is_active']) {
+                $updateData['failed_attempts'] = 0;
+            }
         }
 
         $user->update($updateData);

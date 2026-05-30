@@ -28,7 +28,7 @@ class AuthService
             throw new \Exception('InvalidCredentials');
         }
 
-        if ($user->customerProfile && !$user->customerProfile->is_active) {
+        if (!$user->is_active || ($user->customerProfile && !$user->customerProfile->is_active)) {
             throw new \Exception('AccountLocked');
         }
 
@@ -37,12 +37,26 @@ class AuthService
         }
 
         if (!$token = auth('api')->attempt($credentials)) {
-            throw new \Exception('InvalidCredentials');
+            $user->increment('failed_attempts');
+            if ($user->failed_attempts >= 5) {
+                $user->update(['is_active' => false]);
+                if ($user->customerProfile) {
+                    $user->customerProfile->update(['is_active' => false]);
+                }
+                throw new \Exception('AccountLocked');
+            }
+            $remaining = 5 - $user->failed_attempts;
+            throw new \Exception("InvalidCredentials|{$remaining}");
         }
 
         if (!$user->hasVerifiedEmail()) {
             auth('api')->logout();
             throw new \Exception('EmailNotVerified');
+        }
+
+        // Reset failed attempts upon successful login
+        if ($user->failed_attempts > 0) {
+            $user->update(['failed_attempts' => 0]);
         }
 
         return $token;

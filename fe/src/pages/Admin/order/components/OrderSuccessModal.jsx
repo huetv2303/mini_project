@@ -69,7 +69,7 @@ const OrderSuccessModal = ({ isOpen, onClose, order }) => {
         <div className="flex-1 p-8 flex flex-col justify-between bg-white">
           <div className="space-y-6">
             <div className="flex items-center gap-3 text-emerald-600">
-              <div className="p-3 bg-emerald-50 rounded-2xl">
+              <div className="p-3 bg-emerald-50 rounded-xl">
                 <CheckCircle2 className="w-10 h-10" />
               </div>
               <div>
@@ -80,7 +80,7 @@ const OrderSuccessModal = ({ isOpen, onClose, order }) => {
               </div>
             </div>
 
-            <div className="p-5 bg-gray-50 rounded-2xl border border-gray-100 space-y-3.5 text-xs">
+            <div className="p-5 bg-gray-50 rounded-xl border border-gray-100 space-y-3.5 text-xs">
               <div className="flex justify-between items-center">
                 <span className="text-gray-500 font-medium">Mã đơn hàng:</span>
                 <span className="text-gray-900 font-bold uppercase tracking-wider">
@@ -112,7 +112,7 @@ const OrderSuccessModal = ({ isOpen, onClose, order }) => {
           <div className="space-y-3 mt-8">
             <button
               onClick={handlePrint}
-              className="w-full py-4 bg-blue-600 text-white rounded-2xl text-xs font-bold uppercase tracking-wider hover:bg-blue-700 active:scale-98 transition shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2"
+              className="w-full py-4 bg-blue-600 text-white rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-blue-700 active:scale-98 transition shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2"
             >
               <Printer className="w-4 h-4" />
               In Hóa Đơn K80 (80mm)
@@ -120,7 +120,7 @@ const OrderSuccessModal = ({ isOpen, onClose, order }) => {
 
             <button
               onClick={() => onClose(true)}
-              className="w-full py-4 bg-black text-white rounded-2xl text-xs font-bold uppercase tracking-wider hover:bg-gray-800 active:scale-98 transition flex items-center justify-center gap-2"
+              className="w-full py-4 bg-black text-white rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-gray-800 active:scale-98 transition flex items-center justify-center gap-2"
             >
               <Plus className="w-4 h-4" />
               Tiếp tục tạo đơn mới
@@ -128,7 +128,7 @@ const OrderSuccessModal = ({ isOpen, onClose, order }) => {
 
             <button
               onClick={() => onClose(false)}
-              className="w-full py-4 bg-gray-100 text-gray-600 rounded-2xl text-xs font-bold uppercase tracking-wider hover:bg-gray-200 active:scale-98 transition flex items-center justify-center gap-2"
+              className="w-full py-4 bg-gray-100 text-gray-600 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-gray-200 active:scale-98 transition flex items-center justify-center gap-2"
             >
               <X className="w-4 h-4" />
               Đóng và xem chi tiết
@@ -142,7 +142,7 @@ const OrderSuccessModal = ({ isOpen, onClose, order }) => {
             Bản xem trước khi in hóa đơn
           </span>
 
-          <div className="flex-1 overflow-y-auto custom-scrollbar rounded-2xl shadow-inner bg-white border border-gray-200 max-w-[340px] mx-auto w-full">
+          <div className="flex-1 overflow-y-auto custom-scrollbar rounded-xl shadow-inner bg-white border border-gray-200 max-w-[340px] mx-auto w-full">
             <div id="pos-receipt-print-area">
               <POSReceipt order={order} />
             </div>

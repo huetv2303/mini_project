@@ -41,10 +41,11 @@ const CartDrawer = ({ isOpen, onClose }) => {
   useEffect(() => {
     if (isOpen) {
       setVisible(true);
-      requestAnimationFrame(() => setAnimating(true));
+      const rId = requestAnimationFrame(() => setAnimating(true));
+      return () => cancelAnimationFrame(rId);
     } else {
-      setAnimating(true);
-      const timer = setTimeout(() => setAnimating(false), 300);
+      setAnimating(false);
+      const timer = setTimeout(() => setVisible(false), 300);
       return () => clearTimeout(timer);
     }
   }, [isOpen]);
@@ -88,7 +89,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
         {/* Drawer Header */}
         <div className="p-6 border-b border-slate-100 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-sky-50 flex items-center justify-center text-sky-600">
+            <div className="w-10 h-10 rounded-xl bg-sky-50 flex items-center justify-center text-sky-600">
               <ShoppingBag size={20} />
             </div>
             <div>
@@ -106,7 +107,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
           </div>
           <button
             onClick={onClose}
-            className="w-10 h-10 hover:bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all active:scale-90"
+            className="w-10 h-10 hover:bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all active:scale-90"
           >
             <X size={18} />
           </button>
@@ -139,9 +140,9 @@ const CartDrawer = ({ isOpen, onClose }) => {
             cartItems.map((item) => (
               <div
                 key={item.variant_id}
-                className="flex gap-4 p-4 rounded-3xl border border-slate-100 bg-white hover:border-slate-200/60 shadow-sm hover:shadow-md transition-all duration-300 group"
+                className="flex gap-4 p-4 rounded-xl border border-slate-100 bg-white hover:border-slate-200/60 shadow-sm hover:shadow-md transition-all duration-300 group"
               >
-                <div className="w-20 aspect-[3/4] bg-slate-50 rounded-2xl overflow-hidden flex-shrink-0">
+                <div className="w-20 aspect-[3/4] bg-slate-50 rounded-xl overflow-hidden flex-shrink-0">
                   <img
                     src={getImageUrl(item.image)}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -152,7 +153,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
                 <div className="flex-1 flex flex-col justify-between">
                   <div>
                     <div className="flex justify-between items-start gap-2">
-                      <h3 className="text-xs font-black text-slate-800 line-clamp-1 group-hover:text-sky-600 transition-colors uppercase tracking-tight">
+                      <h3 className="text-[13px] font-medium text-slate-800 line-clamp-1 group-hover:text-sky-600 transition-colors ">
                         <Link to={`/products/${item.slug}`} onClick={onClose}>
                           {item.name}
                         </Link>
@@ -169,7 +170,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
                       {item.attributes?.map((attr, idx) => (
                         <span
                           key={idx}
-                          className="text-[9px] bg-sky-50 text-sky-600 px-2 py-0.5 rounded-lg font-black uppercase tracking-wider border border-sky-100/50"
+                          className="text-[12px] bg-sky-50 text-sky-600 px-2 py-0.5 rounded-lg font-medium  border border-sky-100/50"
                         >
                           {attr.attribute_value}
                         </span>
@@ -225,7 +226,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
                       setPromotionCode(e.target.value.toUpperCase())
                     }
                     placeholder="MÃ GIẢM GIÁ..."
-                    className="w-full h-full pl-4 pr-10 bg-white border border-slate-100 rounded-xl text-xs font-black uppercase outline-none focus:border-sky-500 transition-all placeholder:text-slate-300"
+                    className="w-full h-full pl-4 pr-10 bg-white border border-slate-100 rounded-xl text-[13px] font-medium  outline-none focus:border-sky-500 transition-all placeholder:text-slate-300"
                   />
                   {(promotionCode || appliedPromotion) && (
                     <button
@@ -250,7 +251,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
                     )
                   }
                   disabled={isApplying || !promotionCode}
-                  className="px-5 h-full bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-[10px] font-black uppercase tracking-wider disabled:bg-slate-100 disabled:text-slate-400 transition-all flex items-center justify-center min-w-[90px] shadow-md shadow-sky-500/10 active:scale-95"
+                  className="px-5 h-full bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-[13px] font-medium  disabled:bg-slate-100 disabled:text-slate-400 transition-all flex items-center justify-center min-w-[90px] shadow-md shadow-sky-500/10 active:scale-95"
                 >
                   {isApplying ? (
                     <Loader2 className="w-3 h-3 animate-spin" />
@@ -271,7 +272,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
                   );
                   if (data) setIsPromotionModalOpen(true);
                 }}
-                className="w-full py-2.5 border border-dashed border-slate-200 bg-white rounded-xl text-[10px] text-slate-500 font-black uppercase hover:border-sky-500 hover:text-sky-600 hover:bg-sky-50/50 transition-all flex items-center justify-center gap-1.5 active:scale-[0.99]"
+                className="w-full py-2.5 border border-dashed border-slate-200 bg-white rounded-xl text-[1rem] text-slate-500 font-medium  hover:border-sky-500 hover:text-sky-600 hover:bg-sky-50/50 transition-all flex items-center justify-center gap-1.5 active:scale-[0.99]"
               >
                 {isLoadingEligible ? (
                   <Loader2 className="w-3 h-3 animate-spin" />
@@ -284,7 +285,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
 
             <hr className="border-slate-100" />
 
-            <div className="space-y-2 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+            <div className="space-y-2 bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
               <div className="flex items-center justify-between text-xs font-bold text-slate-500">
                 <span>Tạm tính:</span>
                 <span className="text-slate-800">
@@ -303,17 +304,17 @@ const CartDrawer = ({ isOpen, onClose }) => {
                 </div>
               )}
               <div className="flex items-center justify-between pt-2 border-t border-slate-50">
-                <span className="text-xs font-black text-slate-800 uppercase tracking-wider">
+                <span className="text-[1rem] font-medium text-slate-800 ">
                   Tổng cộng:
                 </span>
-                <span className="text-lg font-black text-sky-700">
+                <span className="text-[1rem] font-bold text-sky-700">
                   {formatPrice(finalAmount)}
                 </span>
               </div>
             </div>
 
             <div className="flex flex-col gap-2.5 pt-1">
-              <p className="text-[9px] text-slate-400 text-center uppercase tracking-widest font-black flex items-center justify-center gap-1">
+              <p className="text-[13px] text-slate-400 text-center font-medium  flex items-center justify-center gap-1">
                 <Coins size={11} className="text-sky-500" /> Phí ship tính lúc
                 thanh toán
               </p>
@@ -323,7 +324,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
                   onClose();
                   clearBuyNowItem();
                 }}
-                className="w-full bg-sky-600 hover:bg-sky-700 text-white text-center py-3.5 rounded-2xl text-xs font-black uppercase tracking-wider shadow-lg shadow-sky-500/20 hover:-translate-y-0.5 transition-all active:scale-95"
+                className="w-full bg-sky-600 hover:bg-sky-700 text-white text-center py-3.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-lg shadow-sky-500/20 hover:-translate-y-0.5 transition-all active:scale-95"
               >
                 THANH TOÁN NGAY
               </Link>

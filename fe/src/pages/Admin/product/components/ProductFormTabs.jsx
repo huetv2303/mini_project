@@ -9,7 +9,7 @@ const ProductFormTabs = ({ activeTab, setActiveTab }) => {
   ];
 
   return (
-    <div className="flex gap-2 p-1.5 bg-gray-100/50 backdrop-blur-md rounded-2xl w-fit mb-8 border border-white/50 shadow-inner">
+    <div className="flex gap-2 p-1.5 bg-gray-100/50 backdrop-blur-md rounded-xl w-fit mb-8 border border-white/50 shadow-inner">
       {tabs.map((tab) => {
         const Icon = tab.icon;
         return (
