@@ -23,4 +23,14 @@ class Permission extends Model
     {
         return $this->belongsToMany(Role::class, 'role_permission');
     }
+
+    /**
+     * Một Permission có thể được gán trực tiếp cho nhiều User
+     */
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'user_permissions')
+                    ->withPivot('is_direct')
+                    ->withTimestamps();
+    }
 }

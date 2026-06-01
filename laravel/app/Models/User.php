@@ -48,10 +48,26 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     }
 
     /**
-     * Kiểm tra User có Permission cụ thể không
+     * Relationship trực tiếp với Permission qua bảng user_permissions
+     */
+    public function permissions(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Permission::class, 'user_permissions')
+                    ->withPivot('is_direct')
+                    ->withTimestamps();
+    }
+
+    /**
+     * Kiểm tra User có Permission cụ thể không (bao gồm quyền từ Vai trò và trực tiếp)
      */
     public function hasPermission(string $permissionCode): bool
     {
+        // 1. Kiểm tra từ quyền gán trực tiếp
+        if ($this->permissions()->where('code', $permissionCode)->exists()) {
+            return true;
+        }
+
+        // 2. Kiểm tra từ vai trò của người dùng
         if (!$this->role) {
             return false;
         }

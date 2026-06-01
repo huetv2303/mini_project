@@ -72,7 +72,8 @@ Route::group(['prefix' => 'v1'], function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::post('/change-password', [AuthController::class, 'changePassword']);
 
-        Route::middleware('permission:admin.manage')->group(function () {
+        // Phân quyền: CHỈ ADMIN
+        Route::middleware('admin')->group(function () {
             Route::prefix('roles')->group(function () {
                 Route::get('/', [RoleController::class, 'index']);
                 Route::get('/{id}', [RoleController::class, 'show']);
@@ -81,7 +82,12 @@ Route::group(['prefix' => 'v1'], function () {
             });
 
             Route::get('/permissions', [PermissionController::class, 'index']);
+            Route::get('/permissions/all', [PermissionController::class, 'getAllPermissions']);
+            Route::post('/permissions/assign-users', [PermissionController::class, 'assignUsers']);
+        });
 
+        // Quản lý Nhân viên
+        Route::middleware('permission:staff.manage')->group(function () {
             Route::prefix('users')->group(function () {
                 Route::get('/', [UserController::class, 'index']);
                 Route::post('/', [UserController::class, 'store']);
@@ -93,12 +99,16 @@ Route::group(['prefix' => 'v1'], function () {
         });
 
         Route::prefix('customers')->group(function () {
-            Route::post('/bulk-update-status', [CustomerController::class, 'bulkUpdateStatus']);
-            Route::get('/', [CustomerController::class, 'index']);
-            Route::get('/{id}', [CustomerController::class, 'show']);
-            Route::post('/', [CustomerController::class, 'store']);
-            Route::put('/{id}', [CustomerController::class, 'update']);
-            Route::delete('/{id}', [CustomerController::class, 'destroy']);
+            Route::middleware('permission:users.view')->group(function () {
+                Route::get('/', [CustomerController::class, 'index']);
+                Route::get('/{id}', [CustomerController::class, 'show']);
+            });
+            Route::middleware('permission:users.manage')->group(function () {
+                Route::post('/bulk-update-status', [CustomerController::class, 'bulkUpdateStatus']);
+                Route::post('/', [CustomerController::class, 'store']);
+                Route::put('/{id}', [CustomerController::class, 'update']);
+                Route::delete('/{id}', [CustomerController::class, 'destroy']);
+            });
         });
 
         Route::prefix('categories')->group(function () {
@@ -130,53 +140,65 @@ Route::group(['prefix' => 'v1'], function () {
         });
 
         Route::prefix('orders')->group(function () {
-            Route::post('/bulk-update', [OrderController::class, 'bulkUpdate']);
-            Route::get('/', [OrderController::class, 'index']);
-            Route::post('/', [OrderController::class, 'store']);
-            Route::get('/{id}', [OrderController::class, 'show']);
-            Route::put('/{id}', [OrderController::class, 'update']);
-            Route::patch('/{id}/cancel', [OrderController::class, 'cancel']);
-            Route::patch('/{id}/refund', [OrderController::class, 'refund']);
-            Route::patch('/{id}/update-payment-method', [OrderController::class, 'updatePaymentMethod']);
-        });
-
-        Route::prefix('order-returns')->group(function () {
-            Route::post('/bulk-refund', [OrderReturnController::class, 'bulkRefund']);
-            Route::get('/', [OrderReturnController::class, 'index']);
-            Route::post('/', [OrderReturnController::class, 'store']);
-            Route::get('/{id}', [OrderReturnController::class, 'show']);
-            Route::patch('/{id}/receive', [OrderReturnController::class, 'receive']);
-            Route::patch('/{id}/refund', [OrderReturnController::class, 'refund']);
-        });
-
-        Route::prefix('stock-receipts')->group(function () {
-            Route::get('/', [StockReceiptController::class, 'index']);
-            Route::post('/', [StockReceiptController::class, 'store']);
-            Route::get('/{id}', [StockReceiptController::class, 'show']);
-            
-            // Chỉ Quản lý/Admin mới có quyền Duyệt (Xác nhận) hoặc Hủy phiếu nhập kho
-            Route::middleware('permission:admin.manage')->group(function () {
-                Route::post('/{id}/confirm', [StockReceiptController::class, 'confirm']);
-                Route::post('/{id}/cancel', [StockReceiptController::class, 'cancel']);
+            Route::middleware('permission:orders.view')->group(function () {
+                Route::get('/', [OrderController::class, 'index']);
+                Route::get('/{id}', [OrderController::class, 'show']);
+            });
+            Route::middleware('permission:orders.edit')->group(function () {
+                Route::post('/bulk-update', [OrderController::class, 'bulkUpdate']);
+                Route::post('/', [OrderController::class, 'store']);
+                Route::put('/{id}', [OrderController::class, 'update']);
+                Route::patch('/{id}/cancel', [OrderController::class, 'cancel']);
+                Route::patch('/{id}/refund', [OrderController::class, 'refund']);
+                Route::patch('/{id}/update-payment-method', [OrderController::class, 'updatePaymentMethod']);
             });
         });
 
-        Route::prefix('inventory')->group(function () {
-            Route::get('/', [InventoryController::class, 'index']);
-            Route::get('/report', [InventoryController::class, 'report']);
-            Route::get('/{variantId}/history', [InventoryController::class, 'history']);
-            Route::post('/adjust', [InventoryController::class, 'adjust']);
-            Route::post('/import', [InventoryController::class, 'import']);
+        Route::prefix('order-returns')->group(function () {
+            Route::middleware('permission:orders.view')->group(function () {
+                Route::get('/', [OrderReturnController::class, 'index']);
+                Route::get('/{id}', [OrderReturnController::class, 'show']);
+            });
+            Route::middleware('permission:orders.edit')->group(function () {
+                Route::post('/bulk-refund', [OrderReturnController::class, 'bulkRefund']);
+                Route::post('/', [OrderReturnController::class, 'store']);
+                Route::patch('/{id}/receive', [OrderReturnController::class, 'receive']);
+                Route::patch('/{id}/refund', [OrderReturnController::class, 'refund']);
+            });
+        });
+
+        Route::middleware('permission:inventory.manage')->group(function () {
+            Route::prefix('stock-receipts')->group(function () {
+                Route::get('/', [StockReceiptController::class, 'index']);
+                Route::post('/', [StockReceiptController::class, 'store']);
+                Route::get('/{id}', [StockReceiptController::class, 'show']);
+                
+                // Chỉ Quản lý/Admin mới có quyền Duyệt (Xác nhận) hoặc Hủy phiếu nhập kho
+                Route::middleware('permission:admin.manage')->group(function () {
+                    Route::post('/{id}/confirm', [StockReceiptController::class, 'confirm']);
+                    Route::post('/{id}/cancel', [StockReceiptController::class, 'cancel']);
+                });
+            });
+
+            Route::prefix('inventory')->group(function () {
+                Route::get('/', [InventoryController::class, 'index']);
+                Route::get('/report', [InventoryController::class, 'report']);
+                Route::get('/{variantId}/history', [InventoryController::class, 'history']);
+                Route::post('/adjust', [InventoryController::class, 'adjust']);
+                Route::post('/import', [InventoryController::class, 'import']);
+            });
         });
 
         Route::get('/dashboard/statistics', [DashboardController::class, 'statistics']);
 
         Route::prefix('payment-methods')->group(function () {
             Route::get('/', [PaymentMethodController::class, 'index']);
-            Route::post('/', [PaymentMethodController::class, 'store']);
             Route::get('/{id}', [PaymentMethodController::class, 'show']);
-            Route::put('/{id}', [PaymentMethodController::class, 'update']);
-            Route::delete('/{id}', [PaymentMethodController::class, 'destroy']);
+            Route::middleware('permission:admin.manage')->group(function () {
+                Route::post('/', [PaymentMethodController::class, 'store']);
+                Route::put('/{id}', [PaymentMethodController::class, 'update']);
+                Route::delete('/{id}', [PaymentMethodController::class, 'destroy']);
+            });
         });
 
         // Payment Processing
@@ -190,9 +212,11 @@ Route::group(['prefix' => 'v1'], function () {
         Route::prefix('shipping-methods')->group(function () {
             Route::get('/', [ShippingMethodController::class, 'index']);
             Route::get('/active', [ShippingMethodController::class, 'active']);
-            Route::post('/', [ShippingMethodController::class, 'store']);
-            Route::put('/{id}', [ShippingMethodController::class, 'update']);
-            Route::delete('/{id}', [ShippingMethodController::class, 'destroy']);
+            Route::middleware('permission:admin.manage')->group(function () {
+                Route::post('/', [ShippingMethodController::class, 'store']);
+                Route::put('/{id}', [ShippingMethodController::class, 'update']);
+                Route::delete('/{id}', [ShippingMethodController::class, 'destroy']);
+            });
         });
 
         // Tax Rates
@@ -200,13 +224,17 @@ Route::group(['prefix' => 'v1'], function () {
             Route::get('/statistics', [TaxRateController::class, 'statistics']);
             Route::get('/', [TaxRateController::class, 'index']);
             Route::get('/active', [TaxRateController::class, 'active']);
-            Route::post('/', [TaxRateController::class, 'store']);
-            Route::put('/{id}', [TaxRateController::class, 'update']);
-            Route::delete('/{id}', [TaxRateController::class, 'destroy']);
+            Route::middleware('permission:admin.manage')->group(function () {
+                Route::post('/', [TaxRateController::class, 'store']);
+                Route::put('/{id}', [TaxRateController::class, 'update']);
+                Route::delete('/{id}', [TaxRateController::class, 'destroy']);
+            });
         });
 
         // Promotions
-        Route::apiResource('promotions', PromotionController::class)->except(['index', 'show']);
+        Route::middleware('permission:admin.manage')->group(function () {
+            Route::apiResource('promotions', PromotionController::class)->except(['index', 'show']);
+        });
         Route::post('promotions/apply', [PromotionController::class, 'apply']);
         Route::post('promotions/eligible', [PromotionController::class, 'getEligiblePromotions']);
 
@@ -242,7 +270,7 @@ Route::group(['prefix' => 'v1'], function () {
         Route::get('/user/wallet-transactions', [UserController::class, 'walletTransactions']);
 
         Route::get('/user', function (Request $request) {
-            $user = $request->user()->load(['role.permissions', 'customerProfile']);
+            $user = $request->user()->load(['role.permissions', 'permissions', 'customerProfile']);
             return new UserResource($user);
         });
 
@@ -283,7 +311,7 @@ Route::group(['prefix' => 'v1'], function () {
             Route::post('/messages', [\App\Http\Controllers\api\v1\SupportChatController::class, 'sendCustomerMessage']);
 
             // Admin/Staff routes
-            Route::middleware('permission:admin.manage')->group(function () {
+            Route::middleware('permission:support.manage')->group(function () {
                 Route::get('/conversations', [\App\Http\Controllers\api\v1\SupportChatController::class, 'getAdminConversations']);
                 Route::get('/conversations/{customerId}/messages', [\App\Http\Controllers\api\v1\SupportChatController::class, 'getAdminMessages']);
                 Route::post('/conversations/{customerId}/messages', [\App\Http\Controllers\api\v1\SupportChatController::class, 'sendAdminReply']);

@@ -25,6 +25,7 @@ import AdminProfile from "./pages/Admin/AdminProfile";
 import ReviewManagement from "./pages/Admin/review/ReviewManagement";
 import SupportChat from "./pages/Admin/support/SupportChat";
 import MyReviews from "./pages/Customer/MyReviews";
+import PermissionMatrix from "./pages/Admin/permission/PermissionMatrix";
 
 // Auth & Route Guards
 import RoleGuard from "./middleware/RoleGuard";
@@ -276,8 +277,18 @@ const App = () => {
                     path="/admin/staff"
                     element={
                       <AuthGuard>
-                        <RoleGuard permission="admin.manage">
+                        <RoleGuard permission="staff.manage">
                           <StaffListPage />
+                        </RoleGuard>
+                      </AuthGuard>
+                    }
+                  />
+                  <Route
+                    path="/admin/permissions"
+                    element={
+                      <AuthGuard>
+                        <RoleGuard requireAdmin={true}>
+                          <PermissionMatrix />
                         </RoleGuard>
                       </AuthGuard>
                     }
@@ -500,7 +511,7 @@ const App = () => {
                     path="/admin/reviews"
                     element={
                       <AuthGuard>
-                        <RoleGuard permission="admin.manage">
+                        <RoleGuard permission="reviews.manage">
                           <ReviewManagement />
                         </RoleGuard>
                       </AuthGuard>
@@ -510,7 +521,7 @@ const App = () => {
                     path="/admin/support"
                     element={
                       <AuthGuard>
-                        <RoleGuard permission="admin.manage">
+                        <RoleGuard permission="support.manage">
                           <SupportChat />
                         </RoleGuard>
                       </AuthGuard>

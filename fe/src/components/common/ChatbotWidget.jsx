@@ -475,17 +475,19 @@ export default function ChatbotWidget() {
             >
               <Bot size={14} /> AI Trợ Lý
             </button>
-            <button
-              onClick={() => setChatMode("human")}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                chatMode === "human"
-                  ? "bg-white text-green-700 shadow-sm"
-                  : "text-white/80 hover:text-white hover:bg-white/5"
-              }`}
-            >
-              <Headphones size={14} /> Tư Vấn Viên
-              <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span>
-            </button>
+            {(user?.role?.id == 3 || user?.role_code == "customer") && (
+              <button
+                onClick={() => setChatMode("human")}
+                className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  chatMode === "human"
+                    ? "bg-white text-green-700 shadow-sm"
+                    : "text-white/80 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                <Headphones size={14} /> Tư Vấn Viên
+                <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span>
+              </button>
+            )}
           </div>
         </div>
 

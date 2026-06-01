@@ -15,6 +15,7 @@ class UserResource extends JsonResource
             'email'             => $this->email,
             'role_id'           => $this->role_id,
             'role'              => new RoleResource($this->whenLoaded('role')),
+            'permissions'       => PermissionResource::collection($this->whenLoaded('permissions')),
             'customer_profile'  => new CustomerProfileResource($this->whenLoaded('customerProfile')),
             'avatar'            => $this->avatar,
             'has_password'      => !is_null($this->password),

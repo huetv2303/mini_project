@@ -14,7 +14,8 @@ import {
   CreditCard,
   Gift,
   MessageSquare,
-  UserCheck
+  UserCheck,
+  Shield,
 } from "lucide-react";
 
 import { useAuth } from "../../../context/AuthContext";
@@ -71,7 +72,19 @@ const Sidebar = () => {
           label="Tổng quan"
         />
 
-        <SectionTitle title="Hệ thống" />
+        <SectionTitle
+          title="Hệ thống"
+          show={
+            hasPermission("orders.view") ||
+            hasPermission("categories.view") ||
+            hasPermission("suppliers.view") ||
+            hasPermission("products.view") ||
+            hasPermission("inventory.manage") ||
+            hasPermission("reviews.manage") ||
+            hasPermission("admin.manage") ||
+            isAdmin
+          }
+        />
         <div className="space-y-1">
           <SidebarItem
             to="/admin/orders"
@@ -119,15 +132,23 @@ const Sidebar = () => {
             to="/admin/support"
             icon={MessageSquare}
             label="Tư vấn Chat"
-            show={hasPermission("admin.manage")}
+            show={hasPermission("support.manage")}
           />
-          
-          <SectionTitle title="Mở rộng" show={isAdmin} />
+
+          <SectionTitle
+            title="Mở rộng"
+            show={
+              isAdmin ||
+              hasPermission("admin.manage") ||
+              hasPermission("users.view") ||
+              hasPermission("staff.manage")
+            }
+          />
           <SidebarItem
             to="/admin/promotions"
             icon={Gift}
             label="Khuyến mại"
-            show={isAdmin}
+            show={isAdmin || hasPermission("admin.manage")}
           />
           <SidebarItem
             to="/admin/customers"
@@ -139,27 +160,36 @@ const Sidebar = () => {
             to="/admin/staff"
             icon={UserCheck}
             label="Nhân viên"
+            show={hasPermission("staff.manage")}
+          />
+          <SidebarItem
+            to="/admin/permissions"
+            icon={Shield}
+            label="Phân quyền"
             show={isAdmin}
           />
 
-          <SectionTitle title="Cấu hình" show={isAdmin} />
+          <SectionTitle
+            title="Cấu hình"
+            show={isAdmin || hasPermission("admin.manage")}
+          />
           <SidebarItem
             to="/admin/shipping-methods"
             icon={Truck}
             label="Vận chuyển"
-            show={isAdmin}
+            show={isAdmin || hasPermission("admin.manage")}
           />
           <SidebarItem
             to="/admin/tax-rates"
             icon={Percent}
             label="Thuế"
-            show={isAdmin}
+            show={isAdmin || hasPermission("admin.manage")}
           />
           <SidebarItem
             to="/admin/payment-methods"
             icon={CreditCard}
             label="Thanh toán"
-            show={isAdmin}
+            show={isAdmin || hasPermission("admin.manage")}
           />
         </div>
       </nav>

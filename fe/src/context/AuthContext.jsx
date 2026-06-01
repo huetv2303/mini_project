@@ -70,13 +70,20 @@ export const AuthProvider = ({ children }) => {
   const hasPermission = (permissionCode) => {
     if (!user) return false;
 
-    // Handle potential data wrapping from Laravel resources
+    // 1. Admin tối cao luôn có toàn bộ quyền mặc định
     const roleData = user.role?.data || user.role;
-    const permissions = roleData?.permissions?.data || roleData?.permissions;
+    if (roleData?.code === "admin") return true;
 
-    if (!permissions || !Array.isArray(permissions)) return false;
+    // 2. Lấy quyền từ vai trò (Role Permissions)
+    const rolePermissions = roleData?.permissions?.data || roleData?.permissions || [];
 
-    return permissions.some((p) => p.code === permissionCode);
+    // 3. Lấy quyền được gán trực tiếp (Direct User Permissions)
+    const directPermissions = user.permissions?.data || user.permissions || [];
+
+    // 4. Hợp nhất cả hai danh sách quyền để kiểm tra
+    const allPermissions = [...rolePermissions, ...directPermissions];
+
+    return allPermissions.some((p) => p.code === permissionCode);
   };
 
   return (

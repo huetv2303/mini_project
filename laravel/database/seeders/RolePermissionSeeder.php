@@ -39,11 +39,17 @@ class RolePermissionSeeder extends Seeder
             ['name' => 'Xem người dùng', 'code' => 'users.view', 'group' => 'Người dùng'],
             ['name' => 'Quản lý người dùng', 'code' => 'users.manage', 'group' => 'Người dùng'],
             
+            // Nhân viên (Staff Management)
+            ['name' => 'Quản lý nhân viên', 'code' => 'staff.manage', 'group' => 'Nhân viên'],
+
             // Kho hàng
             ['name' => 'Quản lý kho', 'code' => 'inventory.manage', 'group' => 'Kho hàng'],
             
             // Đánh giá
             ['name' => 'Quản lý đánh giá', 'code' => 'reviews.manage', 'group' => 'Đánh giá'],
+
+            // Tư vấn
+            ['name' => 'Quản lý Tư vấn Chat', 'code' => 'support.manage', 'group' => 'Tư vấn'],
 
             // Quản trị
             ['name' => 'Truy cập trang quản trị', 'code' => 'dashboard.view', 'group' => 'Hệ thống'],
@@ -66,15 +72,7 @@ class RolePermissionSeeder extends Seeder
         $staffRole = Role::where('code', 'staff')->first();
         if ($staffRole) {
             $staffPermissions = Permission::whereIn('code', [
-                'products.view',     // Chỉ xem sản phẩm
-                'categories.view',   // Chỉ xem danh mục
-                'suppliers.view',    // Chỉ xem nhà cung cấp
-                'orders.view',       // Xem đơn hàng
-                'orders.edit',       // Tạo/Sửa đơn hàng & Trả hàng
-                'users.view',        // Xem khách hàng
-                'users.manage',      // Quản lý khách hàng
-                'inventory.manage',  // Quản lý kho hàng
-                'dashboard.view'     // Chỉ được vào dashboard, không được quản trị hệ thống
+                'dashboard.view'     // Chỉ được vào dashboard, không thấy các module khác cho đến khi được gán
             ])->get();
             $staffRole->permissions()->sync($staffPermissions);
         }
